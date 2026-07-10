@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Duke Workflow V2.4.2 — Hướng Dẫn Vận Hành Chuyên Sâu</title>
+  <title>Duke Workflow V2.4.5 — Hướng Dẫn Vận Hành Chuyên Sâu</title>
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1208,7 +1208,7 @@
     </nav>
 
     <div class="nav-footer">
-      <p>Release v2.4.2 (Gom nhóm & Dọn dẹp)</p>
+      <p>Release v2.4.5 (Cấu hình Lazy Loading và Quản lý Planning)</p>
       <p style="margin-top: 0.25rem;">Designed by Duke Skill System</p>
     </div>
   </aside>
@@ -1221,7 +1221,7 @@
       <div class="hero-glow-orb"></div>
       <div class="hero-text">
         <div class="hero-badge"><i data-lucide="zap" style="width: 12px; height: 12px;"></i> Premium Architecture</div>
-        <h1 class="hero-title"><span style="white-space: nowrap;">Kiến trúc Vận hành</span><br><span class="gradient-text">AI Developer V2.4.2</span></h1>
+        <h1 class="hero-title"><span style="white-space: nowrap;">Kiến trúc Vận hành</span><br><span class="gradient-text">AI Developer V2.4.5</span></h1>
         <p class="hero-desc">Quy trình tối ưu hóa Token, định tuyến thông minh và phòng thủ hồi quy dành cho Agent cao cấp.</p>
         <div class="button-bezel-outer">
           <a href="#setup" class="hero-btn">
@@ -1690,11 +1690,50 @@ Active_Memory_Anchors:
         <h2>Các thay đổi</h2>
       </div>
       <p class="intro-text">
-        Chi tiết các thay đổi và tối ưu hóa trong phiên bản WSR-Duke-All-2.4.2 so với 2.4.1.
+        Chi tiết các thay đổi và tối ưu hóa trong phiên bản WSR-Duke-All-2.4.5 so với 2.4.4.
       </p>
 
       <!-- SAFE HORIZONTAL LIST WITH INTERACTIVE SHINE EFFECTS -->
       <div class="changelog-list">
+        <!-- Row 00: WSR-Duke-All-2.4.5 (Cấu hình Lazy Loading và Quản lý Planning) -->
+        <div class="changelog-row-outer">
+          <div class="changelog-row-inner">
+            <div class="changelog-meta">
+              <div class="card-icon" style="color: var(--primary-teal); background-color: var(--primary-teal-glow);"><i data-lucide="zap"></i></div>
+              <div class="changelog-meta-text">
+                <h3>Cấu hình Lazy Loading và Quản lý Planning</h3>
+              </div>
+            </div>
+            <div class="changelog-details">
+              <ul>
+                <li>Chuyển sang nạp JIT quy trình và playbook tiết kiệm token</li>
+                <li>Đồng bộ cấu hình tự động qua sync_config.py</li>
+                <li>Lưu file planning không chứa hậu tố version</li>
+                <li>Cập nhật GEMINI.md làm rõ ranh giới file artifact của IDE</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+
+        <!-- Row 00: WSR-Duke-All-2.4.4 (Cập nhật luật duyệt pl) -->
+        <div class="changelog-row-outer">
+          <div class="changelog-row-inner">
+            <div class="changelog-meta">
+              <div class="card-icon" style="color: var(--primary-teal); background-color: var(--primary-teal-glow);"><i data-lucide="zap"></i></div>
+              <div class="changelog-meta-text">
+                <h3>Cập nhật luật duyệt pl</h3>
+              </div>
+            </div>
+            <div class="changelog-details">
+              <ul>
+                <li>Sửa đổi GEMINI.md để làm rõ ranh giới file artifact của IDE</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+
         <!-- Row 00: WSR-Duke-All-2.4.2 (Gom nhóm & Dọn dẹp Tài liệu) -->
         <div class="changelog-row-outer">
           <div class="changelog-row-inner">
@@ -1844,7 +1883,7 @@ Active_Memory_Anchors:
       </div>
 
       <div class="risk-block">
-        <h4><i data-lucide="alert-triangle"></i> Triển khai bản 2.4.2 toàn cục:</h4>
+        <h4><i data-lucide="alert-triangle"></i> Triển khai bản 2.4.5 toàn cục:</h4>
         <ul>
           <li>Phải xóa cấu hình hardcode DEC.</li>
           <li>Phải tạo file AGENTS.md đúng.</li>
@@ -2012,7 +2051,7 @@ Active_Memory_Anchors:
       en: {
         "Giới thiệu": "Introduction",
         "Kiến trúc Vận hành": "Operations Architecture",
-        "AI Developer V2.4.2": "AI Developer V2.4.2",
+        "AI Developer V2.4.5": "AI Developer V2.4.5",
         "Gom nhóm & Dọn dẹp Kế hoạch": "Planning Organization & Cleanup",
         "Cập nhật workflow /pl: Tự động gom nhóm lưu file kế hoạch vào thư mục DOCS/Planning/.": "Update /pl workflow: Automatically group and save planning files in DOCS/Planning/.",
         "Nâng cấp workflow /clean: Tự động quét và đề xuất dọn dẹp các tệp kế hoạch cũ (phiên bản thấp) trong cả DOCS/ và DOCS/Planning/.": "Upgrade /clean workflow: Automatically scan and propose cleanup of old (low-version) planning files in both DOCS/ and DOCS/Planning/.",
@@ -2090,7 +2129,7 @@ Active_Memory_Anchors:
         "TẦNG GLOBAL (CHIA SẺ)": "GLOBAL LAYER (SHARED)",
         "TẦNG LOCAL (DỰ ÁN CỤC BỘ)": "LOCAL LAYER (PROJECT SPECIFIC)",
         "Các thay đổi": "Changelog",
-        "Chi tiết các thay đổi và tối ưu hóa trong phiên bản WSR-Duke-All-2.4.2 so với 2.4.1.": "Detailed changes and optimizations in WSR-Duke-All-2.4.2 compared to 2.4.1.",
+        "Chi tiết các thay đổi và tối ưu hóa trong phiên bản WSR-Duke-All-2.4.5 so với 2.4.4.": "Detailed changes and optimizations in WSR-Duke-All-2.4.5 compared to 2.4.4.",
         "README.html nâng cấp": "Upgraded README.html",
         "Thiết lập chọn ngôn ngữ VI/EN.": "Setup VI/EN language selection.",
         "Tự động dịch DOM động.": "Automatic dynamic DOM translation.",
@@ -2122,7 +2161,7 @@ Active_Memory_Anchors:
         "Global Skills bổ sung": "Additional Global Skills",
         "Bọc block tag tất cả skills.": "Wrap all skills with block tags.",
         "Hỗ trợ Dynamic Skill Selection.": "Support Dynamic Skill Selection.",
-        "Triển khai bản 2.4.2 toàn cục:": "Global 2.4.2 Deployment Warnings:",
+        "Triển khai bản 2.4.5 toàn cục:": "Global 2.4.5 Deployment Warnings:",
         "Phải xóa cấu hình hardcode DEC.": "Must remove hardcoded DEC configurations.",
         "Phải tạo file AGENTS.md đúng.": "Must create correct AGENTS.md file.",
         "Lỗi bảng mã tiếng Việt.": "Watch for Vietnamese encoding errors.",

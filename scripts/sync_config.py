@@ -2,8 +2,9 @@ import os
 import shutil
 
 def sync_config():
-    # Thư mục nguồn cục bộ trong repo
-    local_global_dir = r"h:\My Drive\1. DEC-Good\.agents\global"
+    # Thư mục nguồn cục bộ trong repo tính tương đối từ vị trí file script
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    local_global_dir = os.path.abspath(os.path.join(current_dir, "..", "global"))
     
     # Thư mục đích global của Agent
     user_profile = os.environ.get("USERPROFILE") or os.path.expanduser("~")

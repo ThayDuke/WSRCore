@@ -3,6 +3,7 @@
 
 ---
 
+<!-- START_BLOCK: ARCHITECTURE -->
 ## CỐT LÕI KIẾN TRÚC
 *   **Ngôn ngữ lập trình:** Python 3.x, HTML5, JavaScript (ES6+).
 *   **Quy định thiết kế:** Code sạch, xử lý ngoại lệ toàn cục, không sử dụng thư viện ngoài nếu không có chỉ thị.
@@ -10,9 +11,11 @@
 *   **Quy định UTF-8 Tiếng Việt:** 
     - Không được dùng shell pipeline (như Get-Content/Set-Content) đọc/ghi file UTF-8 có tiếng Việt diacritics.
     - Mọi file tiếng Việt mới/sửa đổi phải viết có dấu chuẩn UTF-8. Sau khi ghi phải verify không lỗi `U+FFFD`, không mojibake dạng double-encoded UTF-8.
+<!-- END_BLOCK: ARCHITECTURE -->
 
 ---
 
+<!-- START_BLOCK: MINIMAL_CODING -->
 ## NGUYÊN TẮC CODE TỐI THIỂU (MINIMAL CODING PROTOCOL)
 *   **Quy tắc chung:** Sửa đúng gốc, ít dòng, ít file, ít rủi ro nhất.
     - *Cấm sửa ngọn:* Tuyệt đối cấm sửa ngọn (ví dụ sửa file build thay vì sửa file template). Sửa ngọn sẽ tính failed và bị rollback lập tức.
@@ -36,16 +39,20 @@
     - Sửa giao diện bằng hardcode tạm.
     - Viết lại toàn bộ file vì muốn đồng bộ style.
 *   **Nguyên lý cốt lõi:** "Code tốt nhất là code không cần viết. Code tốt thứ hai là code nhỏ, đúng chỗ, dễ xoá."
+<!-- END_BLOCK: MINIMAL_CODING -->
 
 ---
 
+<!-- START_BLOCK: AUDIO_SHELL -->
 ## XỬ LÝ ÂM THANH & TỰ ĐỘNG HÓA
 *   **Tách câu & Lọc TTS:** Logic phân tách câu âm thanh phải loại bỏ hoàn toàn tiền tố tên người nói (ví dụ: "A:", "B:", "Speaker:") trước khi nạp vào bộ xử lý TTS.
 *   **Conventional Commit:** Tự động tạo Conventional Commit Message (`type(scope): description`) khi sửa đổi xong.
 *   **Dọn dẹp Cleanup:** Hỗ trợ quét rác tự động trong `Temp/` và đề xuất dọn dẹp an toàn qua workflow `clean dec`.
+<!-- END_BLOCK: AUDIO_SHELL -->
 
 ---
 
+<!-- START_BLOCK: UI_DESIGN -->
 ## GIAO DIỆN WEB & GAME HOÁ (DEC)
 *   **Chỉ thị cốt lõi:**
     1.  `Shared core first`: Bắt đầu từ shared core trong `Tools/assets/shared/` hoặc template nguồn.
@@ -66,10 +73,13 @@
     - Typography: H1 `Be Vietnam Pro` zoom `0.7` margin-bottom `8px`. Main Label `font-weight: 800` margin-top `24px` margin-bottom `10px` size `1.05rem`.
     - *Banned:* Nghiêm cấm dùng font Sora hoặc font legacy khác. Cấm padding nhãn tiêu đề.
 *   **Miễn trừ đặc biệt cho Game (GL, GC, GB):** Miễn trừ hoàn toàn quy tắc DMU, cho phép thiết kế free style tối ưu trải nghiệm chơi game.
+<!-- END_BLOCK: UI_DESIGN -->
 
 ---
 
+<!-- START_BLOCK: LOCAL_SERVER -->
 ## CẤU HÌNH SERVER LOCAL
 *   **Cổng localhost:** Khởi chạy localhost luôn sử dụng cổng kết nối cố định `6868`.
 *   **Ẩn Console Windows:** Khi khởi động server, bắt buộc sử dụng `ctypes.windll.user32.ShowWindow` kết hợp `kernel32.GetConsoleWindow` và tham số `0` để ẩn console hoàn toàn.
 *   **Syntax verification:** Chạy `node --check <changed-js>` or `python -m py_compile <changed-python>` để xác minh cú pháp trước khi chạy server.
+<!-- END_BLOCK: LOCAL_SERVER -->

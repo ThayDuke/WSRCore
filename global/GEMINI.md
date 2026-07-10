@@ -27,13 +27,13 @@
 - **Cấm test tự động:** Tuyệt đối không tự ý chạy các công cụ test tự động (ví dụ: `npm test`, `pytest`, `vitest`...); cấm tự ý sử dụng Chrome, `browser_subagent`, `open_browser_url`, hoặc `chrome-devtools-plugin` để test giao diện tự động (chỉ test thủ công); cấm các test suite lớn gây lãng phí tài nguyên và thời gian. Chỉ kiểm tra cú pháp (linter/syntax check) nhanh trên file sửa đổi nếu cần.
 - **Cấm tự ý Commit & Git phức tạp:** Tuyệt đối cấm Agent tự động chạy lệnh `git commit` sau khi kết thúc task. Mọi thao tác commit phải do người dùng thực hiện thủ công, trừ khi người dùng chủ động gõ lệnh `/commit` hoặc yêu cầu "commit all changes" để Agent tự động thực hiện commit. Agent chỉ được sử dụng Conventional Commit Message siêu ngắn (dưới 10 từ, định dạng `type(scope): description`). Tuyệt đối không sử dụng các lệnh Git nâng cao (`git rebase`, `git merge`, `git push` hoặc tự xử lý xung đột nhánh). Cấm tự ý tạo file backup đuôi `.bak` thủ công.
 - **Cấm tự ý Backup:** Không tự ý chạy script backup (ví dụ: `backup_dec.py`) hoặc tự đưa tác vụ backup vào `task.md`. Việc sao lưu, khôi phục giao hoàn toàn cho Git. Chỉ thực hiện backup thủ công khi người dùng trực tiếp yêu cầu hoặc gõ lệnh.
-- **Cấm Artifact dài dòng:** Cấm tạo file `implementation_plan.md` vật lý (tuân thủ Cách 3). Mọi tài liệu thiết kế hoặc báo cáo kết quả (như `walkthrough.md`) chỉ được phép tóm tắt tối đa dưới 15-20 dòng.
+- **Cấm Artifact dài dòng:** Cấm tạo file `implementation_plan.md` vật lý dưới mọi hình thức (trong workspace hay tại thư mục brain của IDE). Mọi tài liệu thiết kế hoặc báo cáo kết quả (như `walkthrough.md`) chỉ được phép tóm tắt tối đa dưới 15-20 dòng.
 
 ## 3. Plan Approval Protocol (Quy trình duyệt Kế hoạch - Cách 3)
-- Đối với các tác vụ yêu cầu lập kế hoạch (Implementation Plan), **KHÔNG tạo/xuất file vật lý `implementation_plan.md`**.
-- Thay vào đó, giải thích và trình bày kế hoạch chi tiết trực tiếp trên giao diện chat hiện tại.
-- Dừng lại hoàn toàn, chờ User phản hồi hoặc phê duyệt thủ công bằng tin nhắn tiếp theo mới được phép thực thi.
-- **Vòng thảo luận `/pl` liên tiếp:** Nếu sau khi gọi `/pl`, prompt tiếp theo không có dấu hiệu phê duyệt thì coi như tiếp tục vòng thảo luận `/pl`. Agent sẽ tạo ra các phiên bản file kế hoạch mới `planning_[tên]_v2.md`, `v3.md`... cho đến khi nhận được phê duyệt cuối cùng mới được phép thực thi code.
+- Đối với các tác vụ yêu cầu lập kế hoạch (Implementation Plan), **CẤM TUYỆT ĐỐI tạo file `implementation_plan.md` (bao gồm cả trong workspace lẫn ngoài thư mục brain của IDE)** để tránh kích hoạt cơ chế tự động duyệt của hệ thống.
+- Kế hoạch bắt buộc chỉ được tạo tại `DOCS/Planning/planning_[tên_nhiệm_vụ].md` trong workspace (không chứa đuôi version ở tên file) và trình bày tóm tắt trực tiếp trên chat.
+- Dừng lại hoàn toàn, chờ User phê duyệt thủ công bằng tin nhắn trực tiếp trên chat mới được phép thực thi.
+- **Vòng thảo luận `/pl` liên tiếp:** Nếu sau khi gọi `/pl`, prompt tiếp theo không có dấu hiệu phê duyệt thì coi như tiếp tục vòng thảo luận `/pl`. Agent sẽ sửa đổi trực tiếp nội dung trên file kế hoạch hiện tại (sử dụng localized patch) và tăng chỉ số phiên bản trong YAML frontmatter (`version: "v[X]"`) cùng tiêu đề chính, tuyệt đối không tạo file mới hay đổi tên file bên ngoài.
 
 ## 4. Minimal Coding Protocol (Giao thức Code tối thiểu)
 - **Ưu tiên giải pháp nhỏ nhất:** Sửa đúng gốc, ít dòng, ít file, ít rủi ro nhất.

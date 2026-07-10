@@ -21,42 +21,6 @@ Before EVERY DEC task:
   - No-Tool Web build (`index.html`) -> Never fix directly. Fix the dashboard source and regenerate.
 - **Micro-fix Prevention:** Do NOT "visually patch" without identifying the root cause layer.
 - **Regression Guard:** Every fix must state "Must remain unchanged".
-- **Vietnamese UTF-8 Standard:** Documentation, rules, skills, UI copy, business logs, checklists, and reports created for DEC must be written in proper accented Vietnamese. After writing a Vietnamese file, verify it decodes as UTF-8, contains no replacement character `U+FFFD`, contains no suspicious ASCII question mark `U+003F` replacing Vietnamese diacritics, and introduces no mojibake patterns (e.g. double-encoded UTF-8 strings). Valid Vietnamese words with characters like 'ã', 'Ã', 'â', 'Â' (e.g. "đã", "Đã", "ĐÃ HOÀN THÀNH NHIỆM VỤ") are fully allowed and should not trigger false positives.
-- **Cấm tự động kiểm thử bằng Chrome (Anti-Waste & Browser Prohibition):** Tuyệt đối cấm sử dụng Chrome, `browser_subagent`, `open_browser_url`, hoặc `chrome-devtools-plugin` để tự động hóa hoặc chạy kiểm thử giao diện. Mọi xác nhận UI/logic phải do người dùng tự thực hiện thủ công qua 3 bước QA ngắn gọn.
-
-
-## 2.5. Minimal Coding Protocol (Giao thức Code tối thiểu - DEC)
-> [!WARNING]
-> **CẢNH BÁO:** Agent bắt buộc tuân thủ giao thức code tối thiểu để bảo vệ hệ thống trước khi triển khai bất kỳ thay đổi nào.
-> 
-> 1. **Mục tiêu tối giản:** Sửa đúng gốc, ít dòng, ít file, ít rủi ro nhất.
->    - *Cấm tuyệt đối sửa ngọn:* Cấm dùng "sửa tối thiểu" làm lý do sửa ngọn (ví dụ sửa file build thay vì sửa file template). Sửa ngọn sẽ bị tính FAILED và rollback lập tức.
->    - *Cơ chế dung hòa đồng bộ:* Khi sửa UI bắt buộc đồng bộ theme Youth/Elegant và file template nguồn, được tính là 1 tác vụ đơn nhất.
->    - *Cơ chế dung hòa patch:* Ưu tiên localized patch (chỉ thay đổi khối cần thiết), nhưng code chèn bên trong patch bắt buộc hoàn chỉnh (không dùng placeholder).
->    - *Cơ chế dung hòa Godmode:* Khi kích hoạt Godmode cho phép sửa nhiều file nhưng vẫn phải tối giản tối đa số dòng code thay đổi.
-> 2. **Xác định bắt buộc trước khi code (Chặn suy nghĩ từ đầu):**
->    - Mục tiêu thật của task.
->    - Failure Layer: UI, Logic, Export, Shell, Data, Config.
->    - File nguồn đúng cần sửa.
->    - Hành vi bắt buộc phải giữ nguyên (Regression Guard).
->    - Rủi ro hồi quy tiềm ẩn.
->    - Phương án ít thay đổi nhất.
-> 3. **Cấm tuyệt đối:**
->    - Refactor lan rộng khi chỉ yêu cầu sửa nhỏ.
->    - Tạo class, service, framework nội bộ khi chưa cần thiết.
->    - Tách file mới chỉ để code trông "sạch" hơn.
->    - Viết logic fallback phức tạp khi nguyên nhân gốc đã rõ ràng.
->    - Thêm dependency ngoài nếu có thể dùng code hiện có.
->    - Chạm shared component khi task không yêu cầu.
->    - Sửa giao diện bằng cách hardcode giá trị tạm.
->    - Rewrite toàn bộ file để đồng bộ style.
-> 4. **Trình bày phương án:** Phải ghi rõ: Sửa ở đâu, sửa gì, không đổi gì, vì sao tối thiểu.
-> 5. **Quy tắc thực thi:** Tuân thủ localized patch, không đổi format hàng loạt, không đổi tên biến/API, không tối ưu giả định.
-> 6. **Nguyên lý cốt lõi:** "Code tốt nhất là code không cần viết. Code tốt thứ hai là code nhỏ, đúng chỗ, dễ xoá."
-
-
-
-
 
 ## 3. DEC Master UI (DMU 2026) - TUYỆT ĐỐI KHÔNG HARDCODE
 > [!IMPORTANT]
@@ -132,9 +96,9 @@ Bắt buộc bảo toàn các hành vi logic ngầm định sau đây của hệ
   ```
 - **User Signal & Tiered Reload:**
   - Lệnh `/reload` (không phân biệt chữ hoa/thường):
-    - **Chế độ Tiêu chuẩn (Mặc định `/reload`):** Nạp `AG_GLOBAL_RULES.md`, `GEMINI.md`, `AGENTS.md`, `AG_DECISION_RULES.md`, `dec-debug-playbook.md`, `regression-checklists.md` và `project_checkpoint.yaml`. Không nạp kỹ năng hay bài học.
+    - **Chế độ Tiêu chuẩn (Mặc định `/reload`):** Nạp `AG_GLOBAL_RULES.md`, `GEMINI.md`, `AGENTS.md`, `br.md` và `project_checkpoint.yaml`. Không nạp kỹ năng, bài học, hay các file quy tắc/playbook/checklist cục bộ khác (chúng sẽ được nạp JIT theo giai đoạn).
     - **Chế độ Chỉ định Kỹ năng (`/reload <tên_kỹ_năng>`):** Nạp các quy tắc chế độ Tiêu chuẩn + duy nhất 1 file kỹ năng được chỉ định (operator, stitch, output, redesign, soft).
-    - **Chế độ Đầy đủ (`/reload full`):** Nạp toàn bộ quy tắc, tất cả 5 file kỹ năng, `AG_LESSONS.jsonl` và `ag-prompt-patterns.md`.
+    - **Chế độ Đầy đủ (`/reload full`):** Nạp toàn bộ quy tắc (`AG_DECISION_RULES.md`, `dec-debug-playbook.md`, `regression-checklists.md`), tất cả 5 file kỹ năng, `AG_LESSONS.jsonl` và `ag-prompt-patterns.md`.
   - Sau khi nạp, chỉ hiển thị xác nhận ngắn gọn "Đã đọc và ghi nhớ skill & rules" kèm danh sách file, không tóm tắt nội dung để tiết kiệm tối đa quota và context.
 
 ## 10. Resolving Rule Conflicts & Overlaps (Quy tắc xử lý giao thoa)
@@ -142,18 +106,7 @@ Bắt buộc bảo toàn các hành vi logic ngầm định sau đây của hệ
 > Khi xảy ra mâu thuẫn giữa luật hiển thị code của GEMINI.md và quy định Full-Output của output-skill.md:
 > 1. **Thảo luận & Lập kế hoạch:** Tuyệt đối không in các block code lên chat. Chỉ liệt kê file tác động và tính năng chính (tuân thủ GEMINI.md).
 > 2. **Ghi/Sửa file thực tế:** Viết code hoàn chỉnh, đầy đủ vào file, không sử dụng placeholder hoặc comment rút gọn (tuân thủ output-skill.md).
-> 3. **In code lên chat:** Chỉ thực hiện khi người dùng yêu cầu rõ ràng bằng từ khóa ("in code cho tôi xem").
-> 4. **Quy trình lập kế hoạch:** Không tạo file `implementation_plan.md` vật lý (Quy trình Cách 3). Trình bày trực tiếp trên chat và chờ duyệt. Khi đã duyệt, tạo/cập nhật file `task.md` vật lý để theo dõi tiến độ.
-> 5. **Mặc định xử lý prompt là /br:** Tất cả prompt đều mặc định brainstorm trừ khi có slash command khác hoặc nhận được tín hiệu phê duyệt ngắn gọn (<= 4 từ, ví dụ: `ok`, `làm đi`, `duyệt`, `ok duyệt`, `Ok làm đi`...).
-> 6. **Vòng thảo luận liên tiếp (v2, v3...):** Nếu nhiều prompt liên tiếp không phê duyệt hoặc không gọi slash command khác, xử lý như vòng thảo luận v2, v3... cho đến khi phê duyệt. Với `/pl`, tạo và tăng phiên bản file kế hoạch `planning_[tên]_v2.md`, `planning_[tên]_v3.md`...
-> 
-> [!NOTE]
-> **Quy chuẩn hiển thị Alerts cho /br và /pl:**
-> - `[HIỂU_YÊU_CẦU]` -> `> [!TIP]`
-> - `[PHƯƠNG_PHÁP]` -> `> [!NOTE]`
-> - `[ĐỀ_XUẤT_TỐI_ƯU]` -> Không dùng alert (dạng văn bản thường).
-> - `[CẢNH_BÁO]` -> `> [!WARNING]`
-> - `[NEO_HỒI_QUY]` -> Không dùng alert (dạng văn bản thường).
+> 3. **In code lên chat:** Chỉ thực hiện khi và chỉ khi người dùng yêu cầu rõ ràng bằng từ khóa ("in code cho tôi xem"). Mọi trường hợp khác tuân thủ nghiêm ngặt việc không in code lên chat.
 
 ## 11. Quy chuẩn Layer Địa hình (GB)
 - Cơ chế quản lý ảnh xếp chồng theo từng lớp (layer):

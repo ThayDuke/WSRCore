@@ -6,14 +6,20 @@ description: "Quy trình Planning: lập kế hoạch và xuất ra file tài li
 
 Khi người dùng nhập lệnh `/pl` hoặc yêu cầu bắt đầu bằng `/pl`, Agent bắt buộc phải thực hiện quy trình sau để xây dựng tài liệu thiết kế và gỡ lỗi chuyên sâu:
 
-## Bước 1: Risk Gate & Kiểm tra Ngữ cảnh
-- Kiểm tra load rules toàn cục và cục bộ.
-- Chấm rủi ro 5 yếu tố, xác định Risk Level.
+## Bước 1: Khởi tạo Ngữ cảnh & Risk Gate (On-demand Context Loading)
+- **Tự động nạp Quy tắc & Playbook cục bộ (JIT)**:
+  - Nếu tác vụ liên quan tới dự án DEC: Nạp `.agents/rules/AG_DECISION_RULES.md`.
+  - Nếu là gỡ lỗi (debug/fix bug): Nạp thêm `.agents/rules/dec-debug-playbook.md`.
+  - Nếu sửa đổi giao diện hoặc logic (UI, Logic, Export): Nạp thêm `.agents/rules/regression-checklists.md`.
+  - Để học hỏi kinh nghiệm cũ: Chỉ truy vấn bài học liên quan bằng cách chạy `grep_search` trên `.agents/memory/AG_LESSONS.jsonl` với tên file cần chạm hoặc từ khóa lỗi. Tuyệt đối không đọc toàn bộ file `AG_LESSONS.jsonl` qua `view_file`.
+  - Tải trạng thái checkpoint nếu cần khôi phục ngữ cảnh: `.agents/memory/project_checkpoint.yaml`.
+- Chấm rủi ro qua 5 yếu tố: file, layer, dùng chung, tiếng Việt, phê duyệt.
+- Xác định Risk Level: LOW, MEDIUM, HIGH.
 - Ước lượng % context window.
 - **Tư duy tối thiểu (Chặn từ đầu):** Xác định rõ Mục tiêu thật, Failure Layer (UI, Logic, Export, Shell, Data, Config), File nguồn đúng cần sửa (cấm sửa ngọn), Hành vi giữ nguyên, Rủi ro hồi quy và Phương án ít thay đổi nhất.
 
 ## Bước 2: Xây dựng File Tài Liệu Markdown Chuyên Sâu
-Tạo và ghi nội dung vào file tài liệu theo đường dẫn: `DOCS/Planning/planning_[tên_nhiệm_vụ]_v[X].md`. Nội dung file bắt buộc tuân thủ cấu trúc dữ liệu nghiêm ngặt sau:
+Tạo và ghi nội dung vào file tài liệu theo đường dẫn: `DOCS/Planning/planning_[tên_nhiệm_vụ].md`. Nội dung file bắt buộc tuân thủ cấu trúc dữ liệu nghiêm ngặt sau:
 
 1. **Metadata Header (Cấu trúc YAML Frontmatter):**
    ```yaml
@@ -54,7 +60,7 @@ Tạo và ghi nội dung vào file tài liệu theo đường dẫn: `DOCS/Plann
 ## Bước 4: Điểm dừng Bắt buộc (Mandatory Halt)
 - Dừng toàn bộ tiến trình. Không tự ý can thiệp vào mã nguồn của dự án.
 - **Tín hiệu phê duyệt ngắn gọn (<= 4 từ):** Câu đồng ý không phân biệt chữ hoa thường (ví dụ: `ok`, `làm đi`, `duyệt`, `ok duyệt`, `Ok làm đi`, `Được rồi làm đi`, `Duyệt phương án`, `Làm đi bạn`...). Khi nhận được tín hiệu này mới được phép tiến hành code thực tế.
-- **Vòng thảo luận và Tăng phiên bản kế hoạch:** Nếu prompt tiếp theo không có dấu hiệu phê duyệt hoặc slash command khác, Agent coi như tiếp tục vòng thảo luận `/pl` và bắt buộc tạo ra phiên bản file kế hoạch tiếp theo: `planning_[tên]_v2.md`, `planning_[tên]_v3.md`... cho đến khi nhận được phê duyệt cuối cùng.
+- **Vòng thảo luận và nâng cấp phiên bản kế hoạch:** Nếu prompt tiếp theo không có dấu hiệu phê duyệt hoặc slash command khác, Agent coi như tiếp tục vòng thảo luận `/pl`, thực hiện sửa đổi trực tiếp nội dung trên file kế hoạch cũ (dùng patch), tăng thuộc tính `version` trong YAML frontmatter và tiêu đề chính (ví dụ nâng lên `v2`, `v3`...), tuyệt đối không tạo file mới hay đổi tên file ngoài.
 - **Lưu ý khi thực thi**: Sau khi viết code, chạy wsr_audit.py (ưu tiên ENGINE/wsr_audit.py, fallback global) để chấm điểm và sinh QA.
 
 

@@ -6,11 +6,17 @@ description: Brainstorm trực tiếp tại chat (phân tích cách hiểu, phư
 
 Khi người dùng nhập lệnh `/br` hoặc yêu cầu bắt đầu bằng `/br`, Agent bắt buộc phải thực hiện quy trình sau để đảm bảo an toàn hệ thống và tối ưu hóa giải pháp:
 
-## Bước 1: Risk Gate & Kiểm tra Ngữ cảnh
+## Bước 1: Khởi tạo Ngữ cảnh & Risk Gate (On-demand Context Loading)
+- **Tự động nạp Quy tắc & Playbook cục bộ (JIT)**:
+  - Nếu tác vụ liên quan tới dự án DEC: Nạp `.agents/rules/AG_DECISION_RULES.md`.
+  - Nếu là gỡ lỗi (debug/fix bug): Nạp thêm `.agents/rules/dec-debug-playbook.md`.
+  - Nếu sửa đổi giao diện hoặc logic (UI, Logic, Export): Nạp thêm `.agents/rules/regression-checklists.md`.
+  - Để học hỏi kinh nghiệm cũ: Chỉ truy vấn bài học liên quan bằng cách chạy `grep_search` trên `.agents/memory/AG_LESSONS.jsonl` với tên file cần chạm hoặc từ khóa lỗi. Tuyệt đối không đọc toàn bộ file `AG_LESSONS.jsonl` qua `view_file`.
+  - Tải trạng thái checkpoint nếu cần khôi phục ngữ cảnh: `.agents/memory/project_checkpoint.yaml`.
 - Chấm rủi ro qua 5 yếu tố: file, layer, dùng chung, tiếng Việt, phê duyệt.
 - Xác định Risk Level: LOW, MEDIUM, HIGH.
-- Nếu HIGH: Khuyên dùng /pl ngay, dừng brainstorm sâu.
-- Chỉ nạp các block kỹ năng liên quan trong SKILL.md.
+- Nếu HIGH: Khuyên dùng `/pl` ngay, dừng brainstorm sâu.
+- Chỉ nạp các block kỹ năng liên quan trong `SKILL.md` (Router Kỹ năng).
 - Ước lượng % context window.
 - **Tư duy tối thiểu (Chặn từ đầu):** Xác định rõ Mục tiêu thật, Failure Layer (UI, Logic, Export, Shell, Data, Config), File nguồn đúng cần sửa (cấm sửa ngọn), Hành vi giữ nguyên, Rủi ro hồi quy và Phương án ít thay đổi nhất.
 
