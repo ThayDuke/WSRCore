@@ -1,0 +1,27 @@
+{
+  "name": "dec-dev-operator",
+  "version": "2.3.9",
+  "owner": "Codex",
+  "domain": "DEC",
+  "mode": "Optimized Architect (Consolidated / Quota-focused)",
+  "status": "active",
+  "last_updated": "2026-07-06",
+  "skill_md_role": "lightweight redirect",
+  "playbook_file": "dec-debug-playbook.md",
+  "decision_rules_file": ".agents/rules/AG_DECISION_RULES.md",
+  "lessons_file": ".agents/memory/AG_LESSONS.jsonl",
+  "canonical_root": ".agents",
+  "source_packages": [
+    "DOCS/WSR-Duke-All-2.3.9",
+    "DOCS/WSR-DEC"
+  ],
+  "legacy_root": ".codex",
+  "migration_status": "codex-canonical",
+  "lesson_query_mode": "filtered-by-tag-file-symptom-surface",
+  "promotion_rule": "promote lesson when repeated >= 3 times or when it reveals a high-value reusable pattern",
+  "versioning_rule": {
+    "patch": "small wording tweaks, minor lesson updates, low-impact rule clarifications",
+    "minor": "new rules, new workflow sections, promoted patterns, meaningful behavior expansion",
+    "major": "role change, architecture shift, lifecycle redesign, incompatible operating changes"
+  }
+}
