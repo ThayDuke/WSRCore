@@ -1,0 +1,17 @@
+{
+  "adapterId": "gemini",
+  "displayName": "Gemini Adapter",
+  "enabled": true,
+  "targetRootEnvironmentVariable": "GEMINI_HOME",
+  "requiresExplicitTargetRoot": false,
+  "skillLoadingMode": "block-jit",
+  "artifactMappings": {
+    "policy": "",
+    "rule": "global_rules/AG_GLOBAL_RULES.md",
+    "workflow": "global_workflows/",
+    "skill": "skills/",
+    "script": "scripts/"
+  },
+  "unsupportedFeatures": [],
+  "pathStyle": "windows"
+}

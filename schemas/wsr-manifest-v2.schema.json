@@ -1,0 +1,123 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "WSRManifestV2",
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "type": "integer",
+      "enum": [2]
+    },
+    "packageName": {
+      "type": "string"
+    },
+    "version": {
+      "type": "string"
+    },
+    "buildId": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["Review", "ReleaseCandidate", "Released"]
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "canonicalLayout": {
+      "type": "string",
+      "enum": [".agents"]
+    },
+    "compatibilityLayouts": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "minimumPython": {
+      "type": "string"
+    },
+    "policySource": {
+      "type": "string"
+    },
+    "checksumsFile": {
+      "type": "string"
+    },
+    "cleanWhitelist": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "packageExclusions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "commands": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "description": { "type": "string" },
+          "script": { "type": "string" },
+          "options": {
+            "type": "object",
+            "additionalProperties": { "type": "string" }
+          }
+        },
+        "required": ["description", "script"]
+      }
+    },
+    "adapters": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "artifacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "source": { "type": "string" },
+          "type": {
+            "type": "string",
+            "enum": ["policy", "rule", "workflow", "skill", "script", "document", "generated"]
+          },
+          "required": { "type": "boolean" },
+          "mutable": { "type": "boolean" },
+          "deploy": { "type": "boolean" },
+          "targets": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "owner": { "type": "string" },
+          "encoding": { "type": "string" }
+        },
+        "required": ["id", "source", "type", "required", "mutable", "deploy", "targets", "owner"]
+      }
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "packageName",
+    "version",
+    "buildId",
+    "status",
+    "createdAt",
+    "canonicalLayout",
+    "compatibilityLayouts",
+    "minimumPython",
+    "policySource",
+    "checksumsFile",
+    "cleanWhitelist",
+    "packageExclusions",
+    "commands",
+    "adapters",
+    "artifacts"
+  ],
+  "additionalProperties": false
+}

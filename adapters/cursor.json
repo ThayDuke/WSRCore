@@ -1,0 +1,11 @@
+{
+  "adapterId": "cursor",
+  "displayName": "Cursor Adapter",
+  "enabled": false,
+  "targetRootEnvironmentVariable": "CURSOR_HOME",
+  "requiresExplicitTargetRoot": true,
+  "skillLoadingMode": "full-file",
+  "artifactMappings": {},
+  "unsupportedFeatures": ["block-jit"],
+  "pathStyle": "windows"
+}

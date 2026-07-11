@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tài liệu Hướng dẫn WSR 2.4.6 Hardened</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        .container {
+            background: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        h1, h2, h3 {
+            color: #1e3d59;
+        }
+        h1 {
+            border-bottom: 2px solid #e9b824;
+            padding-bottom: 10px;
+        }
+        .warning-box {
+            background-color: #fff3cd;
+            border-left: 5px solid #ffc107;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        pre {
+            background: #272822;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #1e3d59;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Hướng dẫn Vận hành WSR 2.4.6 Hardened</h1>
+        
+        <div class="warning-box">
+            <strong>⚠️ CẢNH BÁO PHIÊN BẢN:</strong><br>
+            Tài liệu này thuộc <strong>Review Package WSR 2.4.6 nháp</strong>.
+            Cấu hình chưa được áp dụng trực tiếp lên hệ thống runtime global của Agent.
+        </div>
+
+        <h2>1. Thư mục cấu hình chuẩn (Canonical Folder)</h2>
+        <p>
+            Hệ thống WSR sử dụng thư mục <code>.agents/</code> làm đường dẫn cấu hình và lưu trữ runtime chính thức.
+            Đường dẫn <code>.codex/</code> chỉ được duy trì làm bí danh (compatibility alias) phục vụ tương thích ngược.
+        </p>
+
+        <h2>2. Quy trình lập kế hoạch `/pl` (Planning Mode)</h2>
+        <p>
+            Khi thiết kế kế hoạch, Agent tạo và ghi nhận tại:
+            <code>DOCS/Planning/planning_[tên_nhiệm_vụ].md</code>.
+        </p>
+        <p>
+            Kế hoạch chỉ chứa <strong>mã giả (pseudocode), scope tác động, memory anchors, và checklist</strong>.
+            Tuyệt đối không chứa mã nguồn đầy đủ để tối ưu hóa context window.
+        </p>
+
+        <h2>3. Chế độ quét `/audit`</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Chế độ</th>
+                    <th>Ý nghĩa</th>
+                    <th>Lệnh thực thi nháp</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>quick</code></td>
+                    <td>Quét nhanh các file thay đổi (Git changed)</td>
+                    <td><code>python scripts/wsr_audit.py --changed</code></td>
+                </tr>
+                <tr>
+                    <td><code>deep</code></td>
+                    <td>Quét sâu toàn bộ package review</td>
+                    <td><code>python scripts/wsr_audit.py --mode deep</code></td>
+                </tr>
+                <tr>
+                    <td><code>debt</code></td>
+                    <td>Quét nợ kỹ thuật (TODO/FIXME/wsr-debt)</td>
+                    <td><code>python scripts/wsr_debt_scanner.py --check</code></td>
+                </tr>
+                <tr>
+                    <td><code>drift</code></td>
+                    <td>So sánh drift cấu hình giữa nháp và global</td>
+                    <td><code>python scripts/sync_config.py</code> (Không có --apply)</td>
+                </tr>
+                <tr>
+                    <td><code>doctor</code></td>
+                    <td>Kiểm tra tính nhất quán toàn diện hệ thống</td>
+                    <td>Chạy quét manifest và tệp tin bắt buộc</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>4. Script Inventory (Danh mục script)</h2>
+        <ul>
+            <li><code>scripts/wsr_debt_scanner.py</code>: Bộ quét nợ kỹ thuật chống false positive.</li>
+            <li><code>scripts/wsr_audit.py</code>: Bộ kiểm thử tĩnh lỗi mã hóa (mojibake) và cú pháp.</li>
+            <li><code>scripts/wsr_clean.py</code>: Dọn dẹp an toàn dựa trên whitelist.</li>
+            <li><code>scripts/pack_wsr.py</code>: Đóng gói package review thành zip.</li>
+            <li><code>scripts/sync_config.py</code>: Đồng bộ nháp lên global khi có <code>--apply</code>.</li>
+        </ul>
+
+        <h2>5. Nạp Skill JIT (Dynamic Skill Loading)</h2>
+        <p>
+            Hệ thống hỗ trợ nạp cấu hình lazy-load.
+            Nếu skill file chứa các khối phân tách dạng <code>&lt;!-- START_BLOCK: [TÊN] --&gt;</code>,
+            Agent chỉ thực hiện nạp block liên quan trực tiếp đến tác vụ hiện tại để tiết kiệm tối đa token.
+        </p>
+    </div>
+</body>
+</html>

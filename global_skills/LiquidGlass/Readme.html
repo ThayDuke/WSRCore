@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SuperSearch - Tài Liệu Kỹ Thuật & Hướng Dẫn Sử Dụng</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        /* CSS variables & Liquid Glass Design System (lqdl & lqcr) */
+        :root {
+            --font-sans: 'Be Vietnam Pro', sans-serif;
+            --body-bg: radial-gradient(circle at 10% 20%, #e0e7ff 0%, #f5f3ff 50%, #c7d2fe 100%);
+            
+            --lg-bg: rgba(255, 255, 255, 0.4);
+            --lg-bg-prominent: rgba(255, 255, 255, 0.7);
+            --lg-border: rgba(255, 255, 255, 0.45);
+            --lg-border-prominent: rgba(255, 255, 255, 0.65);
+            --lg-blur: 20px;
+            --lg-shadow: 0 12px 40px rgba(31, 38, 135, 0.05),
+                         inset 0 1px 1px rgba(255, 255, 255, 0.4);
+            --lg-text: #0f172a;
+            --lg-text-secondary: #475569;
+            --lg-accent: #2563eb;
+            --lg-accent-light: rgba(37, 99, 235, 0.1);
+            --lg-accent-gradient: linear-gradient(135deg, #2563eb, #8b5cf6);
+            --transition-speed: 0.35s;
+            --scrollbar-thumb: rgba(0, 0, 0, 0.1);
+        }
+
+        [data-theme="dark"] {
+            --body-bg: radial-gradient(circle at 10% 20%, #1e1b4b 0%, #0f172a 50%, #020617 100%);
+            
+            --lg-bg: rgba(15, 23, 42, 0.45);
+            --lg-bg-prominent: rgba(30, 41, 59, 0.65);
+            --lg-border: rgba(255, 255, 255, 0.08);
+            --lg-border-prominent: rgba(255, 255, 255, 0.16);
+            --lg-blur: 24px;
+            --lg-shadow: 0 16px 48px rgba(15, 23, 42, 0.55),
+                         inset 0 1px 0px rgba(255, 255, 255, 0.08);
+            --lg-text: #f3f4f6;
+            --lg-text-secondary: #94a3b8;
+            --lg-accent: #60a5fa;
+            --lg-accent-light: rgba(96, 165, 250, 0.15);
+            --lg-accent-gradient: linear-gradient(135deg, #60a5fa, #a78bfa);
+            --scrollbar-thumb: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background: var(--body-bg);
+            color: var(--lg-text);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 40px 20px;
+            transition: background var(--transition-speed) ease, color var(--transition-speed) ease;
+            overflow-y: scroll;
+            position: relative;
+        }
+
+        /* Canvas Background cho hiệu ứng sao rơi */
+        #starsCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -2;
+            pointer-events: none;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 980px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Liquid Glass Header */
+        header {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-bottom: 24px;
+            padding: 28px;
+            background: var(--lg-bg);
+            backdrop-filter: blur(var(--lg-blur));
+            -webkit-backdrop-filter: blur(var(--lg-blur));
+            border: 1px solid var(--lg-border);
+            border-radius: 24px;
+            box-shadow: var(--lg-shadow);
+            transition: background var(--transition-speed) ease, border-color var(--transition-speed) ease;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        /* Logo bo viền và đổ bóng */
+        .brand-logo {
+            width: 46px;
+            height: 46px;
+            border-radius: 12px;
+            object-fit: contain;
+            box-shadow: 0 6px 18px rgba(37, 99, 235, 0.3);
+            border: 1.5px solid var(--lg-border-prominent);
+            background: var(--lg-bg-prominent);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .brand-logo:hover {
+            transform: scale(1.1) rotate(6deg);
+        }
+
+        .brand-title {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .brand-name {
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: var(--lg-accent-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .brand-subtitle {
+            font-size: 13px;
+            color: var(--lg-text-secondary);
+            font-weight: 400;
+            margin-top: 2px;
+        }
+
+        /* Navigation Tabs */
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            border-bottom: 1px solid var(--lg-border);
+            padding-bottom: 12px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        .nav-tabs::-webkit-scrollbar {
+            display: none;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: 1px solid transparent;
+            color: var(--lg-text-secondary);
+            padding: 10px 22px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14.5px;
+            font-family: var(--font-sans);
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            white-space: nowrap;
+        }
+
+        .tab-btn:hover {
+            color: var(--lg-text);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        [data-theme="light"] .tab-btn:hover {
+            background: rgba(0, 0, 0, 0.03);
+        }
+
+        .tab-btn.active {
+            color: var(--lg-text);
+            background: var(--lg-bg-prominent);
+            border-color: var(--lg-border-prominent);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+        }
+
+        /* Theme toggle button */
+        .theme-toggle {
+            background: var(--lg-bg);
+            border: 1px solid var(--lg-border);
+            color: var(--lg-text);
+            cursor: pointer;
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            box-shadow: var(--lg-shadow);
+            transition: all 0.25s ease;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.05);
+            background: var(--lg-bg-prominent);
+            border-color: var(--lg-border-prominent);
+        }
+
+        .theme-toggle svg {
+            width: 20px;
+            height: 20px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2.2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        [data-theme="dark"] .sun-icon {
+            display: block;
+        }
+        [data-theme="dark"] .moon-icon {
+            display: none;
+        }
+        [data-theme="light"] .sun-icon {
+            display: none;
+        }
+        [data-theme="light"] .moon-icon {
+            display: block;
+        }
+
+        /* Main Glass Card */
+        .main-card {
+            background: var(--lg-bg);
+            backdrop-filter: blur(var(--lg-blur));
+            -webkit-backdrop-filter: blur(var(--lg-blur));
+            border: 1px solid var(--lg-border);
+            box-shadow: var(--lg-shadow);
+            border-radius: 28px;
+            padding: 40px;
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+            transition: background var(--transition-speed) ease, border-color var(--transition-speed) ease;
+        }
+
+        /* Mouse Glow Effect (lqia) */
+        .liquid-glass-glow::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(
+                450px circle at var(--mouse-x, 0px) var(--mouse-y, 0px),
+                rgba(255, 255, 255, 0.08),
+                transparent 80%
+            );
+            z-index: 1;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+            opacity: 0;
+        }
+        
+        .liquid-glass-glow:hover::before {
+            opacity: 1;
+        }
+
+        /* Tab Content Control */
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            position: relative;
+            z-index: 2;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Typography */
+        h1.section-title {
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 12px;
+            letter-spacing: -0.8px;
+            line-height: 1.25;
+            background: var(--lg-accent-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p.section-desc {
+            font-size: 16px;
+            color: var(--lg-text-secondary);
+            line-height: 1.6;
+            margin-bottom: 32px;
+            font-weight: 400;
+        }
+
+        h2.block-title {
+            font-size: 19px;
+            font-weight: 700;
+            margin-top: 36px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-left: 4px solid var(--lg-accent);
+            padding-left: 14px;
+        }
+
+        /* Tech Badges */
+        .tech-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .tech-badge {
+            background: var(--lg-accent-light);
+            border: 1px solid var(--lg-border);
+            color: var(--lg-text);
+            padding: 6px 16px;
+            border-radius: 9999px;
+            font-size: 13px;
+            font-weight: 600;
+            backdrop-filter: blur(4px);
+        }
+
+        /* Grid System */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        @media (max-width: 768px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+            .main-card {
+                padding: 24px;
+            }
+        }
+
+        /* Glass Cards */
+        .info-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 24px;
+            position: relative;
+            z-index: 2;
+            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        [data-theme="light"] .info-card {
+            background: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .info-card:hover {
+            transform: translateY(-3px);
+            background: var(--lg-bg-prominent);
+            border-color: var(--lg-border-prominent);
+            box-shadow: var(--lg-shadow);
+        }
+
+        .card-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: var(--lg-accent-light);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--lg-accent);
+            font-size: 22px;
+            margin-bottom: 16px;
+        }
+
+        .card-title {
+            font-size: 17px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .card-desc {
+            font-size: 14px;
+            color: var(--lg-text-secondary);
+            line-height: 1.6;
+            font-weight: 400;
+        }
+
+        /* Glass Tables */
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            border-radius: 16px;
+            border: 1px solid var(--lg-border);
+            margin-top: 16px;
+            margin-bottom: 24px;
+            backdrop-filter: blur(4px);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        th {
+            background: var(--lg-bg-prominent);
+            font-weight: 700;
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--lg-border);
+            color: var(--lg-text);
+        }
+
+        td {
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--lg-border);
+            color: var(--lg-text-secondary);
+            font-weight: 400;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            color: var(--lg-text);
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        [data-theme="light"] tr:hover td {
+            background: rgba(0, 0, 0, 0.01);
+        }
+
+        .table-tag {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            background: var(--lg-accent-light);
+            color: var(--lg-text);
+        }
+
+        /* Bullet lists */
+        .bullet-list {
+            margin-left: 20px;
+            margin-bottom: 24px;
+            line-height: 1.7;
+            font-size: 14.5px;
+            color: var(--lg-text-secondary);
+        }
+
+        .bullet-list li {
+            margin-bottom: 8px;
+        }
+
+        .bullet-list strong {
+            color: var(--lg-text);
+        }
+
+        /* Keyboard tags */
+        .kbd {
+            background: var(--lg-bg-prominent);
+            border: 1px solid var(--lg-border-prominent);
+            border-radius: 6px;
+            padding: 3px 8px;
+            font-family: monospace;
+            font-size: 12.5px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            color: var(--lg-text);
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 24px;
+            font-size: 13px;
+            color: var(--lg-text-secondary);
+        }
+    </style>
+</head>
+<body>
+    <!-- Canvas cho hiệu ứng sao rơi -->
+    <canvas id="starsCanvas"></canvas>
+
+    <div class="container">
+        <!-- Main Header -->
+        <header>
+            <div class="header-top">
+                <div class="brand">
+                    <img src="../../MDBANK/src/LogoSS256.ico" class="brand-logo" alt="SuperSearch Logo">
+                    <div class="brand-title">
+                        <span class="brand-name">SuperSearch Documentation</span>
+                        <span class="brand-subtitle">Bộ tài liệu kỹ thuật & Hướng dẫn vận hành</span>
+                    </div>
+                </div>
+                <button class="theme-toggle" id="themeToggleBtn" aria-label="Toggle theme">
+                    <!-- Moon icon -->
+                    <svg class="moon-icon" viewBox="0 0 24 24">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <!-- Sun icon -->
+                    <svg class="sun-icon" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+            <!-- Tabs Navigation -->
+            <nav class="nav-tabs">
+                <button class="tab-btn active" data-tab="tab-overview">Tổng Quan & Tính Năng</button>
+                <button class="tab-btn" data-tab="tab-architecture">Kiến Trúc Kỹ Thuật</button>
+                <button class="tab-btn" data-tab="tab-usage">Hướng Dẫn Vận Hành</button>
+            </nav>
+        </header>
+
+        <!-- Main Glass Panel -->
+        <main class="main-card liquid-glass-glow">
+            
+            <!-- TAB 1: OVERVIEW & FEATURES -->
+            <div id="tab-overview" class="tab-content active">
+                <h1 class="section-title">Tìm Kiếm Tri Thức Nội Bộ Tức Thì</h1>
+                <p class="section-desc">SuperSearch là ứng dụng desktop tối ưu hóa cho việc tìm kiếm, phân tích và trích xuất nội dung từ kho tệp tin quy trình và tài liệu nghiệp vụ nội bộ của CICT.</p>
+                
+                <div class="tech-badges">
+                    <span class="tech-badge">Local Processing</span>
+                    <span class="tech-badge">Zero Server Cost</span>
+                    <span class="tech-badge">OCR Integrated</span>
+                    <span class="tech-badge">Offline Indexing</span>
+                </div>
+
+                <h2 class="block-title">Giá Trị Cốt Lõi</h2>
+                <div class="grid-2">
+                    <div class="info-card">
+                        <div class="card-icon">⚡</div>
+                        <h3 class="card-title">Tốc Độ Phản Hồi Chớp Nhoáng</h3>
+                        <p class="card-desc">Giao diện người dùng và cơ sở dữ liệu tích hợp giúp trả về kết quả tìm kiếm ngay lập tức sau mỗi phím gõ (Instant Search-as-you-type) mà không tốn tài nguyên mạng.</p>
+                    </div>
+                    <div class="info-card">
+                        <div class="card-icon">🛡️</div>
+                        <h3 class="card-title">Bảo Mật Dữ Liệu Tuyệt Đối</h3>
+                        <p class="card-desc">Mọi quá trình quét tệp, chuyển đổi Markdown và nhận diện chữ quang học (OCR) đều diễn ra hoàn toàn cục bộ trên máy tính của bạn, cam kết không truyền gửi dữ liệu ra ngoài.</p>
+                    </div>
+                    <div class="info-card">
+                        <div class="card-icon">📂</div>
+                        <h3 class="card-title">Xem Trước Nội Dung (Quick Preview)</h3>
+                        <p class="card-desc">Hỗ trợ đọc nhanh nội dung của tệp tin Markdown hoặc PDF trực tiếp ngay trong ứng dụng với khả năng làm nổi bật (highlight) từ khóa truy vấn thông minh.</p>
+                    </div>
+                    <div class="info-card">
+                        <div class="card-icon">🏷️</div>
+                        <h3 class="card-title">Hệ Thống Lọc Đa Chiều</h3>
+                        <p class="card-desc">Tự động phân loại tài liệu theo phòng ban (IT, HSSE, Kế toán, Nhân sự...) và phân chia thuộc tính tài liệu (Quy trình, Quy chế, Quyết định, Hợp đồng...).</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: ARCHITECTURE & ALGORITHMS -->
+            <div id="tab-architecture" class="tab-content">
+                <h1 class="section-title">Kiến Trúc Kỹ Thuật Tiên Tiến</h1>
+                <p class="section-desc">SuperSearch hoạt động theo mô hình Serverless Offline Desktop App kết hợp sức mạnh xử lý ngôn ngữ cục bộ của Python và hiệu năng hiển thị tối ưu của thư viện WebEngine.</p>
+
+                <h2 class="block-title">1. Pipeline Chuyển Đổi Tài Liệu (Microsoft MarkItDown)</h2>
+                <p class="section-desc" style="margin-bottom: 16px;">Ứng dụng tích hợp các bộ chuyển đổi tùy chỉnh kế thừa từ <code>DocumentConverter</code> nhằm chuẩn hóa mọi định dạng tệp về Markdown trước khi lập chỉ mục:</p>
+                <ul class="bullet-list">
+                    <li><strong>LocalOcrPdfConverter:</strong> Trích xuất văn bản gốc bằng <code>pdfplumber</code>. Nếu phát hiện tệp PDF là dạng quét (chứa ít hơn 100 ký tự), hệ thống tự động gọi engine <code>Tesseract-OCR</code> cục bộ được đóng gói sẵn để quét và nhận diện chữ Việt/Anh (vie+eng).</li>
+                    <li><strong>LocalOcrImageConverter:</strong> Tự động nhận diện chữ quang học trên các tệp ảnh (PNG, JPG, JPEG) bằng công nghệ OCR đa luồng.</li>
+                    <li><strong>LocalDocConverter (Heuristic Anti-CJK):</strong> Đọc tệp Word cũ (<code>.doc</code>) bằng <code>olefile</code>, giải mã UTF-16LE, khôi phục các ký tự ANSI lỗi và lọc bỏ hoàn toàn các ký tự nhiễu tiếng Trung CJK để trích xuất văn bản tiếng Việt/Anh chính xác.</li>
+                    <li><strong>LocalXlsConverter:</strong> Đọc bảng dữ liệu Excel cũ (<code>.xls</code>) bằng <code>xlrd</code> và chuyển đổi cấu trúc thành các bảng Markdown tiêu chuẩn.</li>
+                </ul>
+
+                <h2 class="block-title">2. Quản Lý Tài Nguyên Thông Minh (RAM-Aware Multi-threading)</h2>
+                <p class="section-desc" style="margin-bottom: 16px;">Nhằm tránh gây treo hoặc đơ hệ thống trong quá trình đánh chỉ mục dữ liệu lớn, SuperSearch áp dụng cơ chế tự động giới hạn luồng động:</p>
+                <ul class="bullet-list">
+                    <li><strong>Giám Sát RAM API:</strong> Sử dụng Windows Kernel API (<code>GlobalMemoryStatusEx</code>) qua thư viện <code>ctypes</code> để liên tục đo đạc tải lượng RAM hệ thống.</li>
+                    <li><strong>Tự Điều Chỉnh Worker:</strong> Nếu RAM của máy tính vượt quá 70% tải, luồng xử lý tự động hạ về chế độ đơn luồng (1 worker). Ngược lại, khi máy tính rảnh rỗi, hệ thống sẽ sử dụng tối đa 70% tổng số nhân CPU (ThreadPoolExecutor) để tăng tốc xử lý song song.</li>
+                    <li><strong>Điều Khiển Luồng:</strong> Hỗ trợ các cơ chế kiểm soát tiến trình thời gian thực bao gồm Tạm dừng (Pause), Tiếp tục (Resume) và Hủy (Abort).</li>
+                </ul>
+
+                <h2 class="block-title">3. Cơ Sở Dữ Liệu Serverless Offline (JavaScript Indexed File)</h2>
+                <p class="section-desc" style="margin-bottom: 16px;">Thay vì cài đặt các cơ sở dữ liệu cồng kềnh (như Elasticsearch, SQLite), SuperSearch lưu trữ chỉ mục dưới dạng tệp JavaScript tĩnh:</p>
+                <ul class="bullet-list">
+                    <li><strong>Phân vùng chỉ mục:</strong> Mã băm MD5 của đường dẫn thư mục quét được sử dụng để đặt tên tệp chỉ mục riêng biệt <code>search_db_[md5_hash].js</code>, tránh ghi đè chỉ mục giữa các thư mục khác nhau.</li>
+                    <li><strong>Tải tức thì (0ms Latency):</strong> Giao diện Webview có thể nạp trực tiếp chỉ mục này qua thẻ script, cho phép tìm kiếm offline toàn văn (Full-text search) siêu tốc không cần thông qua mạng hay database engine trung gian.</li>
+                </ul>
+
+                <h2 class="block-title">4. Bộ Phân Loại Tài Liệu Tự Động (AI-Heuristics Classifier)</h2>
+                <p class="section-desc" style="margin-bottom: 16px;">Hệ thống áp dụng thuật toán phân tích nội dung để tự động gắn thẻ metadata và làm sạch tài liệu:</p>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Tiêu chí Phân Loại</th>
+                                <th>Phương pháp Kỹ Thuật</th>
+                                <th>Ví Dụ Thẻ Metadata</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="table-tag">Lọc File Rác / Nháp</span></td>
+                                <td>Đo lường mật độ các ký tự placeholder (<code>_</code>, <code>.</code>, <code>[ ]</code>) để phát hiện và gán nhãn <strong>Empty Form Template</strong>. Tính toán điểm chất lượng OCR từ 0.0 đến 1.0 để phát hiện nhiễu quét.</td>
+                                <td>Empty Form Template, Real Content, Error Reading.</td>
+                            </tr>
+                            <tr>
+                                <td><span class="table-tag">Lĩnh vực nghiệp vụ</span></td>
+                                <td>Phân tích cấu trúc thư mục chứa và tần suất từ khóa nghiệp vụ đặc thù trong tệp.</td>
+                                <td>IT, HSSE, KPI & OKR, Dredging, HR & Admin, Operation, Finance, Marketing.</td>
+                            </tr>
+                            <tr>
+                                <td><span class="table-tag">Loại tài liệu</span></td>
+                                <td>Nhận diện mẫu từ khóa tiêu đề (Quy chế, Nghị quyết, Hợp đồng, Quy trình...).</td>
+                                <td>Quy chế / Chính sách, Quy trình / Hướng dẫn, Quyết định / Biên bản.</td>
+                            </tr>
+                            <tr>
+                                <td><span class="table-tag">Ngôn ngữ & Năm</span></td>
+                                <td>Nhận diện phân phối nguyên âm có dấu Việt Nam và từ nối tiếng Anh. Dùng Regex trích xuất mốc năm từ 2010 đến 2029.</td>
+                                <td>Tiếng Việt (VN), Tiếng Anh (EN), Song ngữ | Năm 2024, 2026...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TAB 3: USAGE & SHORTCUTS -->
+            <div id="tab-usage" class="tab-content">
+                <h1 class="section-title">Hướng Dẫn Vận Hành</h1>
+                <p class="section-desc">Hướng dẫn các thao tác quản trị và hệ thống phím tắt nhanh giúp tối ưu hiệu quả sử dụng ứng dụng SuperSearch.</p>
+
+                <h2 class="block-title">Quy Trình Quét Chỉ Mục Mới</h2>
+                <ul class="bullet-list">
+                    <li><strong>Bước 1: Khởi động:</strong> Nhấp đúp vào tệp <code>SuperSearch.exe</code> để chạy ứng dụng.</li>
+                    <li><strong>Bước 2: Chọn thư mục:</strong> Nhấp vào biểu tượng thư mục ở góc trên giao diện, chọn thư mục chứa tài liệu cần quét.</li>
+                    <li><strong>Bước 3: Thực hiện quét:</strong> Hệ thống tự động chuyển đổi các file tài liệu và tạo tệp chỉ mục. Quá trình quét được cập nhật tiến độ thời gian thực trên giao diện.</li>
+                </ul>
+
+                <h2 class="block-title">⌨️ Phím Tắt Hệ Thống</h2>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Thao Tác</th>
+                                <th>Phím Tắt</th>
+                                <th>Chức Năng</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Tìm kiếm nhanh</td>
+                                <td><span class="kbd">Enter</span> hoặc click icon tìm kiếm</td>
+                                <td>Kích hoạt quá trình truy vấn trên cơ sở dữ liệu chỉ mục.</td>
+                            </tr>
+                            <tr>
+                                <td>Di chuyển dòng kết quả</td>
+                                <td><span class="kbd">↑</span> / <span class="kbd">↓</span></td>
+                                <td>Lên xuống nhanh giữa các tài liệu tìm thấy trên danh sách.</td>
+                            </tr>
+                            <tr>
+                                <td>Xem nhanh nội dung tệp</td>
+                                <td><span class="kbd">Space</span> (Dấu cách)</td>
+                                <td>Bật hoặc tắt khung Quick Preview xem nội dung đã chuyển đổi.</td>
+                            </tr>
+                            <tr>
+                                <td>Mở tệp gốc</td>
+                                <td><span class="kbd">Double Click</span> trên dòng kết quả</td>
+                                <td>Mở trực tiếp tệp tin bằng ứng dụng mặc định của hệ thống Windows.</td>
+                            </tr>
+                            <tr>
+                                <td>Tìm vị trí tệp tin</td>
+                                <td><span class="kbd">Right Click</span> -> Tìm trong Explorer</td>
+                                <td>Mở Windows Explorer và tự động trỏ đến tệp tin mục tiêu.</td>
+                            </tr>
+                            <tr>
+                                <td>Đóng khung xem trước</td>
+                                <td><span class="kbd">Esc</span></td>
+                                <td>Tắt cửa sổ xem trước hoặc các hộp thoại đang mở.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h2 class="block-title">Lưu Ý Về Tệp Tin Rác & Bản Nháp</h2>
+                <p class="section-desc">Hệ thống phân loại tự động sẽ lọc bỏ hoặc đánh dấu bản nháp đối với các tài liệu có dấu hiệu là biểu mẫu trống hoặc chứa lượng lớn nhiễu ký tự. Để đảm bảo tệp của bạn được gán nhãn nội dung thật (Real Content), hãy tránh đặt tên tệp chứa cụm từ <code>draft</code> hoặc để nội dung quá ngắn thiếu dữ liệu thực tế.</p>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer>
+            <p>© 2026 SuperSearch & CICT Procedures Center. Phát triển trên nền tảng Liquid Glass Design System.</p>
+        </footer>
+    </div>
+
+    <!-- Scripting for theme & tabs switching & animations -->
+    <script>
+        // Canvas Background sao rơi nhiều màu (không màu tối/nóng)
+        const canvas = document.getElementById('starsCanvas');
+        const ctx = canvas.getContext('2d');
+        let stars = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        // Màu sắc: trắng và xám nhạt
+        const starColors = ['#ffffff', '#f3f4f6', '#e5e7eb', '#d1d5db'];
+
+        class Star {
+            constructor() {
+                this.reset();
+                this.y = Math.random() * canvas.height;
+            }
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = 0;
+                this.size = Math.random() * 2 + 0.8;
+                this.speed = Math.random() * 1.0 + 0.3;
+                this.color = starColors[Math.floor(Math.random() * starColors.length)];
+                this.opacity = Math.random() * 0.5 + 0.4;
+            }
+            update() {
+                this.y += this.speed;
+                if (this.y > canvas.height) {
+                    this.reset();
+                }
+            }
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.opacity;
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        // Tạo 90 ngôi sao ngẫu nhiên
+        for (let i = 0; i < 90; i++) {
+            stars.push(new Star());
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            stars.forEach(star => {
+                star.update();
+                star.draw();
+            });
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        // Mouse glow interaction (lqia)
+        const mainCard = document.querySelector('.main-card');
+        mainCard.addEventListener('mousemove', e => {
+            const rect = mainCard.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            mainCard.style.setProperty('--mouse-x', `${x}px`);
+            mainCard.style.setProperty('--mouse-y', `${y}px`);
+        });
+
+        // Theme management (lqdl)
+        const htmlElement = document.documentElement;
+        const themeToggleBtn = document.getElementById('themeToggleBtn');
+
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        htmlElement.setAttribute('data-theme', savedTheme);
+
+        themeToggleBtn.addEventListener('click', () => {
+            const currentTheme = htmlElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            htmlElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+
+        // Navigation Tabs switching logic
+        const tabButtons = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        tabButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                tabButtons.forEach(b => b.classList.remove('active'));
+                tabContents.forEach(c => c.classList.remove('active'));
+
+                btn.classList.add('active');
+
+                const targetTabId = btn.getAttribute('data-tab');
+                const targetContent = document.getElementById(targetTabId);
+                if (targetContent) {
+                    targetContent.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

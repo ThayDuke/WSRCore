@@ -1,0 +1,11 @@
+{
+  "adapterId": "antigravity",
+  "displayName": "Antigravity Adapter",
+  "enabled": false,
+  "targetRootEnvironmentVariable": "ANTIGRAVITY_HOME",
+  "requiresExplicitTargetRoot": true,
+  "skillLoadingMode": "block-jit",
+  "artifactMappings": {},
+  "unsupportedFeatures": [],
+  "pathStyle": "windows"
+}

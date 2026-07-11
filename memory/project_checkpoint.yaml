@@ -1,6 +1,13 @@
-last_task: "Internal Version Management for Planning"
-date: "2026-07-10"
-status: "Completed"
-impact: "Updated GEMINI.md and pl.md to save planning files to planning_[task_name].md without version suffix. Iterative version changes are now patched directly inside the file."
-verified: true
-wsr_audit_score: 100
+version: "v5"
+status: "Released"
+buildId: "WSR-2.4.6-HARDENED-V5-RELEASE"
+last_update: "2026-07-12"
+summary: "WSR 2.4.6 Hardening v5 production release and global apply completed successfully. Codex and Gemini targets deployed with zero drift."
+artifacts_count: 48
+checksums_verified: true
+exit_codes_verified: true
+doctor_score: 100
+audit_score: 100
+walkthrough_path: "C:/Users/DUKE NGUYEN/.gemini/antigravity-ide/brain/a501d363-aedf-49fd-9431-6fbc74ac3bcf/walkthrough.md"
+release_zip: "E:/DUKE GOOGLE DRIVE 85/1. DEC-Good/DOCS/WSR2.4.6-Hardened_v2.4.6_WSR-2.4.6-HARDENED-V5-RELEASE.zip"
+zip_sha256: "3F02FE2F69CC96A6712C77E185A235F2D0C139A569B99367152E314A06EF7E6C"

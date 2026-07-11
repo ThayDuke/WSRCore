@@ -1,0 +1,17 @@
+{
+  "adapterId": "codex",
+  "displayName": "Codex Adapter",
+  "enabled": true,
+  "targetRootEnvironmentVariable": "CODEX_HOME",
+  "requiresExplicitTargetRoot": false,
+  "skillLoadingMode": "full-file",
+  "artifactMappings": {
+    "policy": "",
+    "rule": "global_rules/AG_GLOBAL_RULES.md",
+    "workflow": "global_workflows/",
+    "skill": "skills/",
+    "script": "scripts/"
+  },
+  "unsupportedFeatures": ["block-jit"],
+  "pathStyle": "windows"
+}

@@ -1,0 +1,607 @@
+{
+  "schemaVersion": 2,
+  "packageName": "WSR2.4.6-Hardened",
+  "version": "2.4.6",
+  "buildId": "WSR-2.4.6-HARDENED-V5-RELEASE",
+  "status": "Released",
+  "createdAt": "2026-07-11T23:42:50+07:00",
+  "canonicalLayout": ".agents",
+  "compatibilityLayouts": [".codex"],
+  "minimumPython": "3.8",
+  "policySource": "GEMINI.md",
+  "checksumsFile": "WSR_CHECKSUMS.json",
+  "cleanWhitelist": [
+    "DATA/",
+    "ENGINE/",
+    "Template/",
+    "Tools/assets/",
+    "DOCS/Planning/",
+    ".git/",
+    ".agents/",
+    ".codex/"
+  ],
+  "packageExclusions": [
+    "__pycache__/",
+    "*.pyc",
+    "desktop.ini",
+    "*.zip",
+    ".DS_Store",
+    "Thumbs.db"
+  ],
+  "commands": {
+    "audit": {
+      "description": "Run static syntax, encoding, and integrity audits",
+      "script": "scripts/wsr_audit.py",
+      "options": {
+        "--mode": "quick | deep",
+        "--path": "Path to scan",
+        "--json": "Output structured JSON report",
+        "--changed": "Scan only files changed in git"
+      }
+    },
+    "br": {
+      "description": "Trigger brainstorm mode for discussions",
+      "script": "global_workflows/br.md"
+    },
+    "pl": {
+      "description": "Trigger planning workflow and create planning file",
+      "script": "global_workflows/pl.md"
+    },
+    "clean": {
+      "description": "Scan and remove temporary/unwanted files",
+      "script": "scripts/wsr_clean.py",
+      "options": {
+        "--root": "Root path to scan",
+        "--apply": "Execute deletions with token",
+        "--json": "Output scan report as JSON",
+        "--approval-token": "Approval token matching manifest buildId"
+      }
+    },
+    "reload": {
+      "description": "Reload policies, skills, and memory context",
+      "script": "global_workflows/reload.md"
+    },
+    "wsr": {
+      "description": "WSR packaging workflow",
+      "script": "global_workflows/wsr.md"
+    },
+    "backup": {
+      "description": "Create ZIP backup of workspace",
+      "script": "global_workflows/backup.md"
+    },
+    "commit": {
+      "description": "Commit changes via task-scoped logic",
+      "script": "global_workflows/commit.md"
+    }
+  },
+  "adapters": [
+    "adapters/codex.json",
+    "adapters/gemini.json",
+    "adapters/claude.json",
+    "adapters/cursor.json",
+    "adapters/antigravity.json"
+  ],
+  "artifacts": [
+    {
+      "id": "gemini-policy",
+      "source": "GEMINI.md",
+      "type": "policy",
+      "required": true,
+      "mutable": false,
+      "deploy": true,
+      "targets": ["codex", "gemini"],
+      "owner": "Tech Lead",
+      "encoding": "UTF-8"
+    },
+    {
+      "id": "agents-config",
+      "source": "AGENTS.md",
+      "type": "policy",
+      "required": true,
+      "mutable": true,
+      "deploy": true,
+      "targets": ["codex", "gemini"],
+      "owner": "Tech Lead",
+      "encoding": "UTF-8"
+    },
+    {
+      "id": "readme-doc",
+      "source": "README.html",
+      "type": "document",
+      "required": true,
+      "mutable": true,
+      "deploy": true,
+      "targets": ["codex", "gemini"],
+      "owner": "Documentation Engineer",
+      "encoding": "UTF-8"
+    },
+    {
+      "id": "install-guide",
+      "source": "Installation_guide.txt",
+      "type": "document",
+      "required": true,
+      "mutable": true,
+      "deploy": true,
+      "targets": ["codex", "gemini"],
+      "owner": "Documentation Engineer",
+      "encoding": "UTF-8"
+    },
+    {
+      "id": "manifest",
+      "source": "WSR_MANIFEST.json",
+      "type": "document",
+      "required": true,
+      "mutable": true,
+      "deploy": true,
+      "targets": ["codex", "gemini"],
+      "owner": "Configuration Engineer",
+      "encoding": "UTF-8"
+    },
+    {
+      "id": "debt-ledger",
+      "source": "debt_ledger.md",
+      "type": "generated",
+      "required": true,
+      "mutable": true,
+      "deploy": true,
+      "targets": ["codex", "gemini"],
+      "owner": "Python Tooling Engineer B",
+      "encoding": "UTF-8"
+    },
+    {
+      "id": "global-rules",
+      "source": "global_rules/AG_GLOBAL_RULES.md",
+      "type": "rule",
+      "required": true,
+      "mutable": false,
+      "deploy": true,
+      "targets": ["codex", "gemini"],
+      "owner": "Tech Lead",
+      "encoding": "UTF-8"
+    },
+    {
+      "id": "workflow-audit",
+      "source": "global_workflows/audit.md",
+      "type": "workflow",
+      "required": true,
+      "mutable": false,
+      "deploy": true,
+      "targets": ["codex", "gemini"],
+      "owner": "Workflow Engineer",
+      "encoding": "UTF-8"
+    },
+    {
+      "id": "workflow-backup",
+      "source": "global_workflows/backup.md",
+      "type": "workflow",
+      "required": true,
+      "mutable": false,
+      "deploy": true,
+      "targets": ["codex", "gemini"],
+      "owner": "Workflow Engineer",
+      "encoding": "UTF-8"
+    },
+    {
+      "id": "workflow-br",
+      "source": "global_workflows/br.md",
+      "type": "workflow",
+      "required": true,
+      "mutable": false,
+      "deploy": true,
+      "targets": ["codex", "gemini"],
+      "owner": "Workflow Engineer",
+      "encoding": "UTF-8"
+    },
+    {
+      "id": "workflow-clean",
+      "source": "global_workflows/clean.md",
+      "type": "workflow",
+      "required": true,
+      "mutable": false,
+      "deploy": true,
+      "targets": ["codex", "gemini"],
+      "owner": "Workflow Engineer",
+      "encoding": "UTF-8"
+    },
+    {
+      "id": "workflow-commit",
+      "source": "global_workflows/commit.md",
+      "type": "workflow",
+      "required": true,
+      "mutable": false,
+      "deploy": true,
+      "targets": ["codex", "gemini"],
+      "owner": "Workflow Engineer",
+      "encoding": "UTF-8"
+    },
+    {
+      "id": "workflow-pl",
+      "source": "global_workflows/pl.md",
+      "type": "workflow",
+      "required": true,
+      "mutable": false,
+      "deploy": true,
+      "targets": ["codex", "gemini"],
+      "owner": "Workflow Engineer",
+      "encoding": "UTF-8"
+    },
+    {
+      "id": "workflow-reload",
+      "source": "global_workflows/reload.md",
+      "type": "workflow",
+      "required": true,
+      "mutable": false,
+      "deploy": true,
+      "targets": ["codex", "gemini"],
+      "owner": "Workflow Engineer",
+      "encoding": "UTF-8"
+    },
+    {
+      "id": "workflow-wsr",
+      "source": "global_workflows/wsr.md",
+      "type": "workflow",
+      "required": true,
+      "mutable": false,
+      "deploy": true,
+      "targets": ["codex", "gemini"],
+      "owner": "Workflow Engineer",
+      "encoding": "UTF-8"
+    },
+    {
+      "id": "skill-wsr-audit",
+      "source": "skills/wsr-audit/SKILL.md",
+      "type": "skill",
+      "required": true,
+      "mutable": false,
+      "deploy": true,
+      "targets": ["codex", "gemini"],
+      "owner": "Workflow Engineer",
+      "encoding": "UTF-8"
+    },
+    {
+      "id": "skill-wsr-debt",
+      "source": "skills/wsr-debt/SKILL.md",
+      "type": "skill",
+      "required": true,
+      "mutable": false,
+      "deploy": true,
+      "targets": ["codex", "gemini"],
+      "owner": "Workflow Engineer",
+      "encoding": "UTF-8"
+    },
+    {
+      "id": "skill-wsr-review",
+      "source": "skills/wsr-review/SKILL.md",
+      "type": "skill",
+      "required": true,
+      "mutable": false,
+      "deploy": true,
+      "targets": ["codex", "gemini"],
+      "owner": "Workflow Engineer",
+      "encoding": "UTF-8"
+    },
+    {
+      "id": "global-skill-dec-audit",
+      "source": "global_skills/dec-audit/SKILL.md",
+      "type": "skill",
+      "required": true,
+      "mutable": false,
+      "deploy": true,
+      "targets": ["codex", "gemini"],
+      "owner": "Workflow Engineer",
+      "encoding": "UTF-8"
+    },
+    {
+      "id": "global-skill-dec-debt",
+      "source": "global_skills/dec-debt/SKILL.md",
+      "type": "skill",
+      "required": true,
+      "mutable": false,
+      "deploy": true,
+      "targets": ["codex", "gemini"],
+      "owner": "Workflow Engineer",
+      "encoding": "UTF-8"
+    },
+    {
+      "id": "global-skill-dec-review",
+      "source": "global_skills/dec-review/SKILL.md",
+      "type": "skill",
+      "required": true,
+      "mutable": false,
+      "deploy": true,
+      "targets": ["codex", "gemini"],
+      "owner": "Workflow Engineer",
+      "encoding": "UTF-8"
+    },
+    {
+      "id": "global-skill-dec-dev-operator",
+      "source": "global_skills/dec-dev-operator/SKILL.md",
+      "type": "skill",
+      "required": true,
+      "mutable": false,
+      "deploy": true,
+      "targets": ["codex", "gemini"],
+      "owner": "Workflow Engineer",
+      "encoding": "UTF-8"
+    },
+    {
+      "id": "global-skill-dec-dev-ref",
+      "source": "global_skills/dec-dev-operator/references/DEC_UI_skill.md",
+      "type": "skill",
+      "required": true,
+      "mutable": false,
+      "deploy": true,
+      "targets": ["codex", "gemini"],
+      "owner": "Workflow Engineer",
+      "encoding": "UTF-8"
+    },
+    {
+      "id": "global-skill-effective-html",
+      "source": "global_skills/effective-html/SKILL.md",
+      "type": "skill",
+      "required": true,
+      "mutable": false,
+      "deploy": true,
+      "targets": ["codex", "gemini"],
+      "owner": "Workflow Engineer",
+      "encoding": "UTF-8"
+    },
+    {
+      "id": "global-skill-liquid-glass-readme",
+      "source": "global_skills/LiquidGlass/Readme.html",
+      "type": "document",
+      "required": true,
+      "mutable": false,
+      "deploy": true,
+      "targets": ["codex", "gemini"],
+      "owner": "Workflow Engineer",
+      "encoding": "UTF-8"
+    },
+    {
+      "id": "global-skill-liquid-glass",
+      "source": "global_skills/LiquidGlass/skills/liquid-glass-web-win/SKILL.md",
+      "type": "skill",
+      "required": true,
+      "mutable": false,
+      "deploy": true,
+      "targets": ["codex", "gemini"],
+      "owner": "Workflow Engineer",
+      "encoding": "UTF-8"
+    },
+    {
+      "id": "global-skill-output",
+      "source": "global_skills/output-skill/SKILL.md",
+      "type": "skill",
+      "required": true,
+      "mutable": false,
+      "deploy": true,
+      "targets": ["codex", "gemini"],
+      "owner": "Workflow Engineer",
+      "encoding": "UTF-8"
+    },
+    {
+      "id": "global-skill-redesign",
+      "source": "global_skills/redesign-skill/SKILL.md",
+      "type": "skill",
+      "required": true,
+      "mutable": false,
+      "deploy": true,
+      "targets": ["codex", "gemini"],
+      "owner": "Workflow Engineer",
+      "encoding": "UTF-8"
+    },
+    {
+      "id": "global-skill-soft",
+      "source": "global_skills/soft-skill/SKILL.md",
+      "type": "skill",
+      "required": true,
+      "mutable": false,
+      "deploy": true,
+      "targets": ["codex", "gemini"],
+      "owner": "Workflow Engineer",
+      "encoding": "UTF-8"
+    },
+    {
+      "id": "global-skill-stitch",
+      "source": "global_skills/stitch-skill/SKILL.md",
+      "type": "skill",
+      "required": true,
+      "mutable": false,
+      "deploy": true,
+      "targets": ["codex", "gemini"],
+      "owner": "Workflow Engineer",
+      "encoding": "UTF-8"
+    },
+    {
+      "id": "global-skill-stitch-design",
+      "source": "global_skills/stitch-skill/DESIGN.md",
+      "type": "document",
+      "required": true,
+      "mutable": false,
+      "deploy": true,
+      "targets": ["codex", "gemini"],
+      "owner": "Workflow Engineer",
+      "encoding": "UTF-8"
+    },
+    {
+      "id": "script-wsr-audit",
+      "source": "scripts/wsr_audit.py",
+      "type": "script",
+      "required": true,
+      "mutable": false,
+      "deploy": true,
+      "targets": ["codex", "gemini"],
+      "owner": "Python Tooling Engineer B"
+    },
+    {
+      "id": "script-wsr-debt",
+      "source": "scripts/wsr_debt_scanner.py",
+      "type": "script",
+      "required": true,
+      "mutable": false,
+      "deploy": true,
+      "targets": ["codex", "gemini"],
+      "owner": "Python Tooling Engineer B"
+    },
+    {
+      "id": "script-wsr-clean",
+      "source": "scripts/wsr_clean.py",
+      "type": "script",
+      "required": true,
+      "mutable": false,
+      "deploy": true,
+      "targets": ["codex", "gemini"],
+      "owner": "Python Tooling Engineer A"
+    },
+    {
+      "id": "script-pack-wsr",
+      "source": "scripts/pack_wsr.py",
+      "type": "script",
+      "required": true,
+      "mutable": false,
+      "deploy": true,
+      "targets": ["codex", "gemini"],
+      "owner": "Release Engineer"
+    },
+    {
+      "id": "script-sync-config",
+      "source": "scripts/sync_config.py",
+      "type": "script",
+      "required": true,
+      "mutable": false,
+      "deploy": true,
+      "targets": ["codex", "gemini"],
+      "owner": "Deployment Engineer"
+    },
+    {
+      "id": "script-wsr-common",
+      "source": "scripts/wsr_common.py",
+      "type": "script",
+      "required": true,
+      "mutable": false,
+      "deploy": true,
+      "targets": ["codex", "gemini"],
+      "owner": "Python Tooling Engineer A"
+    },
+    {
+      "id": "script-wsr-doctor",
+      "source": "scripts/wsr_doctor.py",
+      "type": "script",
+      "required": true,
+      "mutable": false,
+      "deploy": true,
+      "targets": ["codex", "gemini"],
+      "owner": "Python Tooling Engineer A"
+    },
+    {
+      "id": "schema-manifest-v2",
+      "source": "schemas/wsr-manifest-v2.schema.json",
+      "type": "document",
+      "required": true,
+      "mutable": false,
+      "deploy": true,
+      "targets": ["codex", "gemini"],
+      "owner": "Configuration Engineer",
+      "encoding": "UTF-8"
+    },
+    {
+      "id": "adapter-codex",
+      "source": "adapters/codex.json",
+      "type": "document",
+      "required": true,
+      "mutable": false,
+      "deploy": true,
+      "targets": ["codex", "gemini"],
+      "owner": "Configuration Engineer",
+      "encoding": "UTF-8"
+    },
+    {
+      "id": "adapter-gemini",
+      "source": "adapters/gemini.json",
+      "type": "document",
+      "required": true,
+      "mutable": false,
+      "deploy": true,
+      "targets": ["codex", "gemini"],
+      "owner": "Configuration Engineer",
+      "encoding": "UTF-8"
+    },
+    {
+      "id": "adapter-claude",
+      "source": "adapters/claude.json",
+      "type": "document",
+      "required": true,
+      "mutable": false,
+      "deploy": true,
+      "targets": ["codex", "gemini"],
+      "owner": "Configuration Engineer",
+      "encoding": "UTF-8"
+    },
+    {
+      "id": "adapter-cursor",
+      "source": "adapters/cursor.json",
+      "type": "document",
+      "required": true,
+      "mutable": false,
+      "deploy": true,
+      "targets": ["codex", "gemini"],
+      "owner": "Configuration Engineer",
+      "encoding": "UTF-8"
+    },
+    {
+      "id": "adapter-antigravity",
+      "source": "adapters/antigravity.json",
+      "type": "document",
+      "required": true,
+      "mutable": false,
+      "deploy": true,
+      "targets": ["codex", "gemini"],
+      "owner": "Configuration Engineer",
+      "encoding": "UTF-8"
+    },
+    {
+      "id": "global-skill-dec-dev-openai",
+      "source": "global_skills/dec-dev-operator/agents/openai.yaml",
+      "type": "document",
+      "required": true,
+      "mutable": false,
+      "deploy": true,
+      "targets": ["codex", "gemini"],
+      "owner": "Workflow Engineer",
+      "encoding": "UTF-8"
+    },
+    {
+      "id": "global-skill-liquid-glass-web-doc",
+      "source": "global_skills/LiquidGlass/skills/liquid-glass-web-win/references/liquid-glass-web.md",
+      "type": "document",
+      "required": true,
+      "mutable": false,
+      "deploy": true,
+      "targets": ["codex", "gemini"],
+      "owner": "Workflow Engineer",
+      "encoding": "UTF-8"
+    },
+    {
+      "id": "changelog",
+      "source": "CHANGELOG.md",
+      "type": "document",
+      "required": true,
+      "mutable": true,
+      "deploy": true,
+      "targets": ["codex", "gemini"],
+      "owner": "Release Engineer",
+      "encoding": "UTF-8"
+    },
+    {
+      "id": "wsr-checksums",
+      "source": "WSR_CHECKSUMS.json",
+      "type": "generated",
+      "required": true,
+      "mutable": true,
+      "deploy": true,
+      "targets": ["codex", "gemini"],
+      "owner": "Release Engineer",
+      "encoding": "UTF-8"
+    }
+  ]
+}

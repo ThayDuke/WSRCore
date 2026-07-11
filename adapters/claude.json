@@ -1,0 +1,11 @@
+{
+  "adapterId": "claude",
+  "displayName": "Claude Adapter",
+  "enabled": false,
+  "targetRootEnvironmentVariable": "CLAUDE_HOME",
+  "requiresExplicitTargetRoot": true,
+  "skillLoadingMode": "full-file",
+  "artifactMappings": {},
+  "unsupportedFeatures": ["block-jit"],
+  "pathStyle": "posix"
+}
