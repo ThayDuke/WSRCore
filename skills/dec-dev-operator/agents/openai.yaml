@@ -1,9 +1,0 @@
-interface:
-  display_name: "DEC Dev Operator"
-  short_description: "DEC debugging, UI, and tooling workflow"
-  brand_color: "#00ACC1"
-  default_prompt: "Use $dec-dev-operator to debug or modify the DEC project while following its local rules."
-
-policy:
-  allow_implicit_invocation: true
-

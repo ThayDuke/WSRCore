@@ -1,12 +1,25 @@
-# Quy trình Nạp Cấu Hình `/reload` (Bản nháp 2.4.6)
+---
+description: Reload policies, skills, and memory context
+---
 
-Khi chạy lệnh `/reload` để nạp lại rules, skill và memory:
+# Quy trình Smart Reload `/reload` (WSR Core)
 
-## Quy định thực thi
-1. **Chế độ nạp mặc định (Tiêu chuẩn):**
-   - Chỉ nạp các rules cốt lõi (`GEMINI.md`, `AGENTS.md`) và checkpoint hiện tại.
-   - Bỏ qua các file rules cục bộ đặc thù và các skill chi tiết (sẽ được nạp JIT theo giai đoạn).
-2. **Nạp JIT theo nhu cầu:**
-   - Chỉ nạp skill hoặc rule cục bộ khi bắt đầu thực thi tác vụ cụ thể có liên quan (ví dụ: gỡ lỗi nạp playbook, sửa UI nạp checklist).
-3. **Hiển thị xác nhận:**
-   - Chỉ xuất ra thông báo ngắn gọn xác nhận các file đã nạp, tuyệt đối không tóm tắt lại nội dung để tiết kiệm token.
+`/reload` chỉ xác minh nguồn và nạp context. Lệnh này không cài đặt, đồng bộ hoặc ghi file.
+
+## Cổng thực thi
+1. Xác định nguồn theo thứ tự: path người dùng, source lock, package chứa script. Cấm fallback mơ hồ.
+   Source lock bắt buộc có `sourceRoot`, `version`, `buildId`, `manifestSha256`.
+2. Chạy `scripts/wsr_reload.py` read-only. Doctor strict phải đạt 16/16 và 100/100.
+3. Build mới so với target phải dùng `/reload --deep`. Đây là phê duyệt Deep Audit rõ ràng.
+4. Sau trạng thái VERIFIED, Agent đọc đúng `coreFiles` từ receipt vào context.
+5. Agent chỉ giữ `skillIndex`; nội dung skill tiếp tục nạp JIT theo nhiệm vụ.
+6. Sync chỉ chạy dry-run để phát hiện drift. Cấm thêm hoặc suy diễn tùy chọn apply.
+
+## Trạng thái
+- VERIFIED: nguồn sạch; được phép đọc lõi.
+- LOADED: Agent đã đọc đủ coreFiles và xác nhận trong chat.
+- DRIFTED: source khác target; vẫn được nạp, nhưng không được tuyên bố đã đồng bộ.
+- BLOCKED: sai identity, checksum, Doctor hoặc Deep Audit; cấm đọc nguồn đó.
+
+## Biên nhận bắt buộc
+Chỉ báo sourceRoot, version, buildId, manifest hash, Doctor score, Deep score, drift và coreFiles đã nạp.

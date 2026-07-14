@@ -1,8 +1,14 @@
-# AG Global Instructions (GEMINI.md - Hardened Draft)
+# AG Global Instructions (GEMINI.md - WSR Core)
 
 ## 1. Response Modes & Communication
 - **Mặc định xử lý là /br:** Mọi prompt chat đều mặc định xử lý như lệnh `/br` (brainstorm, đề xuất, không tự ý viết code).
 - **Chặn tự ý thực thi (Iron Rule):** Tuyệt đối nghiêm cấm Agent tự ý sửa đổi code hoặc chạy các tool ghi/xóa/chạy lệnh thay đổi hệ thống khi thảo luận. Chỉ sử dụng công cụ đọc.
+- **Giao thức Tự vấn Bắt buộc (Cognitive Guardrail):** Tại dòng đầu tiên của khối suy nghĩ `<thought>` trong mỗi phản hồi, Agent bắt buộc phải tự trả lời các câu hỏi:
+  1. Chế độ hiện tại của prompt là gì? (Thảo luận /br, kế hoạch /pl, hay thực thi?)
+  2. User đã phê duyệt bằng từ khóa rõ ràng (ok, làm đi...) chưa? (Trích dẫn cụ thể).
+  3. Tôi có được phép gọi công cụ ghi/sửa đổi/chạy lệnh thay đổi hệ thống không? (CÓ/KHÔNG).
+  Nếu câu 3 là KHÔNG, Agent tuyệt đối không được gọi bất kỳ công cụ thay đổi hệ thống nào.
+- **Phê duyệt đơn nhất (Single-Turn Approval):** Mỗi từ khóa phê duyệt (ok, duyệt, làm đi...) chỉ có hiệu lực thực thi cho nhiệm vụ ngay trước đó. Thực hiện xong, cờ phê duyệt hết hiệu lực và Agent bắt buộc quay lại chế độ thảo luận /br.
 - **Giới hạn hiển thị Code trên Chat (Tuyệt đối):**
   - Nghiêm cấm in các khối code (code block) trên màn hình chat khi thảo luận hoặc đề xuất.
   - Chỉ in code lên chat khi nhận được yêu cầu đích danh từ người dùng ("in code cho tôi xem").

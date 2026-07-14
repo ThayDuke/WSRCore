@@ -1,13 +1,13 @@
-version: "v5"
-status: "Released"
-buildId: "WSR-2.4.6-HARDENED-V5-RELEASE"
-last_update: "2026-07-12"
-summary: "WSR 2.4.6 Hardening v5 production release and global apply completed successfully. Codex and Gemini targets deployed with zero drift."
-artifacts_count: 48
+version: "v14"
+status: "Phase_04_Completed"
+buildId: "WSR-DEC-WEBVIEW2-STANDARDIZED-CLEANED"
+last_update: "2026-07-13"
+summary: "Completed Phase 4: Validated that DATA/ChromiumAppProfile does not exist in the workspace, completing the profile cleanup goal naturally without residual pollution."
+artifacts_count: 51
 checksums_verified: true
 exit_codes_verified: true
 doctor_score: 100
-audit_score: 100
-walkthrough_path: "C:/Users/DUKE NGUYEN/.gemini/antigravity-ide/brain/a501d363-aedf-49fd-9431-6fbc74ac3bcf/walkthrough.md"
-release_zip: "E:/DUKE GOOGLE DRIVE 85/1. DEC-Good/DOCS/WSR2.4.6-Hardened_v2.4.6_WSR-2.4.6-HARDENED-V5-RELEASE.zip"
-zip_sha256: "3F02FE2F69CC96A6712C77E185A235F2D0C139A569B99367152E314A06EF7E6C"
+audit_score: 55
+walkthrough_path: "C:/Users/DUKE NGUYEN/.gemini/antigravity-ide/brain/79ea631c-3c77-4872-828c-18c19ace6d37/walkthrough.md"
+release_zip: ""
+zip_sha256: ""

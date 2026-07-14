@@ -1,4 +1,8 @@
-# Quy trình Đóng Gói `/wsr` (Bản nháp 2.4.6)
+---
+description: WSR packaging workflow
+---
+
+# Quy trình Đóng Gói `/wsr` (WSR Core 1.0)
 
 Khi thực hiện đóng gói WSR Package để kiểm tra hoặc lưu trữ:
 

@@ -1,4 +1,8 @@
-# Quy trình Brainstorm `/br` (Bản nháp 2.4.6)
+---
+description: Trigger brainstorm mode for discussions
+---
+
+# Quy trình Brainstorm `/br` (WSR Core 1.0)
 
 Khi người dùng thảo luận hoặc hỏi đáp chung (mặc định chat xử lý như `/br`):
 

@@ -101,7 +101,12 @@ def main():
         
     # 4. Perform deterministic zip package build
     output_dir = os.path.dirname(package_root)
-    zip_filename = f"{packageName}_v{version}_{buildId}.zip"
+    build_parts = buildId.split("-")
+    if len(build_parts) >= 2:
+        build_suffix = "-".join(build_parts[-2:])
+    else:
+        build_suffix = buildId
+    zip_filename = f"{packageName}_{build_suffix}.zip"
     zip_filepath = os.path.join(output_dir, zip_filename)
     
     print(f"[*] Packaging {packageName} (v{version}) with Build ID: {buildId}...")

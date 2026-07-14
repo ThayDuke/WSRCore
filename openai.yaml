@@ -1,5 +1,0 @@
-interface:
-  display_name: "DEC Debug Operator"
-  short_description: "Diagnose DEC bugs and write precise Antigravity fix prompts."
-  icon: "bug"
-  color: "#1F2937"

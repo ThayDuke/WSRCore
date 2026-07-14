@@ -102,16 +102,16 @@ def check_skill_start_blocks(skill_path):
         return False, f"Lỗi check skill block: {e}"
 
 def check_hardcoded_paths(filepath, content_str):
-    """Kiểm tra đường dẫn cứng DOCS/WSR2.4.6 trong tài liệu và rules."""
+    """Kiểm tra đường dẫn cứng DOCS/WSR-Core trong tài liệu và rules."""
     filename = os.path.basename(filepath)
     # Bỏ qua việc tự check trong các script scan chính nó
     if filename in ["wsr_audit.py", "wsr_doctor.py", "wsr_clean.py"]:
         return True, "OK"
         
-    if "DOCS/WSR2.4.6" in content_str:
+    if "DOCS/WSR-Core" in content_str:
         # Check if it is a genuine hardcoded path usage (not inside changelog for past references)
         if filename != "CHANGELOG.md":
-            return False, "Phát hiện đường dẫn cứng DOCS/WSR2.4.6"
+            return False, "Phát hiện đường dẫn cứng DOCS/WSR-Core"
             
     return True, "OK"
 
@@ -244,12 +244,12 @@ def main():
                     files_to_check.append(full_path)
         else:
             for root, dirs, files in os.walk(scan_dir, followlinks=False):
-                dirs[:] = [d for d in dirs if d not in {'.git', '.venv', '__pycache__'}]
+                dirs[:] = [d for d in dirs if d not in {'.git', '.venv', '__pycache__', 'DATA', 'Temp', '.agents', '.codex'}]
                 for file in files:
                     files_to_check.append(os.path.join(root, file))
                     
     # Bỏ qua các file nhị phân, zip, desktop.ini, pyc
-    ignore_extensions = ('.zip', '.png', '.jpg', '.ico', '.ini', '.gif', '.pyc')
+    ignore_extensions = ('.zip', '.png', '.jpg', '.ico', '.ini', '.gif', '.pyc', '.mp3', '.MP3', '.mp4', '.wav', '.psd', '.PSD', '.woff', '.woff2', '.ttf', '.TTF', '.eot', '.pdf', '.webp', '.WEBP', '.cer', '.CER')
     files_to_check = [f for f in files_to_check if not f.endswith(ignore_extensions)]
     
     # Tiến hành audit từng file
@@ -324,7 +324,7 @@ def main():
         wsr_common.print_json_report(report)
     else:
         print("==================================================")
-        print("   WSR-AUDIT (PACKAGE-LOCAL HARDENED)")
+        print("   WSR-AUDIT (WSR CORE)")
         print("==================================================")
         print(f"Tổng số file quét: {report['summary']['total_checked']}")
         print(f"Thành công: {report['summary']['pass_count']} | Thất bại: {report['summary']['fail_count']}")

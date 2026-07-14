@@ -1,4 +1,8 @@
-# Quy trình Audit & Kiểm tra chất lượng WSR (Bản nháp 2.4.6)
+---
+description: Run static syntax, encoding, and integrity audits
+---
+
+# Quy trình Audit & Kiểm tra chất lượng WSR (WSR Core 1.0)
 
 Khi chạy lệnh `/audit` hoặc thực hiện kiểm tra chất lượng, Agent thực hiện:
 

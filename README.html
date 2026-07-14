@@ -1,150 +1,937 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="vi" data-theme="light" data-lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tài liệu Hướng dẫn WSR 2.4.6 Hardened</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f9f9f9;
-        }
-        .container {
-            background: #fff;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-        }
-        h1, h2, h3 {
-            color: #1e3d59;
-        }
-        h1 {
-            border-bottom: 2px solid #e9b824;
-            padding-bottom: 10px;
-        }
-        .warning-box {
-            background-color: #fff3cd;
-            border-left: 5px solid #ffc107;
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 4px;
-        }
-        code {
-            background: #f4f4f4;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-family: 'Courier New', Courier, monospace;
-        }
-        pre {
-            background: #272822;
-            color: #f8f8f2;
-            padding: 15px;
-            border-radius: 4px;
-            overflow-x: auto;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 12px;
-            text-align: left;
-        }
-        th {
-            background-color: #1e3d59;
-            color: white;
-        }
-        tr:nth-child(even) {
-            background-color: #f2f2f2;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WSR Core — Hướng Dẫn Vận Hành Chuyên Sâu</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      /* Theme Sáng - Frosty Apple Glass */
+      --bg-color: #f5f5f7;
+      --bg-gradient: radial-gradient(circle at 10% 20%, rgba(90, 150, 250, 0.15) 0%, transparent 40%),
+                     radial-gradient(circle at 90% 80%, rgba(150, 90, 250, 0.15) 0%, transparent 40%);
+      --text-color: #1d1d1f;
+      --text-muted: #6e6e73;
+      --accent-color: #0071e3;
+      --accent-hover: #0077ed;
+      --lg-bg: rgba(255, 255, 255, 0.45);
+      --lg-bg-active: rgba(255, 255, 255, 0.65);
+      --lg-border: rgba(255, 255, 255, 0.5);
+      --lg-blur: 16px;
+      --lg-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.06), 
+                   inset 0 1px 1px 0 rgba(255, 255, 255, 0.3);
+      --sidebar-width: 280px;
+      --code-bg: rgba(0, 0, 0, 0.04);
+      --code-color: #1d1d1f;
+      --code-border: rgba(0, 0, 0, 0.08);
+      --table-border: rgba(0, 0, 0, 0.08);
+      --th-bg: rgba(0, 0, 0, 0.02);
+    }
+
+    html[data-theme="dark"] {
+      /* Theme Tối - Obsidian Liquid Glass */
+      --bg-color: #0b0f19;
+      --bg-gradient: radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.1) 0%, transparent 45%),
+                     radial-gradient(circle at 90% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 45%);
+      --text-color: #f5f5f7;
+      --text-muted: #86868b;
+      --accent-color: #2f80ed;
+      --accent-hover: #3b9cff;
+      --lg-bg: rgba(15, 23, 42, 0.55);
+      --lg-bg-active: rgba(30, 41, 59, 0.7);
+      --lg-border: rgba(255, 255, 255, 0.08);
+      --lg-blur: 20px;
+      --lg-shadow: 0 12px 40px 0 rgba(15, 23, 42, 0.4), 
+                   inset 0 1px 0px 0 rgba(255, 255, 255, 0.1);
+      --code-bg: rgba(255, 255, 255, 0.06);
+      --code-color: #e5e7eb;
+      --code-border: rgba(255, 255, 255, 0.1);
+      --table-border: rgba(255, 255, 255, 0.1);
+      --th-bg: rgba(255, 255, 255, 0.02);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "Be Vietnam Pro", -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Icons", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      background-color: var(--bg-color);
+      background-image: var(--bg-gradient);
+      background-attachment: fixed;
+      color: var(--text-color);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      transition: background 0.3s, color 0.3s;
+      overflow-x: hidden;
+    }
+
+    /* Song ngữ En/Vi */
+    html[data-lang="vi"] .lang-en { display: none !important; }
+    html[data-lang="en"] .lang-vi { display: none !important; }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(120, 120, 120, 0.3);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(120, 120, 120, 0.5);
+    }
+
+    /* Header */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 64px;
+      background: var(--lg-bg);
+      backdrop-filter: blur(var(--lg-blur));
+      -webkit-backdrop-filter: blur(var(--lg-blur));
+      border-bottom: 1px solid var(--lg-border);
+      box-shadow: var(--lg-shadow);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      z-index: 100;
+      transition: all 0.3s ease;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+      font-size: 1.1rem;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-logo {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      background: linear-gradient(135deg, #0071e3, #875beb);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 0.9rem;
+    }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    /* Buttons Style */
+    .btn-pill {
+      background: var(--lg-bg);
+      border: 1px solid var(--lg-border);
+      color: var(--text-color);
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.05);
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .btn-pill:hover {
+      background: var(--lg-bg-active);
+      transform: translateY(-1px);
+    }
+
+    .btn-icon {
+      background: var(--lg-bg);
+      border: 1px solid var(--lg-border);
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--text-color);
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.05);
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .btn-icon:hover {
+      background: var(--lg-bg-active);
+      transform: scale(1.05);
+    }
+
+    .btn-icon svg {
+      width: 18px;
+      height: 18px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* Layout Wrapper */
+    .wrapper {
+      display: flex;
+      margin-top: 64px;
+      min-height: calc(100vh - 64px);
+    }
+
+    /* Sidebar Navigation */
+    aside {
+      position: fixed;
+      top: 64px;
+      left: 0;
+      bottom: 0;
+      width: var(--sidebar-width);
+      background: var(--lg-bg);
+      backdrop-filter: blur(var(--lg-blur));
+      -webkit-backdrop-filter: blur(var(--lg-blur));
+      border-right: 1px solid var(--lg-border);
+      box-shadow: var(--lg-shadow);
+      padding: 24px 16px;
+      overflow-y: auto;
+      z-index: 90;
+      transition: all 0.3s ease;
+    }
+
+    .nav-group {
+      margin-bottom: 24px;
+    }
+
+    .nav-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      padding-left: 12px;
+    }
+
+    .nav-list {
+      list-style: none;
+    }
+
+    .nav-item a {
+      display: block;
+      padding: 10px 12px;
+      color: var(--text-color);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+      margin-bottom: 4px;
+    }
+
+    .nav-item a:hover, .nav-item.active a {
+      background: var(--lg-bg-active);
+      color: var(--accent-color);
+      transform: translateX(4px);
+    }
+
+    /* Main Content Area */
+    main {
+      margin-left: var(--sidebar-width);
+      flex: 1;
+      padding: 40px;
+      max-width: 1100px;
+      width: calc(100% - var(--sidebar-width));
+      transition: all 0.3s ease;
+    }
+
+    /* Glassmorphism Cards */
+    .card {
+      background: var(--lg-bg);
+      backdrop-filter: blur(var(--lg-blur));
+      -webkit-backdrop-filter: blur(var(--lg-blur));
+      border: 1px solid var(--lg-border);
+      box-shadow: var(--lg-shadow);
+      border-radius: 16px;
+      padding: 32px;
+      margin-bottom: 32px;
+      transition: background 0.3s, border-color 0.3s, box-shadow 0.3s;
+    }
+
+    .card-glow {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card-glow::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: radial-gradient(
+        400px circle at var(--mouse-x, 0px) var(--mouse-y, 0px),
+        rgba(255, 255, 255, 0.08),
+        transparent 80%
+      );
+      z-index: 1;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+
+    html[data-theme="dark"] .card-glow::before {
+      background: radial-gradient(
+        400px circle at var(--mouse-x, 0px) var(--mouse-y, 0px),
+        rgba(255, 255, 255, 0.04),
+        transparent 80%
+      );
+    }
+
+    .card-glow:hover::before {
+      opacity: 1;
+    }
+
+    /* Typography */
+    h1 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 24px;
+      background: linear-gradient(135deg, var(--text-color), var(--accent-color));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+      border-bottom: 1px solid var(--lg-border);
+      padding-bottom: 8px;
+    }
+
+    h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin: 20px 0 10px 0;
+    }
+
+    p {
+      font-size: 0.95rem;
+      line-height: 1.6;
+      color: var(--text-color);
+      margin-bottom: 16px;
+      opacity: 0.9;
+    }
+
+    ul, ol {
+      margin-left: 24px;
+      margin-bottom: 16px;
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    li {
+      margin-bottom: 8px;
+    }
+
+    /* Highlights & Info Box */
+    .alert-box {
+      border-left: 4px solid var(--accent-color);
+      background: rgba(0, 113, 227, 0.05);
+      padding: 16px;
+      border-radius: 0 12px 12px 0;
+      margin-bottom: 20px;
+    }
+
+    .alert-box p {
+      margin-bottom: 0;
+    }
+
+    /* Code Block styling */
+    pre {
+      background-color: var(--code-bg);
+      border: 1px solid var(--code-border);
+      border-radius: 12px;
+      padding: 16px;
+      overflow-x: auto;
+      margin-bottom: 20px;
+    }
+
+    code {
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+      font-size: 0.85rem;
+      color: var(--code-color);
+    }
+
+    p code, li code {
+      background-color: var(--code-bg);
+      border: 1px solid var(--code-border);
+      border-radius: 4px;
+      padding: 2px 6px;
+      font-size: 0.85rem;
+    }
+
+    /* Table styling */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 24px;
+      font-size: 0.9rem;
+    }
+
+    th, td {
+      border: 1px solid var(--table-border);
+      padding: 12px 16px;
+      text-align: left;
+    }
+
+    th {
+      background-color: var(--th-bg);
+      font-weight: 600;
+    }
+
+    tr:nth-child(even) {
+      background-color: rgba(120, 120, 120, 0.02);
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      aside {
+        transform: translateX(-100%);
+      }
+      main {
+        margin-left: 0;
+        width: 100%;
+        padding: 24px;
+      }
+      body.sidebar-open aside {
+        transform: translateX(0);
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Hướng dẫn Vận hành WSR 2.4.6 Hardened</h1>
+
+  <!-- Header -->
+  <header>
+    <div class="brand">
+      <div class="brand-logo">W</div>
+      <span>WSR Core</span>
+    </div>
+    <div class="controls">
+      <!-- Toggle Language -->
+      <button class="btn-pill" id="lang-toggle" onclick="toggleLang()">
+        <span class="lang-vi">EN</span>
+        <span class="lang-en">VI</span>
+      </button>
+      <!-- Toggle Theme (Sun/Moon SVG) -->
+      <button class="btn-icon" id="theme-toggle" onclick="toggleTheme()" aria-label="Toggle Theme">
+        <!-- Sun Icon (Light Mode) -->
+        <svg id="sun-icon" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+        <!-- Moon Icon (Dark Mode) -->
+        <svg id="moon-icon" style="display: none;" viewBox="0 0 24 24">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Layout Wrapper -->
+  <div class="wrapper">
+    <!-- Sidebar Navigation -->
+    <aside>
+      <div class="nav-group">
+        <div class="nav-title">
+          <span class="lang-vi">Tổng quan</span>
+          <span class="lang-en">Overview</span>
+        </div>
+        <ul class="nav-list">
+          <li class="nav-item active"><a href="#gioi-thieu">
+            <span class="lang-vi">Giới thiệu WSR Core</span>
+            <span class="lang-en">Introduction to WSR Core</span>
+          </a></li>
+          <li class="nav-item"><a href="#ung-dung">
+            <span class="lang-vi">Ứng dụng thực tiễn</span>
+            <span class="lang-en">Practical Application</span>
+          </a></li>
+        </ul>
+      </div>
+
+      <div class="nav-group">
+        <div class="nav-title">
+          <span class="lang-vi">Hướng dẫn</span>
+          <span class="lang-en">Guide</span>
+        </div>
+        <ul class="nav-list">
+          <li class="nav-item"><a href="#cai-dat">
+            <span class="lang-vi">Hướng dẫn Cài đặt</span>
+            <span class="lang-en">Installation Guide</span>
+          </a></li>
+          <li class="nav-item"><a href="#su-dung">
+            <span class="lang-vi">Hướng dẫn Sử dụng</span>
+            <span class="lang-en">Usage Instructions</span>
+          </a></li>
+        </ul>
+      </div>
+
+      <div class="nav-group">
+        <div class="nav-title">
+          <span class="lang-vi">Kỹ thuật & So sánh</span>
+          <span class="lang-en">Technical & Comparison</span>
+        </div>
+        <ul class="nav-list">
+          <li class="nav-item"><a href="#ky-thuat">
+            <span class="lang-vi">Kiến trúc kỹ thuật</span>
+            <span class="lang-en">Technical Architecture</span>
+          </a></li>
+          <li class="nav-item"><a href="#so-sanh">
+            <span class="lang-vi">So sánh phiên bản</span>
+            <span class="lang-en">Version Comparison</span>
+          </a></li>
+          <li class="nav-item"><a href="#changelog">
+            <span class="lang-vi">Nhật ký thay đổi</span>
+            <span class="lang-en">Changelog</span>
+          </a></li>
+        </ul>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main>
+      
+      <!-- Section: Giới thiệu -->
+      <section id="gioi-thieu" class="card card-glow">
+        <h1 class="lang-vi">Giới thiệu WSR Core</h1>
+        <h1 class="lang-en">Introduction to WSR Core</h1>
         
-        <div class="warning-box">
-            <strong>⚠️ CẢNH BÁO PHIÊN BẢN:</strong><br>
-            Tài liệu này thuộc <strong>Review Package WSR 2.4.6 nháp</strong>.
-            Cấu hình chưa được áp dụng trực tiếp lên hệ thống runtime global của Agent.
+        <p class="lang-vi">
+          <strong>WSR Core</strong> là nền tảng quản trị Agent độc lập, xây dựng trên Anti-Waste và Minimal Coding. Mục tiêu của bản phát hành này là giảm thiểu "ảo giác" của AI, đồng thời nén dung lượng ngữ cảnh hệ thống nhằm tăng tốc độ phản hồi và độ chính xác của các mô hình ngôn ngữ lớn (LLM) trong quá trình phát triển mã nguồn.
+        </p>
+        <p class="lang-en">
+          <strong>WSR Core</strong> is an independent Agent governance platform built upon Anti-Waste and Minimal Coding. The goal of this release is to minimize AI hallucinations and compress system context volume to maximize speed and precision of Large Language Models (LLMs) during source code generation.
+        </p>
+
+        <div class="alert-box">
+          <p class="lang-vi">
+            <strong>Triết lý "Core Governance":</strong> Cắt bỏ các phần diễn giải dài dòng, thay bằng cấu trúc quy tắc dạng điện tín, tối ưu hóa các điểm neo hành vi cốt lõi để AI hoạt động chuẩn xác và tiết kiệm tài nguyên.
+          </p>
+          <p class="lang-en">
+            <strong>"Core Governance" Philosophy:</strong> Cuts down long explanations, replacing them with telegraphic rules, optimizing core behavioral anchors so AI works precisely while saving resources.
+          </p>
         </div>
 
-        <h2>1. Thư mục cấu hình chuẩn (Canonical Folder)</h2>
-        <p>
-            Hệ thống WSR sử dụng thư mục <code>.agents/</code> làm đường dẫn cấu hình và lưu trữ runtime chính thức.
-            Đường dẫn <code>.codex/</code> chỉ được duy trì làm bí danh (compatibility alias) phục vụ tương thích ngược.
-        </p>
-
-        <h2>2. Quy trình lập kế hoạch `/pl` (Planning Mode)</h2>
-        <p>
-            Khi thiết kế kế hoạch, Agent tạo và ghi nhận tại:
-            <code>DOCS/Planning/planning_[tên_nhiệm_vụ].md</code>.
-        </p>
-        <p>
-            Kế hoạch chỉ chứa <strong>mã giả (pseudocode), scope tác động, memory anchors, và checklist</strong>.
-            Tuyệt đối không chứa mã nguồn đầy đủ để tối ưu hóa context window.
-        </p>
-
-        <h2>3. Chế độ quét `/audit`</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Chế độ</th>
-                    <th>Ý nghĩa</th>
-                    <th>Lệnh thực thi nháp</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td><code>quick</code></td>
-                    <td>Quét nhanh các file thay đổi (Git changed)</td>
-                    <td><code>python scripts/wsr_audit.py --changed</code></td>
-                </tr>
-                <tr>
-                    <td><code>deep</code></td>
-                    <td>Quét sâu toàn bộ package review</td>
-                    <td><code>python scripts/wsr_audit.py --mode deep</code></td>
-                </tr>
-                <tr>
-                    <td><code>debt</code></td>
-                    <td>Quét nợ kỹ thuật (TODO/FIXME/wsr-debt)</td>
-                    <td><code>python scripts/wsr_debt_scanner.py --check</code></td>
-                </tr>
-                <tr>
-                    <td><code>drift</code></td>
-                    <td>So sánh drift cấu hình giữa nháp và global</td>
-                    <td><code>python scripts/sync_config.py</code> (Không có --apply)</td>
-                </tr>
-                <tr>
-                    <td><code>doctor</code></td>
-                    <td>Kiểm tra tính nhất quán toàn diện hệ thống</td>
-                    <td>Chạy quét manifest và tệp tin bắt buộc</td>
-                </tr>
-            </tbody>
-        </table>
-
-        <h2>4. Script Inventory (Danh mục script)</h2>
+        <h3 class="lang-vi">Các tính năng chính</h3>
+        <h3 class="lang-en">Key Features</h3>
         <ul>
-            <li><code>scripts/wsr_debt_scanner.py</code>: Bộ quét nợ kỹ thuật chống false positive.</li>
-            <li><code>scripts/wsr_audit.py</code>: Bộ kiểm thử tĩnh lỗi mã hóa (mojibake) và cú pháp.</li>
-            <li><code>scripts/wsr_clean.py</code>: Dọn dẹp an toàn dựa trên whitelist.</li>
-            <li><code>scripts/pack_wsr.py</code>: Đóng gói package review thành zip.</li>
-            <li><code>scripts/sync_config.py</code>: Đồng bộ nháp lên global khi có <code>--apply</code>.</li>
+          <li>
+            <span class="lang-vi"><strong>Quản lý ngữ cảnh thông minh:</strong> Cơ chế tự động dọn dẹp và nén ngữ cảnh cũ tránh tràn bộ nhớ.</span>
+            <span class="lang-en"><strong>Smart Context Management:</strong> Automatically cleans and compresses old context to avoid memory overflow.</span>
+          </li>
+          <li>
+            <span class="lang-vi"><strong>Giao thức an toàn (Risk Gate):</strong> Đánh giá mức độ rủi ro hệ thống trước khi thay đổi tệp tin.</span>
+            <span class="lang-en"><strong>Risk Gate Security Protocol:</strong> Evaluates system risk level before modifying files.</span>
+          </li>
+          <li>
+            <span class="lang-vi"><strong>Hỗ trợ công nghệ bản địa (Native-first):</strong> Ưu tiên HTML5/CSS gốc, giảm dependency thừa.</span>
+            <span class="lang-en"><strong>Native-first Tech stack:</strong> Prioritizes native HTML5/CSS, minimizing redundant dependencies.</span>
+          </li>
+        </ul>
+      </section>
+
+      <!-- Section: Ứng dụng thực tiễn -->
+      <section id="ung-dung" class="card card-glow">
+        <h2 class="lang-vi">Ứng dụng thực tiễn trong AI Vibe Coding</h2>
+        <h2 class="lang-en">Practical Application in AI Vibe Coding</h2>
+        
+        <p class="lang-vi">
+          Vibe Coding đề cập đến phong cách lập trình mà con người chỉ định hướng ý tưởng chung và để AI tự do thực thi mã nguồn. Nếu không có bộ kiểm soát như WSR, AI sẽ nhanh chóng sa vào bẫy quá đà thiết kế (over-engineering), viết mã rác hoặc làm hỏng các hàm dùng chung hiện tại.
+        </p>
+        <p class="lang-en">
+          Vibe Coding refers to a programming style where humans direct general ideas and let AI freely execute the code. Without WSR controls, AI quickly falls into over-engineering traps, writing junk code or breaking existing shared functions.
+        </p>
+
+        <h3 class="lang-vi">Bảng so sánh hiệu quả</h3>
+        <h3 class="lang-en">Efficiency Comparison</h3>
+        <table>
+          <thead>
+            <tr>
+              <th><span class="lang-vi">Yếu tố</span><span class="lang-en">Criteria</span></th>
+              <th><span class="lang-vi">Không có WSR Control</span><span class="lang-en">Without WSR Control</span></th>
+              <th><span class="lang-vi">Có WSR Core Control</span><span class="lang-en">With WSR Core Control</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong><span class="lang-vi">Tiêu thụ Token</span><span class="lang-en">Token Usage</span></strong></td>
+              <td><span class="lang-vi">Tăng vọt (do nạp đống rules rườm rà)</span><span class="lang-en">Spikes (due to loading massive, redundant rules)</span></td>
+              <td><span class="lang-vi">Tiết kiệm 65% (Quy tắc dạng điện tín ngắn)</span><span class="lang-en">Saves 65% (Telegraphic shortened rules)</span></td>
+            </tr>
+            <tr>
+              <td><strong><span class="lang-vi">Rủi ro hồi quy</span><span class="lang-en">Regression Risk</span></strong></td>
+              <td><span class="lang-vi">Cao (AI tự ý sửa hàm dùng chung, phá vỡ logic cũ)</span><span class="lang-en">High (AI arbitrarily edits shared functions, breaking old logic)</span></td>
+              <td><span class="lang-vi">Thấp (Chặn tự ý thực thi, bắt buộc duyệt kế hoạch)</span><span class="lang-en">Low (Blocks arbitrary execution, requires plan approval)</span></td>
+            </tr>
+            <tr>
+              <td><strong><span class="lang-vi">Over-Engineering</span></strong></td>
+              <td><span class="lang-vi">Thường xuyên (AI tự thêm thư viện, class thừa thãi)</span><span class="lang-en">Frequent (AI adds redundant libraries, classes)</span></td>
+              <td><span class="lang-vi">Cực hiếm (Tuân thủ luật YAGNI và Native-first)</span><span class="lang-en">Extremely rare (Follows YAGNI and Native-first rules)</span></td>
+            </tr>
+            <tr>
+              <td><strong><span class="lang-vi">Đồng bộ Theme UI</span><span class="lang-en">UI Theme Sync</span></strong></td>
+              <td><span class="lang-vi">Rời rạc (Mỗi lần sửa UI lại dùng một bảng màu ngẫu nhiên)</span><span class="lang-en">Fragmented (Random color palettes used per UI edit)</span></td>
+              <td><span class="lang-vi">Nhất quán (Tự động áp dụng và đồng bộ Liquid Glass)</span><span class="lang-en">Consistent (Automatically applies and syncs Liquid Glass)</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- Section: Hướng dẫn cài đặt -->
+      <section id="cai-dat" class="card card-glow">
+        <h2 class="lang-vi">Hướng dẫn cài đặt chi tiết</h2>
+        <h2 class="lang-en">Detailed Installation Guide</h2>
+        
+        <p class="lang-vi">
+          WSR Core được thiết kế để nạp tự động vào môi trường AI thông qua thư mục cấu hình chuẩn. Hãy thực hiện các bước sau:
+        </p>
+        <p class="lang-en">
+          WSR Core is designed to be automatically loaded into the AI environment via standard config directories. Follow these steps:
+        </p>
+
+        <h3 class="lang-vi">Các bước cài đặt thủ công</h3>
+        <h3 class="lang-en">Manual Installation Steps</h3>
+        <ol>
+          <li>
+            <span class="lang-vi">Sao chép toàn bộ các tệp tin cấu hình (`GEMINI.md`, `AGENTS.md`, thư mục `global_rules/`, `global_skills/`, `global_workflows/`...) vào thư mục `.agents/` tại thư mục gốc của dự án (workspace).</span>
+            <span class="lang-en">Copy all config files (`GEMINI.md`, `AGENTS.md`, folders `global_rules/`, `global_skills/`, `global_workflows/`...) to the `.agents/` directory at the project root (workspace).</span>
+          </li>
+          <li>
+            <span class="lang-vi">Đối với khả năng tương thích ngược, cấu trúc này cũng hoạt động khi đặt ở thư mục `.codex/`.</span>
+            <span class="lang-en">For backward compatibility, this structure also works when placed in the `.codex/` directory.</span>
+          </li>
+          <li>
+            <span class="lang-vi">Khởi chạy hoặc khởi động lại (Reload) Agent để nạp ngữ cảnh mới.</span>
+            <span class="lang-en">Launch or restart (Reload) the Agent to load the new context.</span>
+          </li>
+        </ol>
+
+        <h3 class="lang-vi">Cài đặt tự động bằng script</h3>
+        <h3 class="lang-en">Automatic Installation via Script</h3>
+        <p class="lang-vi">Sử dụng tệp tin [sync_config.py](../.agents/scripts/sync_config.py) để đồng bộ hóa nhanh chóng cấu hình từ thư mục global của IDE vào workspace:</p>
+        <p class="lang-en">Use the [sync_config.py](../.agents/scripts/sync_config.py) script to quickly synchronize the config from the IDE global directory into the workspace:</p>
+        <pre><code>python .agents/scripts/sync_config.py --apply</code></pre>
+      </section>
+
+      <!-- Section: Hướng dẫn sử dụng -->
+      <section id="su-dung" class="card card-glow">
+        <h2 class="lang-vi">Hướng dẫn sử dụng chi tiết các tính năng</h2>
+        <h2 class="lang-en">Detailed Usage Instructions</h2>
+        
+        <p class="lang-vi">
+          WSR Core tích hợp sẵn các lệnh điều hướng hành vi (Slash Commands) và các gói kỹ năng (Skills) chuyên dụng.
+        </p>
+        <p class="lang-en">
+          WSR Core integrates built-in behavior-guiding Slash Commands and specialized Skills.
+        </p>
+
+        <h3 class="lang-vi">Chi tiết các Lệnh Slash Commands</h3>
+        <h3 class="lang-en">Slash Commands Details</h3>
+        <ul>
+          <li>
+            <span class="lang-vi"><strong>`/br` (Brainstorm):</strong> Phân tích và đề xuất giải pháp trực tiếp trong chat. Tuyệt đối KHÔNG tự ý sửa code khi đang thảo luận `/br`.</span>
+            <span class="lang-en"><strong>`/br` (Brainstorm):</strong> Analyzes and proposes solutions directly in chat. Strictly NO arbitrary code modifications during `/br`.</span>
+          </li>
+          <li>
+            <span class="lang-vi"><strong>`/pl` (Planning):</strong> Lập kế hoạch thiết kế chi tiết và xuất ra tệp tin MD nằm trong `DOCS/Planning/` (không được tự ý viết code khi chưa có sự phê duyệt).</span>
+            <span class="lang-en"><strong>`/pl` (Planning):</strong> Creates a detailed design plan and writes it to an MD file inside `DOCS/Planning/` (no code writing allowed before approval).</span>
+          </li>
+          <li>
+            <span class="lang-vi"><strong>`/audit` (Audit chất lượng):</strong> Kích hoạt kiểm tra tĩnh chất lượng mã nguồn bằng cách gọi [wsr_audit.py](../.agents/scripts/wsr_audit.py) để phát hiện code rác, mojibake, encoding lỗi.</span>
+            <span class="lang-en"><strong>`/audit` (Quality Audit):</strong> Triggers static code quality audits by calling [wsr_audit.py](../.agents/scripts/wsr_audit.py) to detect junk code, mojibake, and encoding errors.</span>
+          </li>
+          <li>
+            <span class="lang-vi"><strong>`/clean` (Dọn dẹp):</strong> Chạy [wsr_clean.py](../.agents/scripts/wsr_clean.py) để quét và đề xuất xóa bỏ các file tạm, file backup dư thừa, tối ưu dung lượng đĩa.</span>
+            <span class="lang-en"><strong>`/clean` (Clean):</strong> Runs [wsr_clean.py](../.agents/scripts/wsr_clean.py) to scan and propose deletion of temporary and redundant backup files.</span>
+          </li>
+          <li>
+            <span class="lang-vi"><strong>`/wsr` (Đóng gói):</strong> Kích hoạt [pack_wsr.py](../.agents/scripts/pack_wsr.py) tự động thu thập cấu hình hiện tại, nâng phiên bản và đóng gói thành tệp `.zip` an toàn.</span>
+            <span class="lang-en"><strong>`/wsr` (Package):</strong> Activates [pack_wsr.py](../.agents/scripts/pack_wsr.py) to bundle the current config, bump the version, and zip it securely.</span>
+          </li>
+          <li>
+            <span class="lang-vi"><strong>`/reload` (Nạp lại):</strong> Refresh lại toàn bộ cấu hình rules, skills và memory cục bộ mà không làm mất lịch sử hội thoại.</span>
+            <span class="lang-en"><strong>`/reload` (Reload):</strong> Refreshes the local configuration rules, skills, and memory without losing conversation history.</span>
+          </li>
         </ul>
 
-        <h2>5. Nạp Skill JIT (Dynamic Skill Loading)</h2>
-        <p>
-            Hệ thống hỗ trợ nạp cấu hình lazy-load.
-            Nếu skill file chứa các khối phân tách dạng <code>&lt;!-- START_BLOCK: [TÊN] --&gt;</code>,
-            Agent chỉ thực hiện nạp block liên quan trực tiếp đến tác vụ hiện tại để tiết kiệm tối đa token.
+        <h3 class="lang-vi">Các Gói Kỹ Năng Nhúng Sẵn (Embedded Skills)</h3>
+        <h3 class="lang-en">Embedded Skills</h3>
+        <ul>
+          <li>
+            <span class="lang-vi"><strong>wsr-audit:</strong> Quét over-engineering, code rác, dependency thừa thãi và đề xuất thay bằng thư viện tiêu chuẩn (stdlib/native).</span>
+            <span class="lang-en"><strong>wsr-audit:</strong> Scans for over-engineering, junk code, and redundant dependencies, recommending standard libraries (stdlib/native) instead.</span>
+          </li>
+          <li>
+            <span class="lang-vi"><strong>wsr-debt</strong>: Thu thập các comment đánh dấu nợ kỹ thuật `# wsr-debt` hoặc `TODO` vào một ledger tập trung ([debt_ledger.md](../.agents/debt_ledger.md)) để theo dõi.</span>
+            <span class="lang-en"><strong>wsr-debt</strong>: Gathers technical debt comments marked with `# wsr-debt` or `TODO` into a central ledger ([debt_ledger.md](../.agents/debt_ledger.md)) for tracking.</span>
+          </li>
+          <li>
+            <span class="lang-vi"><strong>wsr-review:</strong> Phân tích Git diff để phát hiện nhanh các thay đổi có nguy cơ phá vỡ logic cũ hoặc thiết kế quá mức cần thiết.</span>
+            <span class="lang-en"><strong>wsr-review:</strong> Analyzes Git diff to quickly identify changes that risk breaking old logic or representing excessive design.</span>
+          </li>
+        </ul>
+      </section>
+
+      <!-- Section: Kiến trúc kỹ thuật -->
+      <section id="ky-thuat" class="card card-glow">
+        <h2 class="lang-vi">Mô tả kỹ thuật nâng cao & Logic xử lý</h2>
+        <h2 class="lang-en">Advanced Technical Description & Processing Logic</h2>
+        
+        <p class="lang-vi">
+          WSR Core hoạt động dựa trên sự phối hợp chặt chẽ giữa Manifest (Cấu hình tổng), Checksums (Bảo vệ tính toàn vẹn) và các Script tiện ích.
         </p>
-    </div>
+        <p class="lang-en">
+          WSR Core operates on tight coordination between the Manifest (Master Config), Checksums (Integrity Protection), and Utility Scripts.
+        </p>
+
+        <h3 class="lang-vi">Sơ đồ logic xử lý giữa các thành phần</h3>
+        <h3 class="lang-en">Processing Logic Diagram</h3>
+        <pre><code>
++-----------------------------------------------------------+
+|               WSR_MANIFEST.json (Master)                  |
+|  - Định nghĩa danh mục files, rules, skills, và adapters  |
++-----------------------------+-----------------------------+
+                              |
+                              v (Xác thực thực tế)
++-----------------------------+-----------------------------+
+|               WSR_CHECKSUMS.json (Integrity)              |
+|  - Đảm bảo các file cấu hình không bị thay đổi bất hợp pháp|
++-----------------------------+-----------------------------+
+                              |
+        +---------------------+---------------------+
+        | (Kích hoạt lệnh)                          | (Bảo trì)
+        v                                           v
++-------+---------------------+             +-------+---------------------+
+|      Workflows/*.md         |             |      scripts/*.py           |
+| - Quy trình điều hướng AI   |             | - Thực thi tự động:         |
+| - Phân tích logic (/pl, /br)|             |   quét nợ, audit, dọn dẹp   |
++-----------------------------+             +-----------------------------+
+        </code></pre>
+
+        <h3 class="lang-vi">Chi tiết các thành phần chính</h3>
+        <h3 class="lang-en">Key Components Detail</h3>
+        <ul>
+          <li>
+            <span class="lang-vi"><strong>WSR_MANIFEST.json:</strong> Đóng vai trò là nguồn dữ liệu chuẩn (Source of Truth) xác định toàn bộ tệp tin thuộc gói cấu hình WSR.</span>
+            <span class="lang-en"><strong>WSR_MANIFEST.json:</strong> Acts as the Source of Truth defining all files included in the WSR configuration package.</span>
+          </li>
+          <li>
+            <span class="lang-vi"><strong>WSR_CHECKSUMS.json:</strong> Chứa mã băm SHA-256 của từng file để phục vụ lệnh `wsr_doctor.py` kiểm tra tính toàn vẹn, chống lỗi bảng mã (mojibake) và thay đổi ngoài ý muốn.</span>
+            <span class="lang-en"><strong>WSR_CHECKSUMS.json:</strong> Contains the SHA-256 hash of each file for `wsr_doctor.py` to verify integrity, protecting against encoding errors (mojibake) and unintended changes.</span>
+          </li>
+          <li>
+            <span class="lang-vi"><strong>Adapters (adapters/*.json):</strong> Cấu hình ánh xạ các biến môi trường và luật tương thích cho từng IDE cụ thể (Cursor, Gemini, Claude...).</span>
+            <span class="lang-en"><strong>Adapters (adapters/*.json):</strong> Configures environment mappings and compatibility rules for specific IDEs (Cursor, Gemini, Claude...).</span>
+          </li>
+        </ul>
+      </section>
+
+      <!-- Section: So sánh phiên bản -->
+      <section id="so-sanh" class="card card-glow">
+        <h2 class="lang-vi">So sánh WSR Core với 2.4.4 & 2.4.5</h2>
+        <h2 class="lang-en">Comparison: WSR Core vs 2.4.4 & 2.4.5</h2>
+        
+        <p class="lang-vi">
+          Phiên bản WSR Core đánh dấu bước chuyển dịch lớn từ việc mô tả rules chi tiết sang tinh giản hóa tối đa cấu trúc nhằm chống lãng phí context window.
+        </p>
+        <p class="lang-en">
+          Version WSR Core marks a major shift from descriptive rules to structural simplification to prevent context window waste.
+        </p>
+
+        <table>
+          <thead>
+            <tr>
+              <th><span class="lang-vi">Tính năng</span><span class="lang-en">Feature</span></th>
+              <th>WSR 2.4.4</th>
+              <th>WSR 2.4.5</th>
+              <th>WSR Core (V5)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong><span class="lang-vi">Độ dài GEMINI.md</span><span class="lang-en">GEMINI.md Length</span></strong></td>
+              <td><span class="lang-vi">120 dòng (nhiều diễn giải)</span><span class="lang-en">120 lines (verbose)</span></td>
+              <td><span class="lang-vi">115 dòng (cải tiến nhỏ)</span><span class="lang-en">115 lines (minor updates)</span></td>
+              <td><strong><span class="lang-vi">35 dòng (siêu cô đọng)</span><span class="lang-en">35 lines (highly condensed)</span></strong></td>
+            </tr>
+            <tr>
+              <td><strong><span class="lang-vi">Công cụ quản trị</span><span class="lang-en">Management Scripts</span></strong></td>
+              <td><span class="lang-vi">Không có (Chỉ có rule tĩnh)</span><span class="lang-en">None (Static rules only)</span></td>
+              <td><span class="lang-vi">Bắt đầu tích hợp script dọn dẹp</span><span class="lang-en">Began integrating clean scripts</span></td>
+              <td><strong><span class="lang-vi">Đầy đủ bộ công cụ quản trị (6 script chính)</span><span class="lang-en">Full utility suite (6 core scripts)</span></strong></td>
+            </tr>
+            <tr>
+              <td><strong><span class="lang-vi">Nợ kỹ thuật</span><span class="lang-en">Technical Debt</span></strong></td>
+              <td><span class="lang-vi">Theo dõi thủ công qua comment</span><span class="lang-en">Manual tracking via comments</span></td>
+              <td><span class="lang-vi">Có tag nợ kỹ thuật cục bộ</span><span class="lang-en">Local tech debt tags added</span></td>
+              <td><strong><span class="lang-vi">Quản lý tự động bằng ledger & scanner</span><span class="lang-en">Automated tracking via ledger & scanner</span></strong></td>
+            </tr>
+            <tr>
+              <td><strong><span class="lang-vi">Cấu trúc thư mục</span><span class="lang-en">Directory Structure</span></strong></td>
+              <td><span class="lang-vi">Cũ (chưa chuẩn hóa)</span><span class="lang-en">Old (not standardized)</span></td>
+              <td><span class="lang-vi">Chuẩn hóa bước đầu</span><span class="lang-en">First-stage standardization</span></td>
+              <td><strong><span class="lang-vi">Chuẩn hóa cấu trúc dẹt (phẳng), dễ nạp</span><span class="lang-en">Standardized flat structure, easy load</span></strong></td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- Section: Change log -->
+      <section id="changelog" class="card card-glow">
+        <h2 class="lang-vi">Nhật ký thay đổi (Changelog) - WSR Core</h2>
+        <h2 class="lang-en">Changelog - WSR Core</h2>
+        
+        <h3 class="lang-vi">Bản phát hành Release V5</h3>
+        <h3 class="lang-en">Release V5 Launch</h3>
+        <ul>
+          <li>
+            <span class="lang-vi"><strong>[Tối ưu]</strong> Tinh giản và thu gọn file `GEMINI.md` xuống còn 35 dòng để tiết kiệm ngữ cảnh.</span>
+            <span class="lang-en"><strong>[Optimization]</strong> Condensed `GEMINI.md` to 35 lines to optimize context window space.</span>
+          </li>
+          <li>
+            <span class="lang-vi"><strong>[Tối ưu]</strong> Rút ngắn các file workflow `/br`, `/pl`, `/reload` xuống còn 1/3 dung lượng cũ.</span>
+            <span class="lang-en"><strong>[Optimization]</strong> Shortened workflow files (`/br`, `/pl`, `/reload`) to 1/3 of their previous size.</span>
+          </li>
+          <li>
+            <span class="lang-vi"><strong>[Tính năng]</strong> Bổ sung script [wsr_debt_scanner.py](../.agents/scripts/wsr_debt_scanner.py) để tự động quét nợ kỹ thuật.</span>
+            <span class="lang-en"><strong>[Feature]</strong> Added [wsr_debt_scanner.py](../.agents/scripts/wsr_debt_scanner.py) to automatically scan tech debt.</span>
+          </li>
+          <li>
+            <span class="lang-vi"><strong>[Tính năng]</strong> Bổ sung script [wsr_doctor.py](../.agents/scripts/wsr_doctor.py) để chẩn đoán hệ thống và sửa lỗi mojibake.</span>
+            <span class="lang-en"><strong>[Feature]</strong> Added [wsr_doctor.py](../.agents/scripts/wsr_doctor.py) to diagnose the system and resolve mojibake issues.</span>
+          </li>
+          <li>
+            <span class="lang-vi"><strong>[Sửa lỗi]</strong> Đảm bảo đồng bộ hóa hoàn toàn các file rule cục bộ của dự án.</span>
+            <span class="lang-en"><strong>[Bugfix]</strong> Ensured complete synchronization of local project rule files.</span>
+          </li>
+        </ul>
+      </section>
+
+    </main>
+  </div>
+
+  <script>
+    // Theme Management
+    function toggleTheme() {
+      const html = document.documentElement;
+      const sunIcon = document.getElementById("sun-icon");
+      const moonIcon = document.getElementById("moon-icon");
+      
+      if (html.getAttribute("data-theme") === "light") {
+        html.setAttribute("data-theme", "dark");
+        sunIcon.style.display = "none";
+        moonIcon.style.display = "block";
+        localStorage.setItem("wsr-theme", "dark");
+      } else {
+        html.setAttribute("data-theme", "light");
+        sunIcon.style.display = "block";
+        moonIcon.style.display = "none";
+        localStorage.setItem("wsr-theme", "light");
+      }
+    }
+
+    // Language Management
+    function toggleLang() {
+      const html = document.documentElement;
+      const currentLang = html.getAttribute("data-lang");
+      const newLang = currentLang === "vi" ? "en" : "vi";
+      html.setAttribute("data-lang", newLang);
+      localStorage.setItem("wsr-lang", newLang);
+    }
+
+    // Init Theme and Lang from Local Storage
+    document.addEventListener("DOMContentLoaded", () => {
+      const savedTheme = localStorage.getItem("wsr-theme");
+      if (savedTheme) {
+        document.documentElement.setAttribute("data-theme", savedTheme);
+        const sunIcon = document.getElementById("sun-icon");
+        const moonIcon = document.getElementById("moon-icon");
+        if (savedTheme === "dark") {
+          sunIcon.style.display = "none";
+          moonIcon.style.display = "block";
+        } else {
+          sunIcon.style.display = "block";
+          moonIcon.style.display = "none";
+        }
+      }
+
+      const savedLang = localStorage.getItem("wsr-lang");
+      if (savedLang) {
+        document.documentElement.setAttribute("data-lang", savedLang);
+      }
+
+      // Mouse glow interaction (Liquid Glass Skill lqia)
+      document.querySelectorAll('.card-glow').forEach(element => {
+        element.addEventListener('mousemove', e => {
+          const rect = element.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          
+          element.style.setProperty('--mouse-x', `${x}px`);
+          element.style.setProperty('--mouse-y', `${y}px`);
+        });
+      });
+
+      // Active state for sidebar navigation
+      const navItems = document.querySelectorAll('.nav-item');
+      window.addEventListener('scroll', () => {
+        let currentSection = '';
+        const sections = document.querySelectorAll('section');
+        sections.forEach(section => {
+          const sectionTop = section.offsetTop;
+          if (pageYOffset >= sectionTop - 120) {
+            currentSection = section.getAttribute('id');
+          }
+        });
+
+        navItems.forEach(item => {
+          item.classList.remove('active');
+          const href = item.querySelector('a').getAttribute('href');
+          if (href === '#' + currentSection) {
+            item.classList.add('active');
+          }
+        });
+      });
+    });
+  </script>
 </body>
 </html>

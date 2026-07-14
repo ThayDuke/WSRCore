@@ -1,4 +1,8 @@
-# Quy trình Dọn Dẹp `/clean` (Bản nháp 2.4.6)
+---
+description: Scan and remove temporary/unwanted files
+---
+
+# Quy trình Dọn Dẹp `/clean` (WSR Core 1.0)
 
 Khi chạy lệnh `/clean` để tối ưu dung lượng dự án:
 

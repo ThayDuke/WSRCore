@@ -1,4 +1,8 @@
-# Quy trình Planning `/pl` (Bản nháp 2.4.6)
+---
+description: Trigger planning workflow and create planning file
+---
+
+# Quy trình Planning `/pl` (WSR Core 1.0)
 
 Quy trình lập kế hoạch trước khi code:
 

@@ -1,10 +1,10 @@
-# WSR Global Instructions (WSR 2.4.6 Hardened Release Candidate)
+# WSR Core Global Instructions
 
 > [!WARNING]
-> **ĐÂY LÀ RELEASE CANDIDATE (RC) CHƯA APPLY TOÀN CỤC.**
-> Toàn bộ các cấu hình dưới đây đang ở trạng thái Release Candidate (RC) trong thư mục package hiện tại và chưa được áp dụng trực tiếp vào `.agents/` hay global config của hệ thống.
+> **ĐÂY LÀ NGUỒN PHÁT HÀNH CHÍNH THỨC WSR CORE 1.0.0.**
+> Mọi triển khai từ package này phải đi qua Doctor, checksum và quy trình sync có phê duyệt.
 
-## 1. Cấu trúc Package WSR 2.4.6
+## 1. Cấu trúc Package WSR Core
 - **Manifest:** [WSR_MANIFEST.json](./WSR_MANIFEST.json)
 - **Workflows:**
   - `/audit` -> [audit.md](./global_workflows/audit.md)

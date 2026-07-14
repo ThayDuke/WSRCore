@@ -15,7 +15,7 @@ def log_message(msg, is_json, level="INFO"):
             print(f"[+] {msg}")
 
 def check_containment(base_root, relative_path):
-    """Hardened path containment validation via realpath and commonpath."""
+    """Strict path containment validation via realpath and commonpath."""
     abs_base = os.path.realpath(base_root)
     # Check if absolute path
     if os.path.isabs(relative_path) or relative_path.replace('\\', '/').startswith('/'):
@@ -464,7 +464,7 @@ def run_doctor_checks(package_root, strict=False, is_json=False):
         if os.path.exists(install_guide_path):
             with open(install_guide_path, "r", encoding="utf-8", errors="strict") as f:
                 guide_content = f.read()
-            if re.search(r"WSR2\.4\.6-Hardened_v\d+\.\d+\.\d+_\d+", guide_content) or "DOCS/WSR2.4.6" in guide_content:
+            if re.search(r"WSR-Core_v\d+\.\d+\.\d+_\d+", guide_content) or "DOCS/WSR-Core" in guide_content:
                 guide_clean = False
                 results["warnings"].append("Installation guide contains static build path references")
         if guide_clean:
