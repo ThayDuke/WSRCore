@@ -1,9 +1,9 @@
-version: "v22"
+version: "v24"
 status: "Completed"
-buildId: "WSR-DEC-GITIGNORE-LAUNCHER-FIX"
+buildId: "WSR-DEC-TOOLTALK-ULTITEMP-VISUAL-UPGRADE"
 last_update: "2026-07-15"
-summary: "Updated .gitignore to whitelist QBank and images. Modified Start_DEC.bat to verify virtual environment existence before executing silent launcher, escaping parentheses to prevent syntax errors."
-artifacts_count: 51
+summary: "Nâng cấp visual thiết kế ToolTalk khớp 100% UltiTemp: sử dụng các biến gradient, card-bg, card-active-bg, bo góc, bóng đổ và toggle switch mode lớn (140x36px) chuẩn UltiTemp. Remaster đồng bộ thành công 153 file HTML."
+artifacts_count: 157
 checksums_verified: true
 exit_codes_verified: true
 doctor_score: 100
