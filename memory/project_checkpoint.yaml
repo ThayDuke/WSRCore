@@ -1,13 +1,13 @@
-version: "v20"
+version: "v22"
 status: "Completed"
-buildId: "WSR-DEC-FOCUS-X4-REMASTERED"
-last_update: "2026-07-14"
-summary: "Created planning_tool_talk_status_report.md outlining the current architecture of Tool Talk and a detailed root-cause analysis of lesson loading errors."
+buildId: "WSR-DEC-GITIGNORE-LAUNCHER-FIX"
+last_update: "2026-07-15"
+summary: "Updated .gitignore to whitelist QBank and images. Modified Start_DEC.bat to verify virtual environment existence before executing silent launcher, escaping parentheses to prevent syntax errors."
 artifacts_count: 51
 checksums_verified: true
 exit_codes_verified: true
 doctor_score: 100
-audit_score: 85
-walkthrough_path: "DOCS/Planning/planning_tool_talk_status_report.md"
+audit_score: 100
+walkthrough_path: ""
 release_zip: ""
 zip_sha256: ""
