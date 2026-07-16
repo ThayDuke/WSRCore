@@ -28,7 +28,8 @@
     ".DS_Store",
     "Thumbs.db",
     "memory/",
-    "metadata.json"
+    "metadata.json",
+    "gitnexus/"
   ],
   "commands": {
     "audit": {

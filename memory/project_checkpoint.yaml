@@ -1,9 +1,9 @@
-version: "v30"
+version: "v31"
 status: "Completed"
-buildId: "WSR-DEC-WARNINGS-CLEAN"
+buildId: "IPATEMP-PRONUNCIATION-GAME"
 last_update: "2026-07-16"
-summary: "Theme Youth/Elegant đồng bộ; mojibake builder sạch; audit root resolver hợp lệ."
-artifacts_count: 5
+summary: "IPATemp có shortcut 5, random không lặp, timer 5s/10s và game phát âm tính tim."
+artifacts_count: 6
 checksums_verified: true
 exit_codes_verified: true
 doctor_score: 100
