@@ -1,13 +1,13 @@
-version: "v31"
+version: "v34"
 status: "Completed"
 buildId: "IPATEMP-PRONUNCIATION-GAME"
 last_update: "2026-07-16"
-summary: "IPATemp có shortcut 5, random không lặp, timer 5s/10s và game phát âm tính tim."
-artifacts_count: 6
+summary: "Cập nhật kích thước nút segment và tim đồng bộ ở 34px sử dụng token --dmu-control-small-height. Đồng bộ token này và thuộc tính background-clip: padding-box cho slider toggle vào thư viện DMU dùng chung (dec-ui-tokens.css và dec-ui-theme-toggle.css) để triệt tiêu lỗi lem màu và tràn viền."
+artifacts_count: 8
 checksums_verified: true
 exit_codes_verified: true
 doctor_score: 100
 audit_score: 100
-walkthrough_path: ""
+walkthrough_path: "C:\\Users\\DUKE NGUYEN\\.gemini\\antigravity-ide\\brain\\c8e10a51-1854-4453-972d-f87e494d7bff\\walkthrough.md"
 release_zip: ""
 zip_sha256: ""
