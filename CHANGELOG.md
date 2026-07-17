@@ -1,5 +1,9 @@
 # WSR Core Changelog
 
+## [1.0.2] - 2026-07-17
+- Cập nhật Giao thức Tự vấn Bắt buộc (Cognitive Guardrail) chỉ thực hiện 1 lần ở thought đầu tiên.
+- Bổ sung quy tắc Thought Caveman để giảm tiêu hao token.
+
 ## [1.0.1] - 2026-07-13
 - Bổ sung Giao thức Tự vấn Bắt buộc (Cognitive Guardrail) vào GEMINI.md.
 - Buộc Agent tự vấn kiểm tra quyền sửa đổi trước khi gọi tool hệ thống.

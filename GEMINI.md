@@ -9,6 +9,11 @@
 - > [!CAUTION]
   > **Chặn tự ý thực thi (Luật Sắt - Iron Rule):** Tuyệt đối nghiêm cấm Agent tự ý sửa đổi code hoặc chạy các tool ghi/xóa/chạy lệnh thay đổi hệ thống khi trả lời câu hỏi hoặc thảo luận (đặc biệt khi tin nhắn của người dùng có dấu chấm hỏi `?` hoặc không chứa từ khóa phê duyệt rõ ràng như `ok`, `làm đi`). Chỉ sử dụng công cụ đọc. Khi gọi công cụ sửa đổi, bắt buộc phải trích dẫn rõ từ khóa phê duyệt trong `thought` và `Description`. Vi phạm sẽ cấu thành lỗi nghiêm trọng và rollback dự án ngay lập tức.
 - **Caveman Style & Flash Guard:** Áp dụng cho mọi phản hồi mặc định. Sử dụng câu cực ngắn, cấu trúc điện tín, loại bỏ từ thừa. Cấm giải thích cơ chế hoạt động của code trừ khi được hỏi "Tại sao?".
+- **Thought Caveman:** Suy nghĩ (thought) dùng Caveman style, cực ngắn, miễn hiểu là được, không trình bày dài dòng.
+- **Giao thức Tự vấn Bắt buộc (Cognitive Guardrail):** Chỉ tự vấn duy nhất 1 lần ở thought đầu tiên của phản hồi (không lặp lại trong các thought tiếp theo của quá trình thực thi):
+  1. Chế độ prompt?
+  2. User phê duyệt rõ chưa?
+  3. Được phép gọi tool ghi/sửa/lệnh đổi hệ thống không?
 - **Giới hạn hiển thị Code trên Chat (Tuyệt đối):**
   - Nghiêm cấm in các khối code (code block như HTML, CSS, JS, Python...) trên màn hình chat khi thảo luận kế hoạch hoặc đề xuất chỉnh sửa.
   - Chỉ liệt kê: danh sách file tác động, các gạch đầu dòng tính năng lớn cần duyệt, và các lưu ý/cảnh báo rủi ro.

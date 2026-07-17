@@ -1,8 +1,8 @@
 {
   "schemaVersion": 2,
   "packageName": "WSR-Core",
-  "version": "1.0.1",
-  "buildId": "WSR-CORE-1.0.1-RELEASE",
+  "version": "1.0.2",
+  "buildId": "WSR-CORE-1.0.2-RELEASE",
   "status": "Released",
   "createdAt": "2026-07-11T23:42:50+07:00",
   "canonicalLayout": ".agents",

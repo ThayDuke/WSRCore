@@ -13,7 +13,6 @@ import wsr_common
 CORE_FILES = (
     "GEMINI.md",
     "AGENTS.md",
-    "WSR_MANIFEST.json",
     "memory/project_checkpoint.yaml",
 )
 
