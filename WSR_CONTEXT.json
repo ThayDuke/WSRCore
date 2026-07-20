@@ -3,7 +3,7 @@
   "packageName": "WSR-Core",
   "version": "1.0.7",
   "buildId": "WSR-CORE-1.0.7-RELEASE",
-  "manifestSha256": "cf02bf7da95c3e005266a8e4e1617ccf985cdd57b246d3800562c0fe99513616",
+  "manifestSha256": "8d4628c46dcb20fdcdc429adbf94c5cacfdce79403a5f25a4d91e5b11da4f2cb",
   "policyFiles": [
     "GEMINI.md",
     "global_rules/AG_GLOBAL_RULES.md"
@@ -157,7 +157,7 @@
       "description": "Output formatting guidelines",
       "trigger": "output, format, full output",
       "path": "global_skills/output-skill/SKILL.md",
-      "contentHash": "7b2275b591af7760b36a2dfb1dbcf3c99c5054c52298a1066c4979f39ed947d9",
+      "contentHash": "e5bf48b1ae561511439cf71672209a10a88cee0968cc925909ff861dfa0a96a7",
       "scope": "global",
       "priority": 5
     },
@@ -167,7 +167,7 @@
       "description": "UI redesign and visual overhaul rules",
       "trigger": "redesign, visual update",
       "path": "global_skills/redesign-skill/SKILL.md",
-      "contentHash": "0db15d1e82eb72af534114bbc22ffa9ac32515234ca36bb759c98858e3ce642f",
+      "contentHash": "af275023ae872464fbddf2909aba6ba4a657f30b6b1aecd4467e0b3d67cbe380",
       "scope": "global",
       "priority": 5
     },
@@ -177,7 +177,7 @@
       "description": "Soft skills and communication principles",
       "trigger": "communication, soft skills",
       "path": "global_skills/soft-skill/SKILL.md",
-      "contentHash": "af59c3beac144b7ed6d850f178833742dcfc5ffefa6ebb514e2dcf1a5fdb6615",
+      "contentHash": "3bd49aeeeb6ceb940a1bf2a64aa7cf6315443848bb15ed433d8ff26006175b6c",
       "scope": "global",
       "priority": 5
     },
@@ -187,7 +187,7 @@
       "description": "Stitch UI integration and design taste",
       "trigger": "stitch, UI design taste",
       "path": "global_skills/stitch-skill/SKILL.md",
-      "contentHash": "2c7cc99214d4b8897e09d748c0557f35629ddd8cfec1843cfead5c41f82abf0c",
+      "contentHash": "bbefb01af6104aed14866338bab46a98b38101c80710a610bf32679244a9a9c6",
       "references": [
         "global_skills/stitch-skill/DESIGN.md"
       ],
