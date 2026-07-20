@@ -1,4 +1,4 @@
-# WSR Core 1.0.6 — Agent Loader Contract
+# WSR Core 1.0.7-RELEASE — Agent Loader Contract
 
 > [!IMPORTANT]
 > Đây là nguồn WSR Core chính thức ở trạng thái `Released`.

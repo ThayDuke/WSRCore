@@ -1,12 +1,14 @@
 {
   "schemaVersion": 2,
   "packageName": "WSR-Core",
-  "version": "1.0.6",
-  "buildId": "WSR-CORE-1.0.6-RELEASE",
+  "version": "1.0.7",
+  "buildId": "WSR-CORE-1.0.7-RELEASE",
   "status": "Released",
-  "createdAt": "2026-07-20T13:15:00+07:00",
+  "createdAt": "2026-07-20T14:15:44+07:00",
   "canonicalLayout": ".agents",
-  "compatibilityLayouts": [".codex"],
+  "compatibilityLayouts": [
+    ".codex"
+  ],
   "minimumPython": "3.8",
   "policySource": "GEMINI.md",
   "checksumsFile": "WSR_CHECKSUMS.json",
@@ -116,7 +118,10 @@
       "required": true,
       "mutable": false,
       "deploy": true,
-      "targets": ["codex", "gemini"],
+      "targets": [
+        "codex",
+        "gemini"
+      ],
       "owner": "Tech Lead",
       "encoding": "UTF-8"
     },
@@ -127,7 +132,10 @@
       "required": true,
       "mutable": true,
       "deploy": true,
-      "targets": ["codex", "gemini"],
+      "targets": [
+        "codex",
+        "gemini"
+      ],
       "owner": "Tech Lead",
       "encoding": "UTF-8"
     },
@@ -138,7 +146,10 @@
       "required": true,
       "mutable": true,
       "deploy": true,
-      "targets": ["codex", "gemini"],
+      "targets": [
+        "codex",
+        "gemini"
+      ],
       "owner": "Documentation Engineer",
       "encoding": "UTF-8"
     },
@@ -149,7 +160,10 @@
       "required": true,
       "mutable": true,
       "deploy": true,
-      "targets": ["codex", "gemini"],
+      "targets": [
+        "codex",
+        "gemini"
+      ],
       "owner": "Documentation Engineer",
       "encoding": "UTF-8"
     },
@@ -160,7 +174,10 @@
       "required": true,
       "mutable": true,
       "deploy": true,
-      "targets": ["codex", "gemini"],
+      "targets": [
+        "codex",
+        "gemini"
+      ],
       "owner": "Documentation Engineer",
       "encoding": "UTF-8"
     },
@@ -171,7 +188,10 @@
       "required": true,
       "mutable": true,
       "deploy": true,
-      "targets": ["codex", "gemini"],
+      "targets": [
+        "codex",
+        "gemini"
+      ],
       "owner": "Configuration Engineer",
       "encoding": "UTF-8"
     },
@@ -182,7 +202,10 @@
       "required": true,
       "mutable": true,
       "deploy": true,
-      "targets": ["codex", "gemini"],
+      "targets": [
+        "codex",
+        "gemini"
+      ],
       "owner": "Python Tooling Engineer B",
       "encoding": "UTF-8"
     },
@@ -193,7 +216,10 @@
       "required": true,
       "mutable": false,
       "deploy": true,
-      "targets": ["codex", "gemini"],
+      "targets": [
+        "codex",
+        "gemini"
+      ],
       "owner": "Tech Lead",
       "encoding": "UTF-8"
     },
@@ -204,7 +230,11 @@
       "required": true,
       "mutable": false,
       "deploy": true,
-      "targets": ["codex", "gemini", "antigravity"],
+      "targets": [
+        "codex",
+        "gemini",
+        "antigravity"
+      ],
       "owner": "Workflow Engineer",
       "encoding": "UTF-8"
     },
@@ -215,7 +245,11 @@
       "required": true,
       "mutable": false,
       "deploy": true,
-      "targets": ["codex", "gemini", "antigravity"],
+      "targets": [
+        "codex",
+        "gemini",
+        "antigravity"
+      ],
       "owner": "Workflow Engineer",
       "encoding": "UTF-8"
     },
@@ -226,7 +260,11 @@
       "required": true,
       "mutable": false,
       "deploy": true,
-      "targets": ["codex", "gemini", "antigravity"],
+      "targets": [
+        "codex",
+        "gemini",
+        "antigravity"
+      ],
       "owner": "Workflow Engineer",
       "encoding": "UTF-8"
     },
@@ -237,7 +275,11 @@
       "required": true,
       "mutable": false,
       "deploy": true,
-      "targets": ["codex", "gemini", "antigravity"],
+      "targets": [
+        "codex",
+        "gemini",
+        "antigravity"
+      ],
       "owner": "Workflow Engineer",
       "encoding": "UTF-8"
     },
@@ -248,7 +290,11 @@
       "required": true,
       "mutable": false,
       "deploy": true,
-      "targets": ["codex", "gemini", "antigravity"],
+      "targets": [
+        "codex",
+        "gemini",
+        "antigravity"
+      ],
       "owner": "Workflow Engineer",
       "encoding": "UTF-8"
     },
@@ -259,7 +305,11 @@
       "required": true,
       "mutable": false,
       "deploy": true,
-      "targets": ["codex", "gemini", "antigravity"],
+      "targets": [
+        "codex",
+        "gemini",
+        "antigravity"
+      ],
       "owner": "Workflow Engineer",
       "encoding": "UTF-8"
     },
@@ -270,7 +320,11 @@
       "required": true,
       "mutable": false,
       "deploy": true,
-      "targets": ["codex", "gemini", "antigravity"],
+      "targets": [
+        "codex",
+        "gemini",
+        "antigravity"
+      ],
       "owner": "Workflow Engineer",
       "encoding": "UTF-8"
     },
@@ -281,7 +335,11 @@
       "required": true,
       "mutable": false,
       "deploy": true,
-      "targets": ["codex", "gemini", "antigravity"],
+      "targets": [
+        "codex",
+        "gemini",
+        "antigravity"
+      ],
       "owner": "Workflow Engineer",
       "encoding": "UTF-8"
     },
@@ -292,7 +350,11 @@
       "required": true,
       "mutable": false,
       "deploy": true,
-      "targets": ["codex", "gemini", "antigravity"],
+      "targets": [
+        "codex",
+        "gemini",
+        "antigravity"
+      ],
       "owner": "Workflow Engineer",
       "encoding": "UTF-8"
     },
@@ -303,7 +365,11 @@
       "required": true,
       "mutable": false,
       "deploy": true,
-      "targets": ["codex", "gemini", "antigravity"],
+      "targets": [
+        "codex",
+        "gemini",
+        "antigravity"
+      ],
       "owner": "Workflow Engineer",
       "encoding": "UTF-8"
     },
@@ -314,7 +380,10 @@
       "required": true,
       "mutable": false,
       "deploy": true,
-      "targets": ["codex", "gemini"],
+      "targets": [
+        "codex",
+        "gemini"
+      ],
       "owner": "Workflow Engineer",
       "encoding": "UTF-8"
     },
@@ -325,7 +394,10 @@
       "required": true,
       "mutable": false,
       "deploy": true,
-      "targets": ["codex", "gemini"],
+      "targets": [
+        "codex",
+        "gemini"
+      ],
       "owner": "Workflow Engineer",
       "encoding": "UTF-8"
     },
@@ -336,7 +408,10 @@
       "required": true,
       "mutable": false,
       "deploy": true,
-      "targets": ["codex", "gemini"],
+      "targets": [
+        "codex",
+        "gemini"
+      ],
       "owner": "Workflow Engineer",
       "encoding": "UTF-8"
     },
@@ -347,7 +422,10 @@
       "required": true,
       "mutable": false,
       "deploy": true,
-      "targets": ["codex", "gemini"],
+      "targets": [
+        "codex",
+        "gemini"
+      ],
       "owner": "Workflow Engineer",
       "encoding": "UTF-8"
     },
@@ -358,7 +436,10 @@
       "required": true,
       "mutable": false,
       "deploy": true,
-      "targets": ["codex", "gemini"],
+      "targets": [
+        "codex",
+        "gemini"
+      ],
       "owner": "Workflow Engineer",
       "encoding": "UTF-8"
     },
@@ -369,7 +450,10 @@
       "required": true,
       "mutable": false,
       "deploy": true,
-      "targets": ["codex", "gemini"],
+      "targets": [
+        "codex",
+        "gemini"
+      ],
       "owner": "Workflow Engineer",
       "encoding": "UTF-8"
     },
@@ -380,7 +464,10 @@
       "required": true,
       "mutable": false,
       "deploy": true,
-      "targets": ["codex", "gemini"],
+      "targets": [
+        "codex",
+        "gemini"
+      ],
       "owner": "Workflow Engineer",
       "encoding": "UTF-8"
     },
@@ -391,7 +478,10 @@
       "required": true,
       "mutable": false,
       "deploy": true,
-      "targets": ["codex", "gemini"],
+      "targets": [
+        "codex",
+        "gemini"
+      ],
       "owner": "Workflow Engineer",
       "encoding": "UTF-8"
     },
@@ -402,7 +492,10 @@
       "required": true,
       "mutable": false,
       "deploy": true,
-      "targets": ["codex", "gemini"],
+      "targets": [
+        "codex",
+        "gemini"
+      ],
       "owner": "Workflow Engineer",
       "encoding": "UTF-8"
     },
@@ -413,7 +506,10 @@
       "required": true,
       "mutable": false,
       "deploy": true,
-      "targets": ["codex", "gemini"],
+      "targets": [
+        "codex",
+        "gemini"
+      ],
       "owner": "Workflow Engineer",
       "encoding": "UTF-8"
     },
@@ -424,7 +520,10 @@
       "required": true,
       "mutable": false,
       "deploy": true,
-      "targets": ["codex", "gemini"],
+      "targets": [
+        "codex",
+        "gemini"
+      ],
       "owner": "Workflow Engineer",
       "encoding": "UTF-8"
     },
@@ -435,7 +534,10 @@
       "required": true,
       "mutable": false,
       "deploy": true,
-      "targets": ["codex", "gemini"],
+      "targets": [
+        "codex",
+        "gemini"
+      ],
       "owner": "Workflow Engineer",
       "encoding": "UTF-8"
     },
@@ -446,7 +548,10 @@
       "required": true,
       "mutable": false,
       "deploy": true,
-      "targets": ["codex", "gemini"],
+      "targets": [
+        "codex",
+        "gemini"
+      ],
       "owner": "Workflow Engineer",
       "encoding": "UTF-8"
     },
@@ -457,7 +562,10 @@
       "required": true,
       "mutable": false,
       "deploy": true,
-      "targets": ["codex", "gemini"],
+      "targets": [
+        "codex",
+        "gemini"
+      ],
       "owner": "Python Tooling Engineer B"
     },
     {
@@ -467,7 +575,10 @@
       "required": true,
       "mutable": false,
       "deploy": true,
-      "targets": ["codex", "gemini"],
+      "targets": [
+        "codex",
+        "gemini"
+      ],
       "owner": "Python Tooling Engineer B"
     },
     {
@@ -477,7 +588,10 @@
       "required": true,
       "mutable": false,
       "deploy": true,
-      "targets": ["codex", "gemini"],
+      "targets": [
+        "codex",
+        "gemini"
+      ],
       "owner": "Python Tooling Engineer A"
     },
     {
@@ -487,7 +601,10 @@
       "required": true,
       "mutable": false,
       "deploy": true,
-      "targets": ["codex", "gemini"],
+      "targets": [
+        "codex",
+        "gemini"
+      ],
       "owner": "Release Engineer"
     },
     {
@@ -497,7 +614,10 @@
       "required": true,
       "mutable": false,
       "deploy": true,
-      "targets": ["codex", "gemini"],
+      "targets": [
+        "codex",
+        "gemini"
+      ],
       "owner": "Deployment Engineer"
     },
     {
@@ -507,7 +627,10 @@
       "required": true,
       "mutable": false,
       "deploy": true,
-      "targets": ["codex", "gemini"],
+      "targets": [
+        "codex",
+        "gemini"
+      ],
       "owner": "Python Tooling Engineer A"
     },
     {
@@ -517,7 +640,10 @@
       "required": true,
       "mutable": false,
       "deploy": true,
-      "targets": ["codex", "gemini"],
+      "targets": [
+        "codex",
+        "gemini"
+      ],
       "owner": "Python Tooling Engineer A"
     },
     {
@@ -527,7 +653,10 @@
       "required": true,
       "mutable": false,
       "deploy": true,
-      "targets": ["codex", "gemini"],
+      "targets": [
+        "codex",
+        "gemini"
+      ],
       "owner": "Python Tooling Engineer A"
     },
     {
@@ -537,7 +666,10 @@
       "required": true,
       "mutable": false,
       "deploy": true,
-      "targets": ["codex", "gemini"],
+      "targets": [
+        "codex",
+        "gemini"
+      ],
       "owner": "Configuration Engineer",
       "encoding": "UTF-8"
     },
@@ -548,7 +680,10 @@
       "required": true,
       "mutable": false,
       "deploy": true,
-      "targets": ["codex", "gemini"],
+      "targets": [
+        "codex",
+        "gemini"
+      ],
       "owner": "Configuration Engineer",
       "encoding": "UTF-8"
     },
@@ -559,7 +694,10 @@
       "required": true,
       "mutable": false,
       "deploy": true,
-      "targets": ["codex", "gemini"],
+      "targets": [
+        "codex",
+        "gemini"
+      ],
       "owner": "Configuration Engineer",
       "encoding": "UTF-8"
     },
@@ -570,7 +708,10 @@
       "required": true,
       "mutable": false,
       "deploy": true,
-      "targets": ["codex", "gemini"],
+      "targets": [
+        "codex",
+        "gemini"
+      ],
       "owner": "Configuration Engineer",
       "encoding": "UTF-8"
     },
@@ -581,7 +722,10 @@
       "required": true,
       "mutable": false,
       "deploy": true,
-      "targets": ["codex", "gemini"],
+      "targets": [
+        "codex",
+        "gemini"
+      ],
       "owner": "Configuration Engineer",
       "encoding": "UTF-8"
     },
@@ -592,7 +736,10 @@
       "required": true,
       "mutable": false,
       "deploy": true,
-      "targets": ["codex", "gemini"],
+      "targets": [
+        "codex",
+        "gemini"
+      ],
       "owner": "Configuration Engineer",
       "encoding": "UTF-8"
     },
@@ -603,7 +750,10 @@
       "required": true,
       "mutable": false,
       "deploy": true,
-      "targets": ["codex", "gemini"],
+      "targets": [
+        "codex",
+        "gemini"
+      ],
       "owner": "Configuration Engineer",
       "encoding": "UTF-8"
     },
@@ -614,7 +764,10 @@
       "required": true,
       "mutable": false,
       "deploy": true,
-      "targets": ["codex", "gemini"],
+      "targets": [
+        "codex",
+        "gemini"
+      ],
       "owner": "Configuration Engineer",
       "encoding": "UTF-8"
     },
@@ -625,7 +778,10 @@
       "required": true,
       "mutable": false,
       "deploy": true,
-      "targets": ["codex", "gemini"],
+      "targets": [
+        "codex",
+        "gemini"
+      ],
       "owner": "Workflow Engineer",
       "encoding": "UTF-8"
     },
@@ -636,7 +792,10 @@
       "required": true,
       "mutable": false,
       "deploy": true,
-      "targets": ["codex", "gemini"],
+      "targets": [
+        "codex",
+        "gemini"
+      ],
       "owner": "Workflow Engineer",
       "encoding": "UTF-8"
     },
@@ -647,7 +806,10 @@
       "required": true,
       "mutable": false,
       "deploy": true,
-      "targets": ["codex", "gemini"],
+      "targets": [
+        "codex",
+        "gemini"
+      ],
       "owner": "Configuration Engineer",
       "encoding": "UTF-8"
     },
@@ -658,7 +820,10 @@
       "required": true,
       "mutable": false,
       "deploy": true,
-      "targets": ["codex", "gemini"],
+      "targets": [
+        "codex",
+        "gemini"
+      ],
       "owner": "Loader Engineer",
       "encoding": "UTF-8"
     },
@@ -669,7 +834,10 @@
       "required": true,
       "mutable": false,
       "deploy": true,
-      "targets": ["codex", "gemini"],
+      "targets": [
+        "codex",
+        "gemini"
+      ],
       "owner": "Configuration Engineer",
       "encoding": "UTF-8"
     },
@@ -680,7 +848,10 @@
       "required": true,
       "mutable": false,
       "deploy": true,
-      "targets": ["codex", "gemini"],
+      "targets": [
+        "codex",
+        "gemini"
+      ],
       "owner": "Configuration Engineer",
       "encoding": "UTF-8"
     },
@@ -691,7 +862,10 @@
       "required": true,
       "mutable": true,
       "deploy": true,
-      "targets": ["codex", "gemini"],
+      "targets": [
+        "codex",
+        "gemini"
+      ],
       "owner": "Release Engineer",
       "encoding": "UTF-8"
     },
@@ -702,7 +876,10 @@
       "required": true,
       "mutable": true,
       "deploy": true,
-      "targets": ["codex", "gemini"],
+      "targets": [
+        "codex",
+        "gemini"
+      ],
       "owner": "Release Engineer",
       "encoding": "UTF-8"
     },
@@ -751,13 +928,27 @@
       "encoding": "UTF-8"
     },
     {
+      "id": "conformance-evidence-run-20260720-1-0-7-release",
+      "source": "evidence/cross-ide-conformance/20260720_WSR-CORE-1.0.7-RELEASE/result.json",
+      "type": "evidence",
+      "required": true,
+      "mutable": false,
+      "deploy": false,
+      "targets": [],
+      "owner": "QA Engineer",
+      "encoding": "UTF-8"
+    },
+    {
       "id": "wsr-checksums",
       "source": "WSR_CHECKSUMS.json",
       "type": "generated",
       "required": true,
       "mutable": true,
       "deploy": true,
-      "targets": ["codex", "gemini"],
+      "targets": [
+        "codex",
+        "gemini"
+      ],
       "owner": "Release Engineer",
       "encoding": "UTF-8"
     }

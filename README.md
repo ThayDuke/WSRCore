@@ -1,4 +1,4 @@
-# WSR Core 1.0.6
+# WSR Core 1.0.7-RELEASE
 
 WSR Core là bộ policy, workflow, skill và công cụ kiểm soát dành cho nhiều
 IDE agent. Codex, Gemini và Antigravity có adapter native; generic adapter
@@ -16,7 +16,7 @@ manifest hash. Agent vì vậy không cần dò release folder hoặc suy đoán
 | Gemini | `GEMINI_HOME`, sau đó `~/.gemini` | Native |
 | Antigravity | `GEMINI_HOME`, sau đó `~/.gemini` | Native, dữ liệu dưới `config/` |
 | Generic | Chỉ `--target-root` hoặc `WSR_WORKSPACE_ROOT` | Workspace |
-| Cursor | Disabled, unsupported | Ngoài phạm vi 1.0.6 |
+| Cursor | Disabled, unsupported | Ngoài phạm vi 1.0.7 |
 | Claude | Unsupported | Không triển khai |
 
 ## Quy trình an toàn
@@ -26,7 +26,7 @@ manifest hash. Agent vì vậy không cần dò release folder hoặc suy đoán
 2. Xem dry-run:
    `python scripts/sync_config.py --adapter generic --target-root <workspace>`.
 3. Apply chỉ sau phê duyệt:
-   `python scripts/sync_config.py --adapter generic --target-root <workspace> --apply --approval-token WSR-CORE-1.0.6-RELEASE`.
+   `python scripts/sync_config.py --adapter generic --target-root <workspace> --apply --approval-token WSR-CORE-1.0.7-RELEASE`.
 4. Chạy runtime Doctor:
    `python scripts/wsr_doctor.py --runtime-mode --adapter generic --target-root <workspace> --strict`.
 5. Reload theo profile và capability cần thiết; dùng `--confirm-loaded` chỉ sau

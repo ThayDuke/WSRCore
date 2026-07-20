@@ -1,4 +1,4 @@
-WSR CORE 1.0.6 — HƯỚNG DẪN CÀI ĐẶT ĐA IDE
+WSR CORE 1.0.7 — HƯỚNG DẪN CÀI ĐẶT ĐA IDE
 
 1. Xác minh source package
    python scripts/wsr_doctor.py --source-mode --strict

@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "packageName": "WSR-Core",
-  "version": "1.0.6",
-  "buildId": "WSR-CORE-1.0.6-RELEASE",
-  "manifestSha256": "d9cf94296a0a65d20bc00b0cbfb66af60001f0d6308641375410b84faf143382",
+  "version": "1.0.7",
+  "buildId": "WSR-CORE-1.0.7-RELEASE",
+  "manifestSha256": "6897f1ceaf46e3ad3670877df1ff20a6b41c16b3f99553143c8417c43df19f08",
   "policyFiles": [
     "GEMINI.md",
     "global_rules/AG_GLOBAL_RULES.md"

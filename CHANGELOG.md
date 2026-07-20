@@ -1,5 +1,8 @@
 # WSR Core Changelog
 
+## [1.0.7] - 2026-07-20
+- Fixed `wsr_doctor.py` to support Git submodule metadata by skipping root `.git` files.
+
 ## [1.0.6] - 2026-07-20
 - Released the v2 cross-IDE loader contract for supported adapters.
 - Scoped release gates to Codex, Gemini, Antigravity global, and Generic workspace.

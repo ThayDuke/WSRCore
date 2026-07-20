@@ -280,6 +280,10 @@ def run_doctor_checks(package_root, strict=False, is_json=False, adapter_name=No
                 full_path = os.path.join(root, file)
                 rel_path = os.path.relpath(full_path, package_root).replace('\\', '/')
                 
+                # Skip root .git file (submodule metadata)
+                if rel_path == ".git":
+                    continue
+
                 # Check exclusion
                 if not match_exclusion(rel_path, exclusions):
                     physical_files.append(rel_path)
