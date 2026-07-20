@@ -4,7 +4,7 @@
   "README.html": "ef2dda24234f609b716af60d20350e7a6d00917d54d7a2b8c44793cd6915186f",
   "README.md": "4bc50e5be8b7e55bef16056becbf333815538a49a0340d1b523ead73f50b1e71",
   "Installation_guide.txt": "57239f588ece4739017919b8eabfca744ae282b82217fb15e206b00a4664e516",
-  "WSR_MANIFEST.json": "6897f1ceaf46e3ad3670877df1ff20a6b41c16b3f99553143c8417c43df19f08",
+  "WSR_MANIFEST.json": "cf02bf7da95c3e005266a8e4e1617ccf985cdd57b246d3800562c0fe99513616",
   "debt_ledger.md": "f2fdd0b0d24e00a6881a1c9113768960993ad5a28598c0563d0e71cb627fed7d",
   "global_rules/AG_GLOBAL_RULES.md": "f936767dff366fa193473899cf0469e6bcf2f761d93fa481c8c9929d371f60f9",
   "global_workflows/audit.md": "a3dbdf7876575caa0e192837bab9c19be20d360b03d3cfde3ca060b63621a4a4",
@@ -40,7 +40,7 @@
   "scripts/wsr_reload.py": "476a997506a829d458b8aa20c3dc68717191d267be229716303649380f7f601c",
   "schemas/wsr-manifest-v2.schema.json": "638a91ef03bbf040efbf29355f9d70007bebe1f6cfbe25d45031b2d91f3db7b8",
   "schemas/wsr-context-v1.schema.json": "461cc8fa102f470a680fd79ca4f81261fd4b8e8494d80398bbc062f0c74108d6",
-  "WSR_CONTEXT.json": "e9881ea495de33b690c2a35666f9424579f4f887a32dedcfaa1f19ab663ef0fe",
+  "WSR_CONTEXT.json": "ad6f728b31ab400d67b16988a7f11fc971b3b634af5748b3b6fd96ed33099763",
   "adapters/codex.json": "8a69ac1213cb884807a812cb1ac0f49b3293c77f39aba3a366db7a88967f19c4",
   "adapters/gemini.json": "40b227f7f68b19609f47a17e9d96fee3b69fb91c84301288e4b3b5f77fa3d2ab",
   "adapters/claude.json": "2565bcca4eb9f35632df865279403bb40e093cd0152186b8e639f2bc4bb7c28b",
@@ -52,11 +52,12 @@
   "bootstrap/router.md.template": "42b7ebcd70bda4d42274c830a7f30d79a63ce30b7f4a53c157204dd38cc3d183",
   "schemas/wsr-adapter-v2.schema.json": "a3cac6058ee2234ffc6ff75adfe1a12ef28d1e00d0a793656719488aba84bcdb",
   "schemas/wsr-active-v1.schema.json": "ebfedfae290c2af8fcb4f24bdca9ead3516c12adace605997cc74d18a9382b96",
-  "release_identity_ledger.json": "972572b964b6e544486fb10ccd5f342530fc44d6e72389176928ced78a31d36b",
+  "release_identity_ledger.json": "5672d55ab92b29c7e292d96c31775579512c750731be9cb1b1346ba2bf84031e",
   "CHANGELOG.md": "e4969b671c04dd5c6e55a12a76feddc3c3e1612c9858c8ec00cabd850df6949f",
   "tests/conformance/fixtures.json": "fbd3784a5f8d6de039a7f8b282b3534586bca8aa1fb9b046bcf1bd7fa08c906f",
   "evidence/cross-ide-conformance/index.json": "763204282cde3dd5e8feee66c7aab260fad964d53acfa25b56813ffb0bd28453",
   "evidence/cross-ide-conformance/20260720_WSR-CORE-1.0.5-REVIEW/result.json": "cd616429114ff50f6c6cd7c241ceb5b61fc7966d270c8e07e0bfcc36ba7a3635",
   "evidence/cross-ide-conformance/20260720_WSR-CORE-1.0.6-RELEASE/result.json": "a62380d7e286de26b2f3d63b7ab62ceb069abf27514091acc65815ea7dbccacd",
-  "evidence/cross-ide-conformance/20260720_WSR-CORE-1.0.7-RELEASE/result.json": "7cdbfbfa42e869bd2c1952c630dede757e99b2d4c66229cbca3104bac25c6446"
+  "evidence/cross-ide-conformance/20260720_WSR-CORE-1.0.7-RELEASE/result.json": "7cdbfbfa42e869bd2c1952c630dede757e99b2d4c66229cbca3104bac25c6446",
+  ".gitattributes": "a79691a93b46e49ce460c26ef22afcc03d6eca1e63bf2edbc20e96159510f6c9"
 }

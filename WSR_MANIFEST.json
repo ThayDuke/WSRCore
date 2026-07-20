@@ -951,6 +951,20 @@
       ],
       "owner": "Release Engineer",
       "encoding": "UTF-8"
+    },
+    {
+      "id": "gitattributes",
+      "source": ".gitattributes",
+      "type": "document",
+      "required": true,
+      "mutable": true,
+      "deploy": true,
+      "targets": [
+        "codex",
+        "gemini"
+      ],
+      "owner": "Release Engineer",
+      "encoding": "UTF-8"
     }
   ]
 }
