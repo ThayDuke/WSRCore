@@ -5,7 +5,9 @@
   "properties": {
     "schemaVersion": {
       "type": "integer",
-      "enum": [2]
+      "enum": [
+        2
+      ]
     },
     "adapterId": {
       "type": "string"
@@ -18,62 +20,114 @@
     },
     "supportLevel": {
       "type": "string",
-      "enum": ["native", "workspace", "experimental", "unsupported"]
+      "enum": [
+        "native",
+        "workspace",
+        "experimental",
+        "unsupported"
+      ]
     },
-    "defaultTargetRoot": { "type": "string" },
-    "targetRootEnvironmentVariable": { "type": "string" },
-    "requiresExplicitTargetRoot": { "type": "boolean" },
+    "defaultTargetRoot": {
+      "type": "string"
+    },
+    "targetRootEnvironmentVariable": {
+      "type": "string"
+    },
+    "requiresExplicitTargetRoot": {
+      "type": "boolean"
+    },
     "logicalRoots": {
       "type": "object",
       "properties": {
-        "policyRoot": { "type": "string" },
-        "rulesRoot": { "type": "string" },
-        "workflowsRoot": { "type": "string" },
-        "skillsRoot": { "type": "string" },
-        "scriptsRoot": { "type": "string" },
-        "stateRoot": { "type": "string" }
+        "policyRoot": {
+          "type": "string"
+        },
+        "rulesRoot": {
+          "type": "string"
+        },
+        "workflowsRoot": {
+          "type": "string"
+        },
+        "skillsRoot": {
+          "type": "string"
+        },
+        "scriptsRoot": {
+          "type": "string"
+        },
+        "stateRoot": {
+          "type": "string"
+        }
       },
       "additionalProperties": false
     },
     "discoveryPrecedence": {
       "type": "array",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     },
     "artifactMappings": {
       "type": "array",
       "items": {
         "type": "object",
         "properties": {
-          "artifactType": { "type": "string" },
-          "artifactId": { "type": "string" },
-          "logicalRoot": { "type": "string" },
-          "relativePath": { "type": "string" }
+          "artifactType": {
+            "type": "string"
+          },
+          "artifactId": {
+            "type": "string"
+          },
+          "logicalRoot": {
+            "type": "string"
+          },
+          "relativePath": {
+            "type": "string"
+          }
         },
-        "required": ["artifactType", "logicalRoot"],
+        "required": [
+          "artifactType",
+          "logicalRoot"
+        ],
         "additionalProperties": false
       }
     },
     "routerContract": {
       "type": "object",
       "properties": {
-        "type": { "type": "string" },
-        "path": { "type": "string" }
+        "type": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        }
       },
-      "required": ["type", "path"],
+      "required": [
+        "type",
+        "path"
+      ],
       "additionalProperties": false
     },
     "activeMarkerContract": {
       "type": "object",
       "properties": {
-        "required": { "type": "boolean" },
-        "path": { "type": "string" }
+        "required": {
+          "type": "boolean"
+        },
+        "path": {
+          "type": "string"
+        }
       },
-      "required": ["required", "path"],
+      "required": [
+        "required",
+        "path"
+      ],
       "additionalProperties": false
     },
     "unsupportedFeatures": {
       "type": "array",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     }
   },
   "required": [

@@ -25,5 +25,10 @@
     "required": false,
     "path": ""
   },
-  "unsupportedFeatures": ["block-jit", "user-home-install", "dry-run", "apply"]
+  "unsupportedFeatures": [
+    "block-jit",
+    "user-home-install",
+    "dry-run",
+    "apply"
+  ]
 }

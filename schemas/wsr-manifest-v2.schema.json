@@ -5,7 +5,9 @@
   "properties": {
     "schemaVersion": {
       "type": "integer",
-      "enum": [2]
+      "enum": [
+        2
+      ]
     },
     "packageName": {
       "type": "string"
@@ -18,7 +20,11 @@
     },
     "status": {
       "type": "string",
-      "enum": ["Review", "ReleaseCandidate", "Released"]
+      "enum": [
+        "Review",
+        "ReleaseCandidate",
+        "Released"
+      ]
     },
     "createdAt": {
       "type": "string",
@@ -26,7 +32,9 @@
     },
     "canonicalLayout": {
       "type": "string",
-      "enum": [".agents"]
+      "enum": [
+        ".agents"
+      ]
     },
     "compatibilityLayouts": {
       "type": "array",
@@ -63,20 +71,40 @@
       "additionalProperties": {
         "type": "object",
         "properties": {
-          "description": { "type": "string" },
-          "script": { "type": "string" },
-          "workflow": { "type": "string" },
-          "entrypoint": { "type": "string" },
-          "readOnly": { "type": "boolean" },
-          "mutating": { "type": "boolean" },
-          "approvalRequired": { "type": "boolean" },
-          "requiredProfile": { "type": "string" },
+          "description": {
+            "type": "string"
+          },
+          "script": {
+            "type": "string"
+          },
+          "workflow": {
+            "type": "string"
+          },
+          "entrypoint": {
+            "type": "string"
+          },
+          "readOnly": {
+            "type": "boolean"
+          },
+          "mutating": {
+            "type": "boolean"
+          },
+          "approvalRequired": {
+            "type": "boolean"
+          },
+          "requiredProfile": {
+            "type": "string"
+          },
           "options": {
             "type": "object",
-            "additionalProperties": { "type": "string" }
+            "additionalProperties": {
+              "type": "string"
+            }
           }
         },
-        "required": ["description"]
+        "required": [
+          "description"
+        ]
       }
     },
     "adapters": {
@@ -90,23 +118,58 @@
       "items": {
         "type": "object",
         "properties": {
-          "id": { "type": "string" },
-          "source": { "type": "string" },
+          "id": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string"
+          },
           "type": {
             "type": "string",
-            "enum": ["policy", "rule", "workflow", "skill", "script", "document", "generated", "test", "evidence"]
+            "enum": [
+              "policy",
+              "rule",
+              "workflow",
+              "skill",
+              "script",
+              "document",
+              "generated",
+              "test",
+              "evidence"
+            ]
           },
-          "required": { "type": "boolean" },
-          "mutable": { "type": "boolean" },
-          "deploy": { "type": "boolean" },
+          "required": {
+            "type": "boolean"
+          },
+          "mutable": {
+            "type": "boolean"
+          },
+          "deploy": {
+            "type": "boolean"
+          },
           "targets": {
             "type": "array",
-            "items": { "type": "string" }
+            "items": {
+              "type": "string"
+            }
           },
-          "owner": { "type": "string" },
-          "encoding": { "type": "string" }
+          "owner": {
+            "type": "string"
+          },
+          "encoding": {
+            "type": "string"
+          }
         },
-        "required": ["id", "source", "type", "required", "mutable", "deploy", "targets", "owner"]
+        "required": [
+          "id",
+          "source",
+          "type",
+          "required",
+          "mutable",
+          "deploy",
+          "targets",
+          "owner"
+        ]
       }
     }
   },

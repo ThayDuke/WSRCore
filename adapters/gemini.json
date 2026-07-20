@@ -20,10 +20,26 @@
     "~/.gemini/GEMINI.md"
   ],
   "artifactMappings": [
-    { "artifactType": "rule", "logicalRoot": "rulesRoot", "relativePath": "global_rules/AG_GLOBAL_RULES.md" },
-    { "artifactType": "workflow", "logicalRoot": "workflowsRoot", "relativePath": "./" },
-    { "artifactType": "skill", "logicalRoot": "skillsRoot", "relativePath": "./" },
-    { "artifactType": "script", "logicalRoot": "scriptsRoot", "relativePath": "./" }
+    {
+      "artifactType": "rule",
+      "logicalRoot": "rulesRoot",
+      "relativePath": "global_rules/AG_GLOBAL_RULES.md"
+    },
+    {
+      "artifactType": "workflow",
+      "logicalRoot": "workflowsRoot",
+      "relativePath": "./"
+    },
+    {
+      "artifactType": "skill",
+      "logicalRoot": "skillsRoot",
+      "relativePath": "./"
+    },
+    {
+      "artifactType": "script",
+      "logicalRoot": "scriptsRoot",
+      "relativePath": "./"
+    }
   ],
   "routerContract": {
     "type": "absolute",

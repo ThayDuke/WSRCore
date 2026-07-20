@@ -5,7 +5,9 @@
   "properties": {
     "schemaVersion": {
       "type": "integer",
-      "enum": [1]
+      "enum": [
+        1
+      ]
     },
     "adapterIdentity": {
       "type": "string"
@@ -27,7 +29,9 @@
     },
     "logicalRoots": {
       "type": "object",
-      "additionalProperties": { "type": "string" }
+      "additionalProperties": {
+        "type": "string"
+      }
     },
     "installTimestamp": {
       "type": "string"
