@@ -318,6 +318,7 @@
       margin-bottom: 24px;
       background: linear-gradient(135deg, var(--text-color), var(--accent-color));
       -webkit-background-clip: text;
+      background-clip: text;
       -webkit-text-fill-color: transparent;
     }
 
@@ -621,35 +622,24 @@
         <h2 class="lang-vi">Hướng dẫn cài đặt chi tiết</h2>
         <h2 class="lang-en">Detailed Installation Guide</h2>
         
-        <p class="lang-vi">
-          WSR Core được thiết kế để nạp tự động vào môi trường AI thông qua thư mục cấu hình chuẩn. Hãy thực hiện các bước sau:
-        </p>
-        <p class="lang-en">
-          WSR Core is designed to be automatically loaded into the AI environment via standard config directories. Follow these steps:
-        </p>
+        <p class="lang-vi">WSR Core dùng adapter v2, router chứa source root tuyệt đối và marker có kiểm chứng để Codex, Gemini, Antigravity và IDE agent khác nạp nhất quán.</p>
+        <p class="lang-en">WSR Core uses v2 adapters, an absolute source router, and a verified marker for consistent loading across Codex, Gemini, Antigravity, and other IDE agents.</p>
 
         <h3 class="lang-vi">Các bước cài đặt thủ công</h3>
         <h3 class="lang-en">Manual Installation Steps</h3>
         <ol>
-          <li>
-            <span class="lang-vi">Sao chép toàn bộ các tệp tin cấu hình (`GEMINI.md`, `AGENTS.md`, thư mục `global_rules/`, `global_skills/`, `global_workflows/`...) vào thư mục `.agents/` tại thư mục gốc của dự án (workspace).</span>
-            <span class="lang-en">Copy all config files (`GEMINI.md`, `AGENTS.md`, folders `global_rules/`, `global_skills/`, `global_workflows/`...) to the `.agents/` directory at the project root (workspace).</span>
-          </li>
-          <li>
-            <span class="lang-vi">Đối với khả năng tương thích ngược, cấu trúc này cũng hoạt động khi đặt ở thư mục `.codex/`.</span>
-            <span class="lang-en">For backward compatibility, this structure also works when placed in the `.codex/` directory.</span>
-          </li>
-          <li>
-            <span class="lang-vi">Khởi chạy hoặc khởi động lại (Reload) Agent để nạp ngữ cảnh mới.</span>
-            <span class="lang-en">Launch or restart (Reload) the Agent to load the new context.</span>
-          </li>
+          <li><span class="lang-vi">Chạy source Doctor 32 gate.</span><span class="lang-en">Run the 32-gate source Doctor.</span></li>
+          <li><span class="lang-vi">Chọn adapter và target root; generic bắt buộc workspace root tường minh.</span><span class="lang-en">Select an adapter and target root; generic requires an explicit workspace root.</span></li>
+          <li><span class="lang-vi">Xem dry-run, apply sau phê duyệt, rồi chạy runtime Doctor.</span><span class="lang-en">Review the dry-run, apply after approval, then run runtime Doctor.</span></li>
         </ol>
 
         <h3 class="lang-vi">Cài đặt tự động bằng script</h3>
         <h3 class="lang-en">Automatic Installation via Script</h3>
-        <p class="lang-vi">Sử dụng tệp tin [sync_config.py](../.agents/scripts/sync_config.py) để đồng bộ hóa nhanh chóng cấu hình từ thư mục global của IDE vào workspace:</p>
-        <p class="lang-en">Use the [sync_config.py](../.agents/scripts/sync_config.py) script to quickly synchronize the config from the IDE global directory into the workspace:</p>
-        <pre><code>python .agents/scripts/sync_config.py --apply</code></pre>
+        <p class="lang-vi">Ví dụ an toàn cho IDE agent generic trong workspace:</p>
+        <p class="lang-en">Safe example for a generic IDE agent inside a workspace:</p>
+        <pre><code>python scripts/wsr_doctor.py --source-mode --strict
+python scripts/sync_config.py --adapter generic --target-root &lt;workspace&gt;
+python scripts/wsr_doctor.py --runtime-mode --adapter generic --target-root &lt;workspace&gt; --strict</code></pre>
       </section>
 
       <!-- Section: Hướng dẫn sử dụng -->
@@ -820,8 +810,38 @@
         <h2 class="lang-vi">Nhật ký thay đổi (Changelog) - WSR Core</h2>
         <h2 class="lang-en">Changelog - WSR Core</h2>
         
-        <h3 class="lang-vi">Bản phát hành Release V5</h3>
-        <h3 class="lang-en">Release V5 Launch</h3>
+        <h3 class="lang-vi">Bản phát hành V1.0.6</h3>
+        <h3 class="lang-en">V1.0.6 Release</h3>
+        <ul>
+          <li><span class="lang-vi"><strong>[Loader]</strong> Router tuyệt đối, progressive disclosure và state machine có SOURCE_VERIFIED/LOADED.</span><span class="lang-en"><strong>[Loader]</strong> Absolute router, progressive disclosure, and SOURCE_VERIFIED/LOADED states.</span></li>
+          <li><span class="lang-vi"><strong>[Adapter]</strong> Logical roots v2 cho Codex, Gemini, Antigravity và generic workspace.</span><span class="lang-en"><strong>[Adapter]</strong> V2 logical roots for Codex, Gemini, Antigravity, and generic workspace.</span></li>
+          <li><span class="lang-vi"><strong>[Safety]</strong> Doctor 32 gate, marker transaction và identity content hash.</span><span class="lang-en"><strong>[Safety]</strong> 32-gate Doctor, transactional marker, and identity content hash.</span></li>
+          <li><span class="lang-vi"><strong>[Scope]</strong> Cursor và Claude bị vô hiệu hóa, không chặn release.</span><span class="lang-en"><strong>[Scope]</strong> Cursor and Claude remain disabled and do not block release.</span></li>
+        </ul>
+
+        <h3 class="lang-vi">Bản phát hành Release V1.0.4</h3>
+        <h3 class="lang-en">Release V1.0.4 Launch</h3>
+        <ul>
+          <li>
+            <span class="lang-vi"><strong>[Workflow]</strong> Tách biệt `/pl` (Plan self-execution) và `/ho` (Handoff specification) workflow.</span>
+            <span class="lang-en"><strong>[Workflow]</strong> Separated `/pl` (Plan self-execution) and `/ho` (Handoff specification) workflows.</span>
+          </li>
+          <li>
+            <span class="lang-vi"><strong>[Manifest]</strong> Đăng ký chính thức `workflow-ho` (`global_workflows/ho.md`) trong `WSR_MANIFEST.json`.</span>
+            <span class="lang-en"><strong>[Manifest]</strong> Registered `workflow-ho` (`global_workflows/ho.md`) in `WSR_MANIFEST.json`.</span>
+          </li>
+          <li>
+            <span class="lang-vi"><strong>[Adapter]</strong> Khai báo mẫu đường dẫn (Sample Paths Guidance) cho Antigravity & Gemini adapters (`C:\Users\[username]\.gemini\config\global_workflows\*.md`).</span>
+            <span class="lang-en"><strong>[Adapter]</strong> Added Sample Paths Guidance for Antigravity & Gemini adapters (`C:\Users\[username]\.gemini\config\global_workflows\*.md`).</span>
+          </li>
+          <li>
+            <span class="lang-vi"><strong>[Tài liệu]</strong> Cập nhật `Installation_guide.txt`, `README.md`, `README.html` và `reload.md` với các hướng dẫn mới.</span>
+            <span class="lang-en"><strong>[Documentation]</strong> Updated `Installation_guide.txt`, `README.md`, `README.html`, and `reload.md` with new instructions.</span>
+          </li>
+        </ul>
+
+        <h3 class="lang-vi">Bản phát hành Release V5 (1.0.0 - 1.0.3)</h3>
+        <h3 class="lang-en">Release V5 Launch (1.0.0 - 1.0.3)</h3>
         <ul>
           <li>
             <span class="lang-vi"><strong>[Tối ưu]</strong> Tinh giản và thu gọn file `GEMINI.md` xuống còn 35 dòng để tiết kiệm ngữ cảnh.</span>

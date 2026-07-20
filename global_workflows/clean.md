@@ -1,5 +1,5 @@
 ---
-description: Scan and remove temporary/unwanted files
+description: Scan and remove temporary files safely using WSR whitelist policy
 ---
 
 # Quy trình Dọn Dẹp `/clean` (WSR Core 1.0)

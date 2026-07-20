@@ -1,11 +1,29 @@
 {
+  "schemaVersion": 2,
   "adapterId": "claude",
-  "displayName": "Claude Adapter",
+  "runtimeFamily": "claude",
   "enabled": false,
-  "targetRootEnvironmentVariable": "CLAUDE_HOME",
+  "supportLevel": "unsupported",
+  "defaultTargetRoot": "",
+  "targetRootEnvironmentVariable": "WSR_WORKSPACE_ROOT",
   "requiresExplicitTargetRoot": true,
-  "skillLoadingMode": "full-file",
-  "artifactMappings": {},
-  "unsupportedFeatures": ["block-jit"],
-  "pathStyle": "posix"
+  "logicalRoots": {
+    "policyRoot": ".claude",
+    "rulesRoot": ".claude/rules",
+    "workflowsRoot": ".claude/workflows",
+    "skillsRoot": ".claude/skills",
+    "scriptsRoot": ".claude/scripts",
+    "stateRoot": ".claude"
+  },
+  "discoveryPrecedence": [],
+  "artifactMappings": [],
+  "routerContract": {
+    "type": "none",
+    "path": ""
+  },
+  "activeMarkerContract": {
+    "required": false,
+    "path": ""
+  },
+  "unsupportedFeatures": ["block-jit", "user-home-install", "dry-run", "apply"]
 }

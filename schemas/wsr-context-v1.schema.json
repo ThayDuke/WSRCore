@@ -1,0 +1,110 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "WSRContextV1",
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "type": "integer",
+      "enum": [1]
+    },
+    "packageName": {
+      "type": "string"
+    },
+    "version": {
+      "type": "string"
+    },
+    "buildId": {
+      "type": "string"
+    },
+    "manifestSha256": {
+      "type": "string"
+    },
+    "policyFiles": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "commandMap": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "workflow": { "type": "string" },
+          "description": { "type": "string" },
+          "readOnly": { "type": "boolean" },
+          "approvalRequired": { "type": "boolean" },
+          "requiredProfile": { "type": "string" },
+          "entrypoint": { "type": "string" }
+        },
+        "required": ["workflow", "description", "readOnly", "approvalRequired", "requiredProfile"]
+      }
+    },
+    "skillIndex": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "capabilityId": { "type": "string" },
+          "name": { "type": "string" },
+          "description": { "type": "string" },
+          "trigger": { "type": "string" },
+          "path": { "type": "string" },
+          "references": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "scope": {
+            "type": "string",
+            "enum": ["global", "project"]
+          },
+          "priority": { "type": "integer" },
+          "contentHash": { "type": "string" }
+        },
+        "required": ["capabilityId", "name", "description", "trigger", "path", "scope", "priority", "contentHash"]
+      }
+    },
+    "loadProfiles": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "items": { "type": "string" }
+      }
+    },
+    "precedenceRules": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "tokenBudget": {
+      "type": "object",
+      "properties": {
+        "startupMax": { "type": "integer" },
+        "estimatedTokens": { "type": "integer" }
+      },
+      "required": ["startupMax"]
+    },
+    "projectOverlayContract": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "overlayPath": { "type": "string" }
+      },
+      "required": ["enabled"]
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "packageName",
+    "version",
+    "buildId",
+    "manifestSha256",
+    "policyFiles",
+    "commandMap",
+    "skillIndex",
+    "loadProfiles",
+    "precedenceRules",
+    "tokenBudget",
+    "projectOverlayContract"
+  ],
+  "additionalProperties": false
+}

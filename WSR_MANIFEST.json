@@ -1,15 +1,16 @@
 {
   "schemaVersion": 2,
   "packageName": "WSR-Core",
-  "version": "1.0.2",
-  "buildId": "WSR-CORE-1.0.2-RELEASE",
+  "version": "1.0.6",
+  "buildId": "WSR-CORE-1.0.6-RELEASE",
   "status": "Released",
-  "createdAt": "2026-07-11T23:42:50+07:00",
+  "createdAt": "2026-07-20T13:15:00+07:00",
   "canonicalLayout": ".agents",
   "compatibilityLayouts": [".codex"],
   "minimumPython": "3.8",
   "policySource": "GEMINI.md",
   "checksumsFile": "WSR_CHECKSUMS.json",
+  "contextFile": "WSR_CONTEXT.json",
   "cleanWhitelist": [
     "DATA/",
     "ENGINE/",
@@ -28,8 +29,7 @@
     ".DS_Store",
     "Thumbs.db",
     "memory/",
-    "metadata.json",
-    "gitnexus/"
+    "metadata.json"
   ],
   "commands": {
     "audit": {
@@ -61,8 +61,23 @@
       }
     },
     "reload": {
-      "description": "Reload policies, skills, and memory context",
-      "script": "global_workflows/reload.md"
+      "description": "Verify a released WSR source and emit a read-only reload receipt",
+      "script": "scripts/wsr_reload.py",
+      "readOnly": true,
+      "options": {
+        "--source-root": "Explicit WSR package root",
+        "--lock-file": "JSON source lock path",
+        "--adapter": "Target adapter name",
+        "--target-root": "Active configuration root for drift checks",
+        "--profile": "startup | command | task | diagnostic",
+        "--command-name": "Slash command selected for command/task profile",
+        "--capability": "Repeatable capability ID for task profile",
+        "--deep": "Approve Deep Audit for a changed build",
+        "--confirm-loaded": "Confirm required entries were loaded after READY",
+        "--allow-review": "Explicitly verify a Review source without releasing it",
+        "--status": "Emit compact status",
+        "--json": "Emit structured JSON receipt"
+      }
     },
     "wsr": {
       "description": "WSR packaging workflow",
@@ -75,6 +90,14 @@
     "commit": {
       "description": "Commit changes via task-scoped logic",
       "script": "global_workflows/commit.md"
+    },
+    "sync": {
+      "description": "Auto-detect latest release and execute configuration sync without prompt re-approval",
+      "script": "global_workflows/sync.md"
+    },
+    "ho": {
+      "description": "Handoff workflow for session transfer",
+      "script": "global_workflows/ho.md"
     }
   },
   "adapters": [
@@ -82,7 +105,8 @@
     "adapters/gemini.json",
     "adapters/claude.json",
     "adapters/cursor.json",
-    "adapters/antigravity.json"
+    "adapters/antigravity.json",
+    "adapters/generic.json"
   ],
   "artifacts": [
     {
@@ -121,17 +145,6 @@
     {
       "id": "readme-md",
       "source": "README.md",
-      "type": "document",
-      "required": true,
-      "mutable": true,
-      "deploy": true,
-      "targets": ["codex", "gemini"],
-      "owner": "Documentation Engineer",
-      "encoding": "UTF-8"
-    },
-    {
-      "id": "readme-txt",
-      "source": "readme.txt",
       "type": "document",
       "required": true,
       "mutable": true,
@@ -191,7 +204,7 @@
       "required": true,
       "mutable": false,
       "deploy": true,
-      "targets": ["codex", "gemini"],
+      "targets": ["codex", "gemini", "antigravity"],
       "owner": "Workflow Engineer",
       "encoding": "UTF-8"
     },
@@ -202,7 +215,7 @@
       "required": true,
       "mutable": false,
       "deploy": true,
-      "targets": ["codex", "gemini"],
+      "targets": ["codex", "gemini", "antigravity"],
       "owner": "Workflow Engineer",
       "encoding": "UTF-8"
     },
@@ -213,7 +226,7 @@
       "required": true,
       "mutable": false,
       "deploy": true,
-      "targets": ["codex", "gemini"],
+      "targets": ["codex", "gemini", "antigravity"],
       "owner": "Workflow Engineer",
       "encoding": "UTF-8"
     },
@@ -224,7 +237,7 @@
       "required": true,
       "mutable": false,
       "deploy": true,
-      "targets": ["codex", "gemini"],
+      "targets": ["codex", "gemini", "antigravity"],
       "owner": "Workflow Engineer",
       "encoding": "UTF-8"
     },
@@ -235,7 +248,18 @@
       "required": true,
       "mutable": false,
       "deploy": true,
-      "targets": ["codex", "gemini"],
+      "targets": ["codex", "gemini", "antigravity"],
+      "owner": "Workflow Engineer",
+      "encoding": "UTF-8"
+    },
+    {
+      "id": "workflow-ho",
+      "source": "global_workflows/ho.md",
+      "type": "workflow",
+      "required": true,
+      "mutable": false,
+      "deploy": true,
+      "targets": ["codex", "gemini", "antigravity"],
       "owner": "Workflow Engineer",
       "encoding": "UTF-8"
     },
@@ -246,7 +270,7 @@
       "required": true,
       "mutable": false,
       "deploy": true,
-      "targets": ["codex", "gemini"],
+      "targets": ["codex", "gemini", "antigravity"],
       "owner": "Workflow Engineer",
       "encoding": "UTF-8"
     },
@@ -257,7 +281,7 @@
       "required": true,
       "mutable": false,
       "deploy": true,
-      "targets": ["codex", "gemini"],
+      "targets": ["codex", "gemini", "antigravity"],
       "owner": "Workflow Engineer",
       "encoding": "UTF-8"
     },
@@ -268,7 +292,18 @@
       "required": true,
       "mutable": false,
       "deploy": true,
-      "targets": ["codex", "gemini"],
+      "targets": ["codex", "gemini", "antigravity"],
+      "owner": "Workflow Engineer",
+      "encoding": "UTF-8"
+    },
+    {
+      "id": "workflow-sync",
+      "source": "global_workflows/sync.md",
+      "type": "workflow",
+      "required": true,
+      "mutable": false,
+      "deploy": true,
+      "targets": ["codex", "gemini", "antigravity"],
       "owner": "Workflow Engineer",
       "encoding": "UTF-8"
     },
@@ -507,6 +542,28 @@
       "encoding": "UTF-8"
     },
     {
+      "id": "schema-context-v1",
+      "source": "schemas/wsr-context-v1.schema.json",
+      "type": "document",
+      "required": true,
+      "mutable": false,
+      "deploy": true,
+      "targets": ["codex", "gemini"],
+      "owner": "Configuration Engineer",
+      "encoding": "UTF-8"
+    },
+    {
+      "id": "wsr-context",
+      "source": "WSR_CONTEXT.json",
+      "type": "document",
+      "required": true,
+      "mutable": false,
+      "deploy": true,
+      "targets": ["codex", "gemini"],
+      "owner": "Configuration Engineer",
+      "encoding": "UTF-8"
+    },
+    {
       "id": "adapter-codex",
       "source": "adapters/codex.json",
       "type": "document",
@@ -584,6 +641,61 @@
       "encoding": "UTF-8"
     },
     {
+      "id": "adapter-generic",
+      "source": "adapters/generic.json",
+      "type": "document",
+      "required": true,
+      "mutable": false,
+      "deploy": true,
+      "targets": ["codex", "gemini"],
+      "owner": "Configuration Engineer",
+      "encoding": "UTF-8"
+    },
+    {
+      "id": "bootstrap-router-template",
+      "source": "bootstrap/router.md.template",
+      "type": "document",
+      "required": true,
+      "mutable": false,
+      "deploy": true,
+      "targets": ["codex", "gemini"],
+      "owner": "Loader Engineer",
+      "encoding": "UTF-8"
+    },
+    {
+      "id": "schema-wsr-adapter-v2",
+      "source": "schemas/wsr-adapter-v2.schema.json",
+      "type": "document",
+      "required": true,
+      "mutable": false,
+      "deploy": true,
+      "targets": ["codex", "gemini"],
+      "owner": "Configuration Engineer",
+      "encoding": "UTF-8"
+    },
+    {
+      "id": "schema-wsr-active-v1",
+      "source": "schemas/wsr-active-v1.schema.json",
+      "type": "document",
+      "required": true,
+      "mutable": false,
+      "deploy": true,
+      "targets": ["codex", "gemini"],
+      "owner": "Configuration Engineer",
+      "encoding": "UTF-8"
+    },
+    {
+      "id": "release-identity-ledger",
+      "source": "release_identity_ledger.json",
+      "type": "document",
+      "required": true,
+      "mutable": true,
+      "deploy": true,
+      "targets": ["codex", "gemini"],
+      "owner": "Release Engineer",
+      "encoding": "UTF-8"
+    },
+    {
       "id": "changelog",
       "source": "CHANGELOG.md",
       "type": "document",
@@ -592,6 +704,50 @@
       "deploy": true,
       "targets": ["codex", "gemini"],
       "owner": "Release Engineer",
+      "encoding": "UTF-8"
+    },
+    {
+      "id": "conformance-fixtures",
+      "source": "tests/conformance/fixtures.json",
+      "type": "test",
+      "required": true,
+      "mutable": false,
+      "deploy": false,
+      "targets": [],
+      "owner": "QA Engineer",
+      "encoding": "UTF-8"
+    },
+    {
+      "id": "conformance-evidence-index",
+      "source": "evidence/cross-ide-conformance/index.json",
+      "type": "evidence",
+      "required": true,
+      "mutable": true,
+      "deploy": false,
+      "targets": [],
+      "owner": "QA Engineer",
+      "encoding": "UTF-8"
+    },
+    {
+      "id": "conformance-evidence-run-20260720",
+      "source": "evidence/cross-ide-conformance/20260720_WSR-CORE-1.0.5-REVIEW/result.json",
+      "type": "evidence",
+      "required": true,
+      "mutable": false,
+      "deploy": false,
+      "targets": [],
+      "owner": "QA Engineer",
+      "encoding": "UTF-8"
+    },
+    {
+      "id": "conformance-evidence-run-20260720-release",
+      "source": "evidence/cross-ide-conformance/20260720_WSR-CORE-1.0.6-RELEASE/result.json",
+      "type": "evidence",
+      "required": true,
+      "mutable": false,
+      "deploy": false,
+      "targets": [],
+      "owner": "QA Engineer",
       "encoding": "UTF-8"
     },
     {

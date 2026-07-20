@@ -1,17 +1,38 @@
 {
+  "schemaVersion": 2,
   "adapterId": "codex",
-  "displayName": "Codex Adapter",
+  "runtimeFamily": "codex",
   "enabled": true,
+  "supportLevel": "native",
+  "defaultTargetRoot": "~/.codex",
   "targetRootEnvironmentVariable": "CODEX_HOME",
   "requiresExplicitTargetRoot": false,
-  "skillLoadingMode": "full-file",
-  "artifactMappings": {
-    "policy": "",
-    "rule": "global_rules/AG_GLOBAL_RULES.md",
-    "workflow": "global_workflows/",
-    "skill": "skills/",
-    "script": "scripts/"
+  "logicalRoots": {
+    "policyRoot": ".",
+    "rulesRoot": "rules",
+    "workflowsRoot": "workflows",
+    "skillsRoot": "skills",
+    "scriptsRoot": "scripts",
+    "stateRoot": "."
   },
-  "unsupportedFeatures": ["block-jit"],
-  "pathStyle": "windows"
+  "discoveryPrecedence": [
+    "AGENTS.md",
+    ".codex/AGENTS.md",
+    "~/.codex/AGENTS.md"
+  ],
+  "artifactMappings": [
+    { "artifactType": "rule", "logicalRoot": "rulesRoot", "relativePath": "global_rules/AG_GLOBAL_RULES.md" },
+    { "artifactType": "workflow", "logicalRoot": "workflowsRoot", "relativePath": "./" },
+    { "artifactType": "skill", "logicalRoot": "skillsRoot", "relativePath": "./" },
+    { "artifactType": "script", "logicalRoot": "scriptsRoot", "relativePath": "./" }
+  ],
+  "routerContract": {
+    "type": "absolute",
+    "path": "AGENTS.md"
+  },
+  "activeMarkerContract": {
+    "required": true,
+    "path": ".wsr-active.json"
+  },
+  "unsupportedFeatures": ["block-jit"]
 }

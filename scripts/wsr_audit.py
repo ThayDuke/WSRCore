@@ -313,11 +313,19 @@ def main():
     if total_denom > 0:
         score = int((report['summary']['pass_count'] / total_denom) * 100)
         report['summary']['score'] = score
+        is_failed = len(fails) > 0 or git_error_occurred
+        report['summary']['status'] = 'FAIL' if is_failed or report['summary']['score'] < 100 else 'PASS'
     else:
-        report['summary']['score'] = 100
-        
-    is_failed = len(fails) > 0 or git_error_occurred
-    report['summary']['status'] = 'FAIL' if is_failed or report['summary']['score'] < 100 else 'PASS'
+        report['summary']['score'] = 0
+        report['summary']['status'] = 'WARN'
+        report['results'].append({
+            'file': 'inventory',
+            'test': 'zero_coverage_check',
+            'status': 'WARN',
+            'message': 'Zero files checked during audit — zero-coverage rejection'
+        })
+        if args.mode == 'deep':
+            report['summary']['status'] = 'FAIL'
     
     # Xuất kết quả
     if args.json:

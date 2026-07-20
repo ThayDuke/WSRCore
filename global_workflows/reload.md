@@ -1,5 +1,5 @@
 ---
-description: Reload policies, skills, and memory context
+description: Verify released WSR source and emit read-only reload status receipt
 ---
 
 # Quy trình Smart Reload `/reload` (WSR Core)
@@ -14,6 +14,7 @@ description: Reload policies, skills, and memory context
 4. Sau trạng thái VERIFIED, Agent đọc đúng `coreFiles` từ receipt vào context.
 5. Agent chỉ giữ `skillIndex`; nội dung skill tiếp tục nạp JIT theo nhiệm vụ.
 6. Sync chỉ chạy dry-run để phát hiện drift. Cấm thêm hoặc suy diễn tùy chọn apply.
+7. Đường dẫn mẫu chỉ dẫn cài đặt workflows Antigravity/Gemini: `C:\Users\[username]\.gemini\config\global_workflows\*.md`.
 
 ## Trạng thái
 - VERIFIED: nguồn sạch; được phép đọc lõi.

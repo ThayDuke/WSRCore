@@ -1,11 +1,37 @@
 {
+  "schemaVersion": 2,
   "adapterId": "antigravity",
-  "displayName": "Antigravity Adapter",
-  "enabled": false,
-  "targetRootEnvironmentVariable": "ANTIGRAVITY_HOME",
-  "requiresExplicitTargetRoot": true,
-  "skillLoadingMode": "block-jit",
-  "artifactMappings": {},
-  "unsupportedFeatures": [],
-  "pathStyle": "windows"
+  "runtimeFamily": "antigravity",
+  "enabled": true,
+  "supportLevel": "native",
+  "defaultTargetRoot": "~/.gemini",
+  "targetRootEnvironmentVariable": "GEMINI_HOME",
+  "requiresExplicitTargetRoot": false,
+  "logicalRoots": {
+    "policyRoot": ".",
+    "rulesRoot": "config/global_rules",
+    "workflowsRoot": "config/global_workflows",
+    "skillsRoot": "config/skills",
+    "scriptsRoot": "config/scripts",
+    "stateRoot": "config"
+  },
+  "discoveryPrecedence": [
+    "AGENTS.md",
+    "~/.gemini/config/AGENTS.md"
+  ],
+  "artifactMappings": [
+    { "artifactType": "rule", "logicalRoot": "rulesRoot", "relativePath": "global_rules/AG_GLOBAL_RULES.md" },
+    { "artifactType": "workflow", "logicalRoot": "workflowsRoot", "relativePath": "./" },
+    { "artifactType": "skill", "logicalRoot": "skillsRoot", "relativePath": "./" },
+    { "artifactType": "script", "logicalRoot": "scriptsRoot", "relativePath": "./" }
+  ],
+  "routerContract": {
+    "type": "absolute",
+    "path": "GEMINI.md"
+  },
+  "activeMarkerContract": {
+    "required": true,
+    "path": "config/.wsr-active.json"
+  },
+  "unsupportedFeatures": []
 }

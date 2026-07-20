@@ -1,29 +1,19 @@
-# WSR Core Global Instructions
+# WSR Core 1.0.6 — Agent Loader Contract
 
-> [!WARNING]
-> **ĐÂY LÀ NGUỒN PHÁT HÀNH CHÍNH THỨC WSR CORE 1.0.0.**
-> Mọi triển khai từ package này phải đi qua Doctor, checksum và quy trình sync có phê duyệt.
+> [!IMPORTANT]
+> Đây là nguồn WSR Core chính thức ở trạng thái `Released`.
+> Cursor và Claude nằm ngoài phạm vi hỗ trợ của bản phát hành này.
 
-## 1. Cấu trúc Package WSR Core
-- **Manifest:** [WSR_MANIFEST.json](./WSR_MANIFEST.json)
-- **Workflows:**
-  - `/audit` -> [audit.md](./global_workflows/audit.md)
-  - `/br` -> [br.md](./global_workflows/br.md)
-  - `/pl` -> [pl.md](./global_workflows/pl.md)
-  - `/clean` -> [clean.md](./global_workflows/clean.md)
-  - `/reload` -> [reload.md](./global_workflows/reload.md)
-  - `/wsr` -> [wsr.md](./global_workflows/wsr.md)
+- Router được `sync_config.py` render từ `bootstrap/router.md.template`.
+- Router chứa source root tuyệt đối, build ID và manifest SHA-256.
+- Không dò `GEMINI.md`, workflow hoặc skill bằng đường dẫn tương đối từ CWD.
+- Trước mọi tác vụ, nạp toàn bộ `GEMINI.md` từ active source root.
+- Với slash command, nạp đúng workflow được khai báo trong `WSR_CONTEXT.json`.
+- Với task capability, nạp đúng skill và references có `capabilityId` được chọn.
+- Chỉ profile `diagnostic` được phép nạp toàn bộ inventory.
+- Marker runtime phải validate theo `schemas/wsr-active-v1.schema.json`.
+- Codex, Gemini và Antigravity dùng native roots riêng.
+- Generic chỉ được triển khai trong workspace với `--target-root` tường minh.
 
-## 2. Scripts Utility mới
-- **Quét nợ:** [wsr_debt_scanner.py](./scripts/wsr_debt_scanner.py) (Chống false positive trong file `.md`).
-- **Audit:** [wsr_audit.py](./scripts/wsr_audit.py) (Hỗ trợ quét theo path, kiểm tra moji-bake).
-- **Dọn dẹp:** [wsr_clean.py](./scripts/wsr_clean.py) (Quét file rác an toàn theo whitelist).
-- **Đóng gói:** [pack_wsr.py](./scripts/pack_wsr.py) (Tạo file nén đóng gói bản review).
-- **Đồng bộ:** [sync_config.py](./scripts/sync_config.py) (Dry-run mặc định, sync khi có `--apply`).
-
-## 3. Minimal Coding Protocol (Quy tắc YAGNI tích hợp)
-- **Bậc 2 (Codebase reuse):** Tái sử dụng helper/util sẵn có của dự án trước khi viết mới.
-- **Bậc 3 (Stdlib first):** Dùng thư viện tiêu chuẩn ngôn ngữ thay vì tự viết.
-- **Bậc 4 (Native platform):** Tận dụng tính năng HTML5/CSS gốc, tránh cài dependency mới.
-- **Sửa tận gốc:** Tìm và vá lỗi ở hàm dùng chung, không sửa triệu chứng ở từng caller riêng lẻ.
-- **Nợ kỹ thuật:** Mọi giải pháp tạm thời phải đánh tag `# wsr-debt:` ghi rõ `ceiling` và `upgrade`.
+Các lệnh quản trị chuẩn: `/audit`, `/backup`, `/br`, `/clean`, `/commit`,
+`/pl`, `/reload`, `/sync`, `/wsr` và `/ho`.

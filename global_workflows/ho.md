@@ -1,16 +1,16 @@
 ---
-description: Trigger planning workflow and create planning file in DOCS/Planning
+description: Trigger handoff planning workflow and create detailed architectural plan file
 ---
 
-# Quy trình Planning `/pl` (WSR Core 1.0)
+# Quy trình Handoff `/ho` (WSR Core 1.0)
 
-Quy trình lập kế hoạch trước khi code:
+Quy trình lập kế hoạch chi tiết Handoff trước khi thực thi:
 
 ## Quy định thực thi
 1. **Tuyệt đối cấm tạo file `implementation_plan.md`:** Để tránh kích hoạt cơ chế tự động duyệt.
 2. **Nơi lưu trữ kế hoạch:** Tạo và ghi tại `DOCS/Planning/planning_[tên_nhiệm_vụ].md`.
 3. **Nội dung kế hoạch (Tiêu chuẩn Handoff chi tiết, không giới hạn dòng):**
-   - Metadata Header dạng YAML (version, description).
+   - Metadata Header dạng YAML (`mode: handoff`, version, description).
    - Kiến trúc đích (Target Architecture): Thiết kế chi tiết luồng xử lý/component/giao tiếp.
    - File Ownership: Phân bảng rõ ràng trách nhiệm từng file bị tác động.
    - Thuật toán (Algorithm): Mô tả logic cốt lõi bằng ngôn ngữ tự nhiên hoặc mã giả.

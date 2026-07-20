@@ -9,7 +9,9 @@ import wsr_doctor
 def run_doctor_preflight(package_root):
     """Run JIT doctor checks directly to verify package state before packaging."""
     try:
-        results, gates_passed, gates_total = wsr_doctor.run_doctor_checks(package_root, strict=False, is_json=True)
+        results, gates_passed, gates_total = wsr_doctor.run_doctor_checks(
+            package_root, strict=False, is_json=True, runtime_mode=False
+        )
         if results["status"] != "PASS":
             return False, f"Doctor checks failed: {results['blockers']}"
         return True, ""
@@ -34,6 +36,24 @@ def generate_checksums_file(package_root, manifest):
     content = json.dumps(checksums, indent=2, sort_keys=True, ensure_ascii=False)
     wsr_common.atomic_write_text(resolved_path, content)
     return checksums
+
+def validate_identity_ledger(package_root, manifest):
+    """Reject missing or reused build identities before package mutation."""
+    ledger_path = os.path.join(package_root, "release_identity_ledger.json")
+    with open(ledger_path, "r", encoding="utf-8") as stream:
+        ledger = json.load(stream)
+    package_content_hash = wsr_common.calculate_package_content_hash(package_root, manifest)
+    bindings = {}
+    for entry in ledger.get("entries", []):
+        build_id = entry.get("buildId")
+        content_hash = entry.get("contentHash")
+        if not build_id or not content_hash:
+            raise ValueError("Every identity-ledger entry requires buildId and contentHash")
+        if build_id in bindings and bindings[build_id] != content_hash:
+            raise ValueError(f"Build identity reused with different content: {build_id}")
+        bindings[build_id] = content_hash
+    if bindings.get(manifest.get("buildId")) != package_content_hash:
+        raise ValueError("Current build identity is not bound to the active package content hash")
 
 def verify_zip_archive(zip_filepath, manifest, checksums):
     """Open built ZIP in read-only mode and verify entries and checksums."""
@@ -82,6 +102,12 @@ def main():
     packageName = manifest.get("packageName", "WSR_Package")
     version = manifest.get("version", "1.0.0")
     buildId = manifest.get("buildId", "N_A")
+
+    try:
+        validate_identity_ledger(package_root, manifest)
+    except Exception as e:
+        print(f"[-] Identity ledger safety gate failed: {e}", file=sys.stderr)
+        sys.exit(wsr_common.EXIT_SAFETY_REJECTION)
     
     # 2. Generate checksums FIRST to let doctor validate successfully
     print("[*] Generating new WSR_CHECKSUMS.json...")
@@ -100,13 +126,14 @@ def main():
         sys.exit(wsr_common.EXIT_FAIL_FINDING)
         
     # 4. Perform deterministic zip package build
-    output_dir = os.path.dirname(package_root)
-    build_parts = buildId.split("-")
-    if len(build_parts) >= 2:
-        build_suffix = "-".join(build_parts[-2:])
-    else:
-        build_suffix = buildId
-    zip_filename = f"{packageName}_{build_suffix}.zip"
+    repo_root = package_root
+    while not os.path.isdir(os.path.join(repo_root, "DOCS")):
+        parent = os.path.dirname(repo_root)
+        if parent == repo_root:
+            raise RuntimeError("Repository DOCS directory not found")
+        repo_root = parent
+    output_dir = os.path.join(repo_root, "DOCS")
+    zip_filename = f"{packageName}_{version}.zip"
     zip_filepath = os.path.join(output_dir, zip_filename)
     
     print(f"[*] Packaging {packageName} (v{version}) with Build ID: {buildId}...")

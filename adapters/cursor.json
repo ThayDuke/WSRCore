@@ -1,11 +1,29 @@
 {
+  "schemaVersion": 2,
   "adapterId": "cursor",
-  "displayName": "Cursor Adapter",
+  "runtimeFamily": "cursor",
   "enabled": false,
-  "targetRootEnvironmentVariable": "CURSOR_HOME",
+  "supportLevel": "unsupported",
+  "defaultTargetRoot": "",
+  "targetRootEnvironmentVariable": "WSR_WORKSPACE_ROOT",
   "requiresExplicitTargetRoot": true,
-  "skillLoadingMode": "full-file",
-  "artifactMappings": {},
-  "unsupportedFeatures": ["block-jit"],
-  "pathStyle": "windows"
+  "logicalRoots": {
+    "policyRoot": ".cursor",
+    "rulesRoot": ".cursor/rules",
+    "workflowsRoot": ".cursor/workflows",
+    "skillsRoot": ".cursor/skills",
+    "scriptsRoot": ".cursor/scripts",
+    "stateRoot": ".cursor"
+  },
+  "discoveryPrecedence": [],
+  "artifactMappings": [],
+  "routerContract": {
+    "type": "none",
+    "path": ""
+  },
+  "activeMarkerContract": {
+    "required": false,
+    "path": ""
+  },
+  "unsupportedFeatures": ["block-jit", "user-home-install", "dry-run", "apply"]
 }

@@ -1,65 +1,46 @@
-# WSR Core
+# WSR Core 1.0.6
 
-WSR is a lightweight, high-performance, and secure Agentic Workflow framework designed for AI coding assistants (such as Gemini, Claude, Cursor, and Antigravity). It restricts AI from making arbitrary changes (Iron Rule), prevents over-engineering (YAGNI & Native-first), and optimizes context usage (Anti-Waste) through telegraphic rules and automated CLI scripts.
+WSR Core là bộ policy, workflow, skill và công cụ kiểm soát dành cho nhiều
+IDE agent. Codex, Gemini và Antigravity có adapter native; generic adapter
+là lựa chọn workspace-scoped cho IDE agent khác.
 
-This directory contains the independent standalone version of **WSR Core**, ready to be initialized as a submodule or an independent repository.
+## Cách nạp
 
----
+Mỗi adapter khai báo logical roots tương đối dưới một target root đã xác minh.
+`sync_config.py` render router chứa active source root tuyệt đối, build ID và
+manifest hash. Agent vì vậy không cần dò release folder hoặc suy đoán từ CWD.
 
-## 1. Core Architecture
+| Adapter | Target mặc định | Phạm vi |
+|---|---|---|
+| Codex | `CODEX_HOME`, sau đó `~/.codex` | Native |
+| Gemini | `GEMINI_HOME`, sau đó `~/.gemini` | Native |
+| Antigravity | `GEMINI_HOME`, sau đó `~/.gemini` | Native, dữ liệu dưới `config/` |
+| Generic | Chỉ `--target-root` hoặc `WSR_WORKSPACE_ROOT` | Workspace |
+| Cursor | Disabled, unsupported | Ngoài phạm vi 1.0.6 |
+| Claude | Unsupported | Không triển khai |
 
-WSR functions by deploying specific components into the `.agents/` (canonical) or `.codex/` (fallback) folder at the root of a target repository:
+## Quy trình an toàn
 
-```
-.agents/ (or WSR Release Package)
-├── adapters/             # Environment & model mappings for Cursor, Gemini, Claude, etc.
-├── global_rules/         # Core coding principles (YAGNI, Minimal Coding, Risk Gate)
-├── global_skills/        # Reusable instruction bundles (Brutalist, Liquid Glass, Output Enforcement)
-├── global_workflows/     # Step-by-step markdown workflows triggered by slash commands
-├── scripts/              # Python utilities for automation, audits, and health diagnostics
-├── debt_ledger.md        # Technical debt ledger tracking tag triggers
-├── WSR_MANIFEST.json     # Master configuration index specifying active rules and files
-└── WSR_CHECKSUMS.json    # SHA-256 integrity mapping to protect against file corruption
-```
+1. Chạy source Doctor:
+   `python scripts/wsr_doctor.py --source-mode --strict`.
+2. Xem dry-run:
+   `python scripts/sync_config.py --adapter generic --target-root <workspace>`.
+3. Apply chỉ sau phê duyệt:
+   `python scripts/sync_config.py --adapter generic --target-root <workspace> --apply --approval-token WSR-CORE-1.0.6-RELEASE`.
+4. Chạy runtime Doctor:
+   `python scripts/wsr_doctor.py --runtime-mode --adapter generic --target-root <workspace> --strict`.
+5. Reload theo profile và capability cần thiết; dùng `--confirm-loaded` chỉ sau
+   khi mọi required entry thực sự đã được agent đọc.
 
----
+Package giữ trạng thái `Released`. Việc apply vẫn cần approval token đúng build.
+Không có thao tác release nào tự ghi vào runtime global.
 
-## 2. Standard Slash Commands
+## Progressive disclosure
 
-When an AI agent is initialized with WSR, it responds to the following standardized workflows:
+- `startup`: policy, manifest, context và adapter.
+- `command`: startup cộng đúng workflow đang chạy.
+- `task`: command cộng skill có `capabilityId` được chọn và references của nó.
+- `diagnostic`: toàn bộ inventory.
 
-- **`/br` (Brainstorm):** Default chat mode. Analyzes system layer requirements and presents solutions. **Direct code modification is strictly forbidden.**
-- **`/pl` (Planning):** Creates a design plan at `DOCS/Planning/planning_[task_name].md` and halts. AI must wait for explicit user approval before execution.
-- **`/audit` (Quality Audit):** Runs `wsr_audit.py` on modified files to verify syntax structure and prevent UTF-8 mojibake.
-- **`/clean` (Clean Room):** Triggers `wsr_clean.py` to scan the workspace and safely purge obsolete plans, temp files, and build cache.
-- **`/wsr` (Package Release):** Runs `pack_wsr.py` to bump versioning metadata, update HTML documentation, and archive WSR into a distribution `.zip`.
-- **`/reload` (Hot Reload):** Re-evaluates local rules, active skills, and lessons learned without clearing conversation history.
-
----
-
-## 3. Automation Scripts (`scripts/`)
-
-WSR includes a suite of robust CLI scripts to manage the developer-agent interaction:
-
-1. **`wsr_audit.py`:** Performs static code auditing. Checks for syntax validity, removes unresolved placeholders, and scans for character encoding issues.
-2. **`wsr_debt_scanner.py`:** Scans files for technical debt triggers (e.g., `# wsr-debt:` comments) and logs them into `debt_ledger.md`.
-3. **`wsr_clean.py`:** Parses rules to locate and wipe redundant markdown files, old planning states, and lockfiles.
-4. **`wsr_doctor.py`:** Performs system diagnostic checks on active rule paths and resolves mojibake errors.
-5. **`sync_config.py`:** Integrates global rules into local IDE presets.
-
----
-
-## 4. How to Deploy
-
-To install WSR in any workspace:
-
-1. **Copy the Package:** Clone or copy this WSR package into the `.agents/` folder at the root of your target project.
-2. **Synchronize System Config:** Execute the sync script to bind active adapter policies to your local developer workspace:
-   ```bash
-   python .agents/scripts/sync_config.py --apply
-   ```
-3. **Verify Integrity:** Run the system diagnosis tool to verify that all modules are mapped correctly:
-   ```bash
-   python .agents/scripts/wsr_doctor.py
-   ```
-4. **Start Coding:** Prompt your AI assistant. It will auto-detect `.agents/GEMINI.md` and inherit all rules.
+Doctor kiểm 32 gate, bao gồm identity, adapter v2, marker, router, token budget,
+transaction evidence và cross-IDE conformance.

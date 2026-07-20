@@ -1,0 +1,52 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "WSRActiveMarkerV1",
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "type": "integer",
+      "enum": [1]
+    },
+    "adapterIdentity": {
+      "type": "string"
+    },
+    "packageVersion": {
+      "type": "string"
+    },
+    "buildId": {
+      "type": "string"
+    },
+    "manifestHash": {
+      "type": "string"
+    },
+    "inventoryHash": {
+      "type": "string"
+    },
+    "routerHash": {
+      "type": "string"
+    },
+    "logicalRoots": {
+      "type": "object",
+      "additionalProperties": { "type": "string" }
+    },
+    "installTimestamp": {
+      "type": "string"
+    },
+    "transactionId": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "adapterIdentity",
+    "packageVersion",
+    "buildId",
+    "manifestHash",
+    "inventoryHash",
+    "routerHash",
+    "logicalRoots",
+    "installTimestamp",
+    "transactionId"
+  ],
+  "additionalProperties": false
+}

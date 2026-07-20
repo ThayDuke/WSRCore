@@ -1,0 +1,13 @@
+# WSR Core Active Router Template
+
+> [!IMPORTANT]
+> **Active WSR Core Identity:** {{PACKAGE_NAME}} v{{VERSION}} ({{BUILD_ID}})
+> **Active Source Root:** `file:///{{ACTIVE_SOURCE_ROOT}}`
+> **Active Manifest SHA-256:** `{{MANIFEST_SHA256}}`
+
+## Directives
+
+1. Load primary safety policies from `{{ACTIVE_SOURCE_ROOT}}/GEMINI.md`.
+2. Load workspace rules from `{{ACTIVE_SOURCE_ROOT}}/global_rules/AG_GLOBAL_RULES.md`.
+3. Route slash commands directly to `{{ACTIVE_SOURCE_ROOT}}/global_workflows/`.
+4. Load capabilities from `{{ACTIVE_SOURCE_ROOT}}/skills/`.

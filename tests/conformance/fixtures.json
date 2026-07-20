@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "gates": {
+    "D17": { "positiveFixture": "context-valid", "negativeFixture": "context-manifest-hash-stale", "expectedExit": 1 },
+    "D18": { "positiveFixture": "load-plan-contained", "negativeFixture": "required-entry-missing", "expectedExit": 1 },
+    "D19": { "positiveFixture": "command-registry-equal", "negativeFixture": "command-registry-drift", "expectedExit": 1 },
+    "D20": { "positiveFixture": "adapter-v2", "negativeFixture": "adapter-v1", "expectedExit": 1 },
+    "D21": { "positiveFixture": "logical-roots-contained", "negativeFixture": "logical-root-escape", "expectedExit": 4 },
+    "D22": { "positiveFixture": "runtime-marker-present", "negativeFixture": "runtime-marker-missing", "expectedExit": 1 },
+    "D23": { "positiveFixture": "runtime-marker-bound", "negativeFixture": "runtime-marker-hash-drift", "expectedExit": 1 },
+    "D24": { "positiveFixture": "identity-unique", "negativeFixture": "build-id-reused", "expectedExit": 1 },
+    "D25": { "positiveFixture": "capability-hashes-valid", "negativeFixture": "capability-hash-stale", "expectedExit": 1 },
+    "D26": { "positiveFixture": "capability-paths-unique", "negativeFixture": "capability-path-collision", "expectedExit": 1 },
+    "D27": { "positiveFixture": "startup-memory-excluded", "negativeFixture": "startup-memory-leak", "expectedExit": 1 },
+    "D28": { "positiveFixture": "startup-budget-valid", "negativeFixture": "startup-budget-exceeded", "expectedExit": 1 },
+    "D29": { "positiveFixture": "router-identity-bound", "negativeFixture": "router-placeholder-unresolved", "expectedExit": 1 },
+    "D30": { "positiveFixture": "quick-audit-covered", "negativeFixture": "quick-audit-zero-coverage", "expectedExit": 1 },
+    "D31": { "positiveFixture": "transaction-rollback-proof", "negativeFixture": "transaction-proof-missing", "expectedExit": 1 },
+    "D32": { "positiveFixture": "adapter-matrix-complete", "negativeFixture": "adapter-evidence-missing", "expectedExit": 1 }
+  }
+}

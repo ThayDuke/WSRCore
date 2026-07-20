@@ -1,0 +1,234 @@
+{
+  "schemaVersion": 1,
+  "packageName": "WSR-Core",
+  "version": "1.0.6",
+  "buildId": "WSR-CORE-1.0.6-RELEASE",
+  "manifestSha256": "d9cf94296a0a65d20bc00b0cbfb66af60001f0d6308641375410b84faf143382",
+  "policyFiles": [
+    "GEMINI.md",
+    "global_rules/AG_GLOBAL_RULES.md"
+  ],
+  "commandMap": {
+    "audit": {
+      "workflow": "global_workflows/audit.md",
+      "description": "Run static syntax, encoding, and integrity audits",
+      "readOnly": true,
+      "approvalRequired": false,
+      "requiredProfile": "command",
+      "entrypoint": "scripts/wsr_audit.py"
+    },
+    "br": {
+      "workflow": "global_workflows/br.md",
+      "description": "Trigger brainstorm mode for discussions",
+      "readOnly": true,
+      "approvalRequired": false,
+      "requiredProfile": "command"
+    },
+    "pl": {
+      "workflow": "global_workflows/pl.md",
+      "description": "Trigger planning workflow and create planning file",
+      "readOnly": true,
+      "approvalRequired": false,
+      "requiredProfile": "command"
+    },
+    "clean": {
+      "workflow": "global_workflows/clean.md",
+      "description": "Scan and remove temporary/unwanted files",
+      "readOnly": false,
+      "approvalRequired": true,
+      "requiredProfile": "command",
+      "entrypoint": "scripts/wsr_clean.py"
+    },
+    "reload": {
+      "workflow": "global_workflows/reload.md",
+      "description": "Verify a released WSR source and emit a read-only reload receipt",
+      "readOnly": true,
+      "approvalRequired": false,
+      "requiredProfile": "command",
+      "entrypoint": "scripts/wsr_reload.py"
+    },
+    "wsr": {
+      "workflow": "global_workflows/wsr.md",
+      "description": "WSR packaging workflow",
+      "readOnly": false,
+      "approvalRequired": true,
+      "requiredProfile": "command"
+    },
+    "backup": {
+      "workflow": "global_workflows/backup.md",
+      "description": "Create ZIP backup of workspace",
+      "readOnly": false,
+      "approvalRequired": true,
+      "requiredProfile": "command"
+    },
+    "commit": {
+      "workflow": "global_workflows/commit.md",
+      "description": "Commit changes via task-scoped logic",
+      "readOnly": false,
+      "approvalRequired": true,
+      "requiredProfile": "command"
+    },
+    "sync": {
+      "workflow": "global_workflows/sync.md",
+      "description": "Auto-detect latest release and execute configuration sync without prompt re-approval",
+      "readOnly": false,
+      "approvalRequired": true,
+      "requiredProfile": "command",
+      "entrypoint": "scripts/sync_config.py"
+    },
+    "ho": {
+      "workflow": "global_workflows/ho.md",
+      "description": "Handoff workflow for session transfer",
+      "readOnly": true,
+      "approvalRequired": false,
+      "requiredProfile": "command"
+    }
+  },
+  "skillIndex": [
+    {
+      "capabilityId": "wsr-audit",
+      "name": "WSR Audit Skill",
+      "description": "Integrity and syntax audit standards for WSRCore",
+      "trigger": "audit, static check, syntax check",
+      "path": "skills/wsr-audit/SKILL.md",
+      "contentHash": "990712eb25d5eeb9c18ea2244187e46fb5481ba9f5fe5c96dee07d5879d6ecc3",
+      "scope": "global",
+      "priority": 10
+    },
+    {
+      "capabilityId": "wsr-debt",
+      "name": "WSR Debt Scanner Skill",
+      "description": "Technical debt scanning standards and ceiling controls",
+      "trigger": "debt, debt scan, wsr-debt",
+      "path": "skills/wsr-debt/SKILL.md",
+      "contentHash": "626c64cd8e9be6d113a52a05da78708166c43f01d196dfe1f8c1641940809edb",
+      "scope": "global",
+      "priority": 10
+    },
+    {
+      "capabilityId": "wsr-review",
+      "name": "WSR Review Skill",
+      "description": "Standard code and package review guidelines",
+      "trigger": "review, code review, wsr-review",
+      "path": "skills/wsr-review/SKILL.md",
+      "contentHash": "ed5ed1169db58d062914f2f3be6d5e1395921bc06107de00bd0d371158600376",
+      "scope": "global",
+      "priority": 10
+    },
+    {
+      "capabilityId": "dec-dev-operator",
+      "name": "DEC Dev Operator",
+      "description": "DEC System development operator skill",
+      "trigger": "dec, dev operator, dec system",
+      "path": "global_skills/dec-dev-operator/SKILL.md",
+      "contentHash": "6d87eec72822088e732ef96566fcd4487763a2587f4f8e1e78b6c3edf4d18ccb",
+      "references": [
+        "global_skills/dec-dev-operator/references/DEC_UI_skill.md"
+      ],
+      "scope": "global",
+      "priority": 20
+    },
+    {
+      "capabilityId": "effective-html",
+      "name": "Effective HTML",
+      "description": "HTML layout and design standards",
+      "trigger": "html, UI, layout",
+      "path": "global_skills/effective-html/SKILL.md",
+      "contentHash": "5cf76935ece32d44ffd4788f3ce95ce1813a3fa090acc9e65c2e9e2c2de42bbf",
+      "scope": "global",
+      "priority": 5
+    },
+    {
+      "capabilityId": "liquid-glass-web-win",
+      "name": "Liquid Glass Web Win",
+      "description": "Liquid Glass design system guidelines",
+      "trigger": "liquid glass, glassmorphism, UI design",
+      "path": "global_skills/LiquidGlass/skills/liquid-glass-web-win/SKILL.md",
+      "contentHash": "488c3ce4c59dead22dab0ba072b5b5b740ec6aa46220cf72fb1d4276844cb4b3",
+      "references": [
+        "global_skills/LiquidGlass/skills/liquid-glass-web-win/references/liquid-glass-web.md"
+      ],
+      "scope": "global",
+      "priority": 5
+    },
+    {
+      "capabilityId": "output-skill",
+      "name": "Output Skill",
+      "description": "Output formatting guidelines",
+      "trigger": "output, format, full output",
+      "path": "global_skills/output-skill/SKILL.md",
+      "contentHash": "7b2275b591af7760b36a2dfb1dbcf3c99c5054c52298a1066c4979f39ed947d9",
+      "scope": "global",
+      "priority": 5
+    },
+    {
+      "capabilityId": "redesign-skill",
+      "name": "Redesign Skill",
+      "description": "UI redesign and visual overhaul rules",
+      "trigger": "redesign, visual update",
+      "path": "global_skills/redesign-skill/SKILL.md",
+      "contentHash": "0db15d1e82eb72af534114bbc22ffa9ac32515234ca36bb759c98858e3ce642f",
+      "scope": "global",
+      "priority": 5
+    },
+    {
+      "capabilityId": "soft-skill",
+      "name": "Soft Skill",
+      "description": "Soft skills and communication principles",
+      "trigger": "communication, soft skills",
+      "path": "global_skills/soft-skill/SKILL.md",
+      "contentHash": "af59c3beac144b7ed6d850f178833742dcfc5ffefa6ebb514e2dcf1a5fdb6615",
+      "scope": "global",
+      "priority": 5
+    },
+    {
+      "capabilityId": "stitch-skill",
+      "name": "Stitch Skill",
+      "description": "Stitch UI integration and design taste",
+      "trigger": "stitch, UI design taste",
+      "path": "global_skills/stitch-skill/SKILL.md",
+      "contentHash": "2c7cc99214d4b8897e09d748c0557f35629ddd8cfec1843cfead5c41f82abf0c",
+      "references": [
+        "global_skills/stitch-skill/DESIGN.md"
+      ],
+      "scope": "global",
+      "priority": 5
+    }
+  ],
+  "loadProfiles": {
+    "startup": [
+      "policy"
+    ],
+    "command": [
+      "policy",
+      "active_workflow"
+    ],
+    "task": [
+      "policy",
+      "active_workflow",
+      "matched_skill"
+    ],
+    "diagnostic": [
+      "policy",
+      "all_workflows",
+      "all_skills",
+      "all_documents"
+    ]
+  },
+  "precedenceRules": [
+    "1. Safety policy core (GEMINI.md, AG_GLOBAL_RULES.md)",
+    "2. Project AGENTS.md closest to working file",
+    "3. Project WSR overlay if declared",
+    "4. Workflow of active slash command",
+    "5. Skill activated by trigger",
+    "6. JIT memory references"
+  ],
+  "tokenBudget": {
+    "startupMax": 12000,
+    "estimatedTokens": 10336
+  },
+  "projectOverlayContract": {
+    "enabled": true,
+    "overlayPath": ".agents/WSR_ACTIVE.json"
+  }
+}

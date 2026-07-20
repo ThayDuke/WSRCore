@@ -1,5 +1,5 @@
 ---
-description: Run static syntax, encoding, and integrity audits
+description: Run static integrity audit, encoding check, and WSR compliance tests
 ---
 
 # Quy trình Audit & Kiểm tra chất lượng WSR (WSR Core 1.0)

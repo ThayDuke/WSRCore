@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "packageName": "WSR-Core",
+  "entries": [
+    {
+      "version": "1.0.4",
+      "buildId": "WSR-CORE-1.0.4-RELEASE",
+      "status": "Released",
+      "contentHash": "033c0c16e94d9f75891e9b75de218dd0687b9a559d9f5e2c3d7bef86a7da50ad"
+    },
+    {
+      "version": "1.0.5",
+      "buildId": "WSR-CORE-1.0.5-REVIEW",
+      "status": "Review",
+      "contentHash": "e203113f95407129a46ec1175b1eaf41b867fcdcba3867ddfd3409591962c9e2"
+    },
+    {
+      "version": "1.0.6",
+      "buildId": "WSR-CORE-1.0.6-RELEASE",
+      "status": "Released",
+      "contentHash": "e7c41136c51a76b1400a890690f75ba638e8639f223f806a1822d07f9cbb097a"
+    }
+  ]
+}

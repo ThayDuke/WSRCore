@@ -1,5 +1,5 @@
 ---
-description: Trigger brainstorm mode for discussions
+description: Trigger brainstorm mode for discussions and minimal proposal review
 ---
 
 # Quy trình Brainstorm `/br` (WSR Core 1.0)

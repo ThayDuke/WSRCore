@@ -1,23 +1,22 @@
 {
   "schemaVersion": 2,
-  "adapterId": "gemini",
-  "runtimeFamily": "gemini",
+  "adapterId": "generic",
+  "runtimeFamily": "generic",
   "enabled": true,
-  "supportLevel": "native",
-  "defaultTargetRoot": "~/.gemini",
-  "targetRootEnvironmentVariable": "GEMINI_HOME",
-  "requiresExplicitTargetRoot": false,
+  "supportLevel": "workspace",
+  "defaultTargetRoot": "",
+  "targetRootEnvironmentVariable": "WSR_WORKSPACE_ROOT",
+  "requiresExplicitTargetRoot": true,
   "logicalRoots": {
-    "policyRoot": ".",
-    "rulesRoot": "rules",
-    "workflowsRoot": "workflows",
-    "skillsRoot": "skills",
-    "scriptsRoot": "scripts",
-    "stateRoot": "."
+    "policyRoot": ".agents",
+    "rulesRoot": ".agents/global_rules",
+    "workflowsRoot": ".agents/global_workflows",
+    "skillsRoot": ".agents/skills",
+    "scriptsRoot": ".agents/scripts",
+    "stateRoot": ".agents"
   },
   "discoveryPrecedence": [
-    "GEMINI.md",
-    "~/.gemini/GEMINI.md"
+    ".agents/AGENTS.md"
   ],
   "artifactMappings": [
     { "artifactType": "rule", "logicalRoot": "rulesRoot", "relativePath": "global_rules/AG_GLOBAL_RULES.md" },
@@ -27,11 +26,11 @@
   ],
   "routerContract": {
     "type": "absolute",
-    "path": "GEMINI.md"
+    "path": ".agents/AGENTS.md"
   },
   "activeMarkerContract": {
     "required": true,
-    "path": ".wsr-active.json"
+    "path": ".agents/.wsr-active.json"
   },
-  "unsupportedFeatures": []
+  "unsupportedFeatures": ["user-home-install"]
 }

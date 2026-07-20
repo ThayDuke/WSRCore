@@ -1,13 +1,19 @@
-version: "v34"
-status: "Completed"
-buildId: "IPATEMP-PRONUNCIATION-GAME"
-last_update: "2026-07-16"
-summary: "Cập nhật kích thước nút segment và tim đồng bộ ở 34px sử dụng token --dmu-control-small-height. Đồng bộ token này và thuộc tính background-clip: padding-box cho slider toggle vào thư viện DMU dùng chung (dec-ui-tokens.css và dec-ui-theme-toggle.css) để triệt tiêu lỗi lem màu và tràn viền."
-artifacts_count: 8
+version: "1.0.6"
+status: "Released"
+buildId: "WSR-CORE-1.0.6-RELEASE"
+last_update: "2026-07-20"
+summary: "WSR Core 1.0.6 released for Codex, Gemini, Antigravity global, and Generic workspace; unsupported adapters excluded."
+artifacts_count: 60
 checksums_verified: true
 exit_codes_verified: true
 doctor_score: 100
 audit_score: 100
-walkthrough_path: "C:\\Users\\DUKE NGUYEN\\.gemini\\antigravity-ide\\brain\\c8e10a51-1854-4453-972d-f87e494d7bff\\walkthrough.md"
-release_zip: ""
-zip_sha256: ""
+reload_state: "LOADED"
+active_agents_state: "NOT_APPLIED"
+active_agents_drift_count: 0
+active_codex_state: "NOT_APPLIED"
+active_codex_drift_count: 0
+deployed: false
+release_zip: "E:/0-DUKE-REPO/DEC-ALL/DOCS/WSR-Core_1.0.6.zip"
+zip_bytes: 140168
+zip_sha256: "87747e430ca6bd0e8c01e11062fe151447c3fecd2d1e4bc435c5c4ba982e7426"

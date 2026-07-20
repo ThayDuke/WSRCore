@@ -43,6 +43,9 @@
     "checksumsFile": {
       "type": "string"
     },
+    "contextFile": {
+      "type": "string"
+    },
     "cleanWhitelist": {
       "type": "array",
       "items": {
@@ -62,12 +65,18 @@
         "properties": {
           "description": { "type": "string" },
           "script": { "type": "string" },
+          "workflow": { "type": "string" },
+          "entrypoint": { "type": "string" },
+          "readOnly": { "type": "boolean" },
+          "mutating": { "type": "boolean" },
+          "approvalRequired": { "type": "boolean" },
+          "requiredProfile": { "type": "string" },
           "options": {
             "type": "object",
             "additionalProperties": { "type": "string" }
           }
         },
-        "required": ["description", "script"]
+        "required": ["description"]
       }
     },
     "adapters": {
@@ -85,7 +94,7 @@
           "source": { "type": "string" },
           "type": {
             "type": "string",
-            "enum": ["policy", "rule", "workflow", "skill", "script", "document", "generated"]
+            "enum": ["policy", "rule", "workflow", "skill", "script", "document", "generated", "test", "evidence"]
           },
           "required": { "type": "boolean" },
           "mutable": { "type": "boolean" },

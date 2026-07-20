@@ -9,11 +9,6 @@
 - > [!CAUTION]
   > **Chặn tự ý thực thi (Luật Sắt - Iron Rule):** Tuyệt đối nghiêm cấm Agent tự ý sửa đổi code hoặc chạy các tool ghi/xóa/chạy lệnh thay đổi hệ thống khi trả lời câu hỏi hoặc thảo luận (đặc biệt khi tin nhắn của người dùng có dấu chấm hỏi `?` hoặc không chứa từ khóa phê duyệt rõ ràng như `ok`, `làm đi`). Chỉ sử dụng công cụ đọc. Khi gọi công cụ sửa đổi, bắt buộc phải trích dẫn rõ từ khóa phê duyệt trong `thought` và `Description`. Vi phạm sẽ cấu thành lỗi nghiêm trọng và rollback dự án ngay lập tức.
 - **Caveman Style & Flash Guard:** Áp dụng cho mọi phản hồi mặc định. Sử dụng câu cực ngắn, cấu trúc điện tín, loại bỏ từ thừa. Cấm giải thích cơ chế hoạt động của code trừ khi được hỏi "Tại sao?".
-- **Thought Caveman:** Suy nghĩ (thought) dùng Caveman style, cực ngắn, miễn hiểu là được, không trình bày dài dòng.
-- **Giao thức Tự vấn Bắt buộc (Cognitive Guardrail):** Chỉ tự vấn duy nhất 1 lần ở thought đầu tiên của phản hồi (không lặp lại trong các thought tiếp theo của quá trình thực thi):
-  1. Chế độ prompt?
-  2. User phê duyệt rõ chưa?
-  3. Được phép gọi tool ghi/sửa/lệnh đổi hệ thống không?
 - **Giới hạn hiển thị Code trên Chat (Tuyệt đối):**
   - Nghiêm cấm in các khối code (code block như HTML, CSS, JS, Python...) trên màn hình chat khi thảo luận kế hoạch hoặc đề xuất chỉnh sửa.
   - Chỉ liệt kê: danh sách file tác động, các gạch đầu dòng tính năng lớn cần duyệt, và các lưu ý/cảnh báo rủi ro.
@@ -32,7 +27,8 @@
 - **Cấm test tự động:** Tuyệt đối không tự ý chạy các công cụ test tự động (ví dụ: `npm test`, `pytest`, `vitest`...); cấm tự ý sử dụng Chrome, `browser_subagent`, `open_browser_url`, hoặc `chrome-devtools-plugin` để test giao diện tự động (chỉ test thủ công); cấm các test suite lớn gây lãng phí tài nguyên và thời gian. Chỉ kiểm tra cú pháp (linter/syntax check) nhanh trên file sửa đổi nếu cần.
 - **Cấm tự ý Commit & Git phức tạp:** Tuyệt đối cấm Agent tự động chạy lệnh `git commit` sau khi kết thúc task. Mọi thao tác commit phải do người dùng thực hiện thủ công, trừ khi người dùng chủ động gõ lệnh `/commit` hoặc yêu cầu "commit all changes" để Agent tự động thực hiện commit. Agent chỉ được sử dụng Conventional Commit Message siêu ngắn (dưới 10 từ, định dạng `type(scope): description`). Tuyệt đối không tự động sử dụng các lệnh Git nâng cao (`git rebase`, `git merge`, `git push` hoặc tự xử lý xung đột nhánh trừ khi được user yêu cầu rõ ràng). Cấm tự ý tạo file backup đuôi `.bak` thủ công trừ khi được user chỉ định.
 - **Cấm tự ý Backup:** Không tự ý chạy script backup (ví dụ: `backup_dec.py`) hoặc tự đưa tác vụ backup vào `task.md`. Việc sao lưu, khôi phục giao hoàn toàn cho Git. Chỉ thực hiện backup thủ công khi người dùng trực tiếp yêu cầu hoặc gõ lệnh.
-- **Cấm Artifact dài dòng:** Cấm tạo file `implementation_plan.md` vật lý dưới mọi hình thức (trong workspace hay tại thư mục brain của IDE). Mọi tài liệu thiết kế hoặc báo cáo kết quả (như `walkthrough.md`) chỉ được phép tóm tắt tối đa dưới 15-20 dòng.
+- **Cấm Artifact dài dòng:** Cấm tạo file `implementation_plan.md` vật lý dưới mọi hình thức (trong workspace hay tại thư mục brain của IDE). Mọi tài liệu báo cáo kết quả (như `walkthrough.md`) chỉ được phép tóm tắt tối đa dưới 15-20 dòng. Riêng tài liệu kế hoạch thủ công tạo bởi `/pl` tại `DOCS/Planning/` không bị giới hạn dòng và phải viết chi tiết theo chuẩn handoff.
+
 
 ## 3. Plan Approval Protocol (Quy trình duyệt Kế hoạch - Cách 3)
 - Đối với các tác vụ yêu cầu lập kế hoạch (Implementation Plan), **CẤM TUYỆT ĐỐI tạo file `implementation_plan.md` (bao gồm cả trong workspace lẫn ngoài thư mục brain của IDE)** để tránh kích hoạt cơ chế tự động duyệt của hệ thống.

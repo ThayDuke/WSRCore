@@ -1,31 +1,27 @@
-======================================================================
-                  HƯỚNG DẪN CÀI ĐẶT WSR CORE 1.0.2
-======================================================================
+WSR CORE 1.0.6 — HƯỚNG DẪN CÀI ĐẶT ĐA IDE
 
-1. CẤU HÌNH MAPPING THƯ MỤC & PLATFORM ADAPTERS
-   - Thư mục canonical chính thức trong workspace là `.agents/`.
-   - Sử dụng Platform Adapters để mapping tương ứng với từng môi trường IDE:
-     + Codex Adapter: Đọc từ environment variable `CODEX_HOME` hoặc `--target-root`.
-     + Gemini Adapter: Đọc từ environment variable `GEMINI_HOME` hoặc `--target-root`.
-     + Claude, Cursor, Antigravity Adapters: Mặc định disabled, chỉ kích hoạt khi cấu hình enabled.
-   - Không tự động phỏng đoán home path nếu cấu hình adapter chưa khai báo rõ.
+1. Xác minh source package
+   python scripts/wsr_doctor.py --source-mode --strict
 
-2. BƯỚC KIỂM TRA SAU CÀI ĐẶT (SAFETY CHECK)
-   - Chạy lệnh doctor để kiểm tra 16 gates cấu hình và tính toàn vẹn:
-     `python .agents/scripts/wsr_doctor.py`
-   - Chạy audit ở chế độ Read-Only để đảm bảo các file chuẩn hóa mã hóa UTF-8 sạch:
-     `python .agents/scripts/wsr_audit.py --mode deep`
-   - Chạy quét nợ kỹ thuật:
-     `python .agents/scripts/wsr_debt_scanner.py --check`
+2. Chọn adapter và target root
+   Codex: CODEX_HOME hoặc ~/.codex
+   Gemini: GEMINI_HOME hoặc ~/.gemini
+   Antigravity: GEMINI_HOME hoặc ~/.gemini; dữ liệu native nằm dưới config/
+   Generic: bắt buộc --target-root hoặc WSR_WORKSPACE_ROOT; chỉ workspace
+   Cursor: disabled, unsupported và ngoài phạm vi 1.0.6
+   Claude: unsupported
 
-3. ĐỒNG BỘ CẤU HÌNH (SYNC TRANSACTIONAL CONFIG)
-   - Mặc định chạy dry-run để xem trước:
-     `python .agents/scripts/sync_config.py --adapter gemini --target-root [path]`
-   - Thực thi deploy chính thức (Yêu cầu User phê duyệt và truyền approval-token):
-     `python .agents/scripts/sync_config.py --adapter gemini --target-root [path] --apply --approval-token [buildId] --allow-review`
-   - Giao dịch (transaction) sẽ tự động rollback nếu xảy ra lỗi ghi đè file.
+3. Xem kế hoạch, không ghi file
+   python scripts/sync_config.py --adapter generic --target-root <workspace>
 
-4. LƯU Ý QUAN TRỌNG KHI REVIEW
-   - Tuyệt đối KHÔNG chạy script `sync_config.py --apply` khi chưa có phê duyệt từ User.
-   - Mọi hoạt động xóa file rác phải thực hiện qua `wsr_clean.py` với token an toàn.
-======================================================================
+4. Apply sau khi người dùng phê duyệt build Released
+   python scripts/sync_config.py --adapter generic --target-root <workspace> --apply --approval-token WSR-CORE-1.0.6-RELEASE
+
+5. Xác minh runtime marker và drift
+   python scripts/wsr_doctor.py --runtime-mode --adapter generic --target-root <workspace> --strict
+
+6. Reload chọn lọc
+   python scripts/wsr_reload.py --source-root <package> --adapter generic --target-root <workspace> --profile task --capability wsr-review --allow-review --json
+
+Router và marker được ghi transactionally. Nếu apply lỗi, sync khôi phục file
+cũ hoặc xóa file mới. Không dùng package root hoặc CWD làm target fallback.

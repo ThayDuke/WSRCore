@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "buildId": "WSR-CORE-1.0.6-RELEASE",
+  "generatedAt": "2026-07-20T13:15:00+07:00",
+  "immutable": true,
+  "scope": "supported-release-surface",
+  "runtimeGlobalWritten": false,
+  "sourceDoctor": {"status": "PASS", "score": 100, "gates": "32/32"},
+  "sandbox": {"operationsPerAdapter": 31, "idempotentDryRunChanges": 0, "negativeFixturesExecuted": 16},
+  "reload": {"ready": "PASS", "loaded": "PASS", "selectedCapabilityCount": 1, "noCapabilitySkillCount": 0, "unknownCapabilityBlocked": true, "unresolvedTargetState": "TARGET_UNRESOLVED"},
+  "transaction": {"apply": "PASS", "markerSchema": "PASS", "rollback": "PASS", "sentinelPreserved": "PASS"},
+  "adapters": {"codex": "PASS", "gemini": "PASS", "antigravity": "PASS", "generic": "PASS"},
+  "excludedAdapters": {"cursor": "DISABLED_UNSUPPORTED", "claude": "DISABLED_UNSUPPORTED"},
+  "manualUatDisposition": {"acceptedBy": "User", "acceptedAt": "2026-07-20", "clientUiSmoke": "POST_RELEASE_NON_BLOCKING", "antigravityWorkspaceOverlay": "GENERIC_ADAPTER_SCOPE"},
+  "negativeFixtures": {"D17": "PASS", "D18": "PASS", "D19": "PASS", "D20": "PASS", "D21": "PASS", "D22": "PASS", "D23": "PASS", "D24": "PASS", "D25": "PASS", "D26": "PASS", "D27": "PASS", "D28": "PASS", "D29": "PASS", "D30": "PASS", "D31": "PASS", "D32": "PASS"},
+  "releaseGate": "PASS",
+  "verdict": "RELEASED"
+}

@@ -8,13 +8,7 @@ import sys
 sys.dont_write_bytecode = True
 
 import wsr_common
-
-
-CORE_FILES = (
-    "GEMINI.md",
-    "AGENTS.md",
-    "memory/project_checkpoint.yaml",
-)
+import sync_config
 
 
 def load_json(path):
@@ -23,48 +17,20 @@ def load_json(path):
 
 
 def resolve_source(source_root, lock_file):
-    package_root = wsr_common.get_package_root()
-    selected_lock = lock_file or os.environ.get("WSR_RELOAD_LOCK")
-    if not source_root and not selected_lock:
-        local_lock = os.path.join(os.getcwd(), ".wsr-lock.json")
-        if os.path.isfile(local_lock):
-            selected_lock = local_lock
-
+    resolved, origin, diags = wsr_common.resolve_active_root(source_root, lock_file)
     lock = None
-    if source_root:
-        candidate = source_root
-        origin = "explicit"
-    elif selected_lock:
-        lock_path = os.path.realpath(selected_lock)
-        if not os.path.isfile(lock_path):
-            raise ValueError(f"Source lock not found: {selected_lock}")
-        lock = load_json(lock_path)
-        required = {"sourceRoot", "version", "buildId", "manifestSha256"}
-        missing = sorted(required.difference(lock))
-        if missing:
-            raise ValueError(f"Source lock missing fields: {missing}")
-        raw_root = lock["sourceRoot"]
-        if not os.path.isabs(raw_root):
-            raw_root = os.path.join(os.path.dirname(lock_path), raw_root)
-        candidate = raw_root
-        origin = f"lock:{lock_path}"
-    else:
-        candidate = package_root
-        origin = "package"
-
-    if os.path.islink(candidate):
-        raise ValueError("Symlink source roots are rejected")
-    resolved = os.path.realpath(candidate)
-    if not os.path.isdir(resolved):
-        raise ValueError(f"Source root not found: {resolved}")
+    if origin.startswith("lock:"):
+        lock_path = origin.split(":", 1)[1]
+        if os.path.isfile(lock_path):
+            lock = load_json(lock_path)
     return resolved, origin, lock
 
 
-def validate_identity(source_root, lock):
+def validate_identity(source_root, lock, allow_review=False):
     manifest_path = os.path.join(source_root, "WSR_MANIFEST.json")
     manifest = load_json(manifest_path)
-    if manifest.get("status") != "Released":
-        raise ValueError("Only Released packages may be loaded")
+    if manifest.get("status") != "Released" and not (allow_review and manifest.get("status") == "Review"):
+        raise ValueError("Only Released packages may be loaded unless --allow-review is explicit")
 
     manifest_sha = wsr_common.calculate_sha256(manifest_path)
     if lock:
@@ -102,7 +68,15 @@ def run_json(command):
 
 def run_doctor(source_root):
     doctor = os.path.join(source_root, "scripts", "wsr_doctor.py")
-    return run_json([sys.executable, doctor, "--path", source_root, "--strict", "--json"])
+    return run_json([sys.executable, doctor, "--path", source_root, "--source-mode", "--strict", "--json"])
+
+
+def run_runtime_doctor(source_root, adapter_name, target_root):
+    doctor = os.path.join(source_root, "scripts", "wsr_doctor.py")
+    return run_json([
+        sys.executable, doctor, "--path", source_root, "--runtime-mode",
+        "--adapter", adapter_name, "--target-root", target_root, "--strict", "--json"
+    ])
 
 
 def run_deep_audit(source_root):
@@ -113,21 +87,34 @@ def run_deep_audit(source_root):
 def resolve_target(source_root, manifest, adapter_name, target_root):
     adapter_path = os.path.join(source_root, "adapters", f"{adapter_name}.json")
     adapter = load_json(adapter_path)
-    if target_root:
-        return os.path.realpath(target_root)
-    env_name = adapter.get("targetRootEnvironmentVariable")
-    env_value = os.environ.get(env_name, "") if env_name else ""
-    return os.path.realpath(env_value) if env_value else None
+    if not adapter.get("enabled"):
+        raise ValueError(f"Adapter '{adapter_name}' is disabled")
+    try:
+        return sync_config.get_target_root(adapter, target_root)
+    except ValueError:
+        if not target_root and adapter.get("requiresExplicitTargetRoot"):
+            return None
+        raise
 
 
-def read_active_identity(target_root):
-    if not target_root:
+def read_active_identity(source_root, target_root, adapter_name):
+    if not target_root or not adapter_name:
         return None
-    manifest_path = os.path.join(target_root, "WSR_MANIFEST.json")
-    if not os.path.isfile(manifest_path):
+    adapter = load_json(os.path.join(source_root, "adapters", f"{adapter_name}.json"))
+    marker_path = wsr_common.safe_resolve_path(target_root, adapter["activeMarkerContract"]["path"])
+    if not os.path.isfile(marker_path):
         return None
     try:
-        return load_json(manifest_path)
+        data = load_json(marker_path)
+        required = {
+            "schemaVersion", "adapterIdentity", "packageVersion", "buildId",
+            "manifestHash", "inventoryHash", "routerHash", "logicalRoots",
+            "installTimestamp", "transactionId"
+        }
+        if set(data) != required or data.get("schemaVersion") != 1 or data.get("adapterIdentity") != adapter_name:
+            return None
+        data["version"] = data["packageVersion"]
+        return data
     except (OSError, ValueError, json.JSONDecodeError):
         return None
 
@@ -159,10 +146,84 @@ def check_drift(source_root, adapter_name, target_root):
     return ("DRIFTED" if changes else "CLEAN"), changes, None
 
 
-def build_core_paths(source_root, adapter_name):
-    paths = [os.path.join(source_root, item) for item in CORE_FILES]
-    paths.insert(3, os.path.join(source_root, "adapters", f"{adapter_name}.json"))
-    return paths
+def build_load_plan(source_root, manifest, adapter_name, profile="startup", command_name=None, capability_ids=None):
+    load_plan = []
+    seen = set()
+
+    def add_entry(rel_path, role, required=True, priority=10, capability_owner=None):
+        abs_path = os.path.realpath(os.path.join(source_root, rel_path))
+        if os.path.commonpath([os.path.realpath(source_root), abs_path]) != os.path.realpath(source_root):
+            raise ValueError(f"Load plan path escapes source root: {rel_path}")
+        if abs_path in seen:
+            return
+        if not os.path.exists(abs_path):
+            if required:
+                raise ValueError(f"Required load plan file missing: {rel_path} ({abs_path})")
+            return
+        seen.add(abs_path)
+        load_plan.append({
+            "absolutePath": abs_path,
+            "role": role,
+            "originRoot": source_root,
+            "sha256": wsr_common.calculate_sha256(abs_path),
+            "required": required,
+            "loadPhase": profile,
+            "precedence": priority,
+            "capabilityOwner": capability_owner
+        })
+
+    context_path = os.path.join(source_root, manifest.get("contextFile", "WSR_CONTEXT.json"))
+    context_data = {}
+    if os.path.exists(context_path):
+        try:
+            with open(context_path, "r", encoding="utf-8") as f:
+                context_data = json.load(f)
+        except Exception as e:
+            raise ValueError(f"Context JSON parse error in {context_path}: {e}")
+
+    for policy_path in context_data.get("policyFiles", []):
+        add_entry(policy_path, "policy", required=True, priority=1)
+    add_entry("WSR_MANIFEST.json", "config", required=True, priority=2)
+    add_entry(manifest.get("contextFile", "WSR_CONTEXT.json"), "config", required=True, priority=2)
+    adapter_path = f"adapters/{adapter_name}.json"
+    add_entry(adapter_path, "adapter", required=True, priority=2)
+
+    if profile in ("command", "task") and command_name:
+        clean_cmd = command_name.lstrip("/")
+        cmd_map = context_data.get("commandMap", {})
+        cmd_info = cmd_map.get(clean_cmd) or manifest.get("commands", {}).get(clean_cmd)
+        if not cmd_info:
+            raise ValueError(f"Unknown command requested: {command_name}")
+        wf_path = cmd_info.get("workflow") or cmd_info.get("script")
+        if wf_path:
+            add_entry(wf_path, "workflow", required=True, priority=4)
+
+    if profile == "task":
+        skill_index = context_data.get("skillIndex", [])
+        requested_caps = list(dict.fromkeys(capability_ids or []))
+        if not requested_caps:
+            # Task profile with no selected capability loads 0 skills
+            pass
+        else:
+            # Validate all requested capabilities exist
+            valid_caps = {sk.get("capabilityId") for sk in skill_index if sk.get("capabilityId")}
+            unknown_caps = set(requested_caps) - valid_caps
+            if unknown_caps:
+                raise ValueError(f"Unknown capability requested: {unknown_caps}")
+
+            for sk in skill_index:
+                cap_id = sk.get("capabilityId")
+                if cap_id in requested_caps:
+                    if sk.get("path"):
+                        add_entry(sk["path"], "skill", required=False, priority=sk.get("priority", 10), capability_owner=cap_id)
+                    for ref in sk.get("references", []):
+                        add_entry(ref, "reference", required=False, priority=sk.get("priority", 10) + 1, capability_owner=cap_id)
+
+    if profile == "diagnostic":
+        for art in manifest.get("artifacts", []):
+            add_entry(art["source"], art.get("type", "document"), required=art.get("required", False), priority=10)
+
+    return load_plan
 
 
 def emit_human(receipt, status_only):
@@ -175,9 +236,10 @@ def emit_human(receipt, status_only):
     if receipt.get("deepAudit"):
         print(f"Deep Audit: {receipt['deepAudit']['score']}/100")
     if not status_only:
-        print("Core files:")
-        for path in receipt["coreFiles"]:
-            print(f" - {path}")
+        print("Load Plan Entries:")
+        for entry in receipt.get("loadPlan", []):
+            req_str = "REQ" if entry["required"] else "OPT"
+            print(f" - [{req_str}] {entry['role'].upper()}: {entry['absolutePath']}")
 
 
 def main():
@@ -186,16 +248,21 @@ def main():
     parser.add_argument("--lock-file", help="JSON source lock path")
     parser.add_argument("--adapter", default="codex", help="Adapter name")
     parser.add_argument("--target-root", help="Active configuration root for drift checks")
+    parser.add_argument("--profile", choices=["startup", "command", "task", "diagnostic"], default="startup", help="Load profile")
+    parser.add_argument("--command-name", help="Slash command name for profile routing")
+    parser.add_argument("--capability", action="append", help="Capability ID for task profile")
     parser.add_argument("--deep", action="store_true", help="Approve and run Deep Audit")
+    parser.add_argument("--confirm-loaded", action="store_true", help="Confirm every required load-plan entry was read")
+    parser.add_argument("--allow-review", action="store_true", help="Allow source verification of an explicitly selected Review build")
     parser.add_argument("--status", action="store_true", help="Emit compact status")
     parser.add_argument("--json", action="store_true", help="Emit JSON receipt")
     args = parser.parse_args()
 
     try:
         source_root, source_origin, lock = resolve_source(args.source_root, args.lock_file)
-        manifest, manifest_sha = validate_identity(source_root, lock)
+        manifest, manifest_sha = validate_identity(source_root, lock, allow_review=args.allow_review)
         target_root = resolve_target(source_root, manifest, args.adapter, args.target_root)
-        active_identity = read_active_identity(target_root)
+        active_identity = read_active_identity(source_root, target_root, args.adapter)
         active_build = active_identity.get("buildId") if active_identity else None
         if active_identity and version_key(manifest) < version_key(active_identity):
             raise ValueError(f"Source downgrade rejected: {manifest.get('buildId')} < {active_build}")
@@ -205,6 +272,7 @@ def main():
             raise RuntimeError(doctor_error or "Doctor strict gate failed")
         if doctor.get("score") != 100:
             raise RuntimeError(f"Doctor score must be 100, got {doctor.get('score')}")
+        transitions = ["SOURCE_VERIFIED"]
 
         build_changed = bool(active_build and active_build != manifest.get("buildId"))
         if build_changed and not args.deep:
@@ -219,7 +287,7 @@ def main():
                 "manifestSha256": manifest_sha,
                 "doctorScore": doctor.get("score"),
                 "drift": "NOT_CHECKED",
-                "coreFiles": build_core_paths(source_root, args.adapter),
+                "loadPlan": build_load_plan(source_root, manifest, args.adapter, args.profile, args.command_name, args.capability),
             }
             if args.json:
                 wsr_common.print_json_report(receipt)
@@ -239,9 +307,31 @@ def main():
             }
 
         drift, changes, drift_error = check_drift(source_root, args.adapter, target_root)
+        load_plan = build_load_plan(source_root, manifest, args.adapter, args.profile, args.command_name, args.capability)
         skills = [item["source"] for item in manifest.get("artifacts", []) if item.get("type") == "skill"]
+        runtime_verified = False
+        runtime_error = None
+        if target_root:
+            runtime_code, runtime_doctor, runtime_stderr = run_runtime_doctor(source_root, args.adapter, target_root)
+            runtime_verified = bool(runtime_code == 0 and runtime_doctor and runtime_doctor.get("status") == "PASS" and runtime_doctor.get("score") == 100)
+            runtime_error = None if runtime_verified else (runtime_stderr or "Runtime Doctor gate failed")
+        if not target_root:
+            state = "TARGET_UNRESOLVED"
+        elif drift == "CLEAN" and runtime_verified:
+            state = "READY"
+        elif drift == "DRIFTED":
+            state = "DRIFTED"
+        else:
+            state = "BLOCKED"
+        transitions.append(state)
+        if args.confirm_loaded:
+            if state != "READY" or any(entry["required"] and not os.path.isfile(entry["absolutePath"]) for entry in load_plan):
+                raise RuntimeError("LOADED confirmation requires READY and every required load-plan entry")
+            state = "LOADED"
+            transitions.append(state)
         receipt = {
-            "state": "VERIFIED",
+            "state": state,
+            "transitions": transitions,
             "sourceRoot": source_root,
             "sourceOrigin": source_origin,
             "version": manifest.get("version"),
@@ -252,8 +342,10 @@ def main():
             "drift": drift,
             "driftChanges": changes,
             "driftWarning": drift_error,
+            "runtimeVerified": runtime_verified,
+            "runtimeWarning": runtime_error,
             "deepAudit": deep_result,
-            "coreFiles": build_core_paths(source_root, args.adapter),
+            "loadPlan": load_plan,
             "skillIndex": skills,
         }
         if args.json:
@@ -272,4 +364,3 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
-
