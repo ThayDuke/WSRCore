@@ -33,3 +33,10 @@
 - **Dòng trạng thái cuối cùng (Bắt buộc):**
   - **Khi hoàn thành viết code thực tế:** Dòng cuối cùng tuyệt đối bắt buộc là: `> [!IMPORTANT]\n> ĐÃ HOÀN THÀNH NHIỆM VỤ`.
   - **Khi brainstorm hoặc đề xuất kế hoạch (chưa được duyệt):** Dòng cuối cùng tuyệt đối bắt buộc là: `> [!IMPORTANT]\n> VUI LÒNG XEM XÉT VÀ PHÊ DUYỆT!`.
+
+### 10. Autonomous Task Ledger & Subagent Protocol
+- **Tác vụ lớn (>= 20 mục):** Bắt buộc dùng mô hình Orchestrator - Subagent Worker.
+- **Main Agent:** Chỉ điều phối qua `task_ledger.json`, cấm nạp dữ liệu thô vào chat.
+- **Worker Subagent:** Khởi động 0% context, xử lý từng bài, ghi đè file, tự hủy context.
+- **Ngắt phiên an toàn (>= 60% Context):** Lưu ledger, xuất mã handoff và reload.
+

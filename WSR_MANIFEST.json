@@ -1,10 +1,10 @@
 {
   "schemaVersion": 2,
   "packageName": "WSR-Core",
-  "version": "1.0.7",
-  "buildId": "WSR-CORE-1.0.7-RELEASE",
+  "version": "1.0.8",
+  "buildId": "WSR-CORE-1.0.8-RELEASE",
   "status": "Released",
-  "createdAt": "2026-07-20T14:15:44+07:00",
+  "createdAt": "2026-08-20T14:35:00+07:00",
   "canonicalLayout": ".agents",
   "compatibilityLayouts": [
     ".codex"
@@ -930,6 +930,17 @@
     {
       "id": "conformance-evidence-run-20260720-1-0-7-release",
       "source": "evidence/cross-ide-conformance/20260720_WSR-CORE-1.0.7-RELEASE/result.json",
+      "type": "evidence",
+      "required": true,
+      "mutable": false,
+      "deploy": false,
+      "targets": [],
+      "owner": "QA Engineer",
+      "encoding": "UTF-8"
+    },
+    {
+      "id": "conformance-evidence-run-20260820-1-0-8-release",
+      "source": "evidence/cross-ide-conformance/20260820_WSR-CORE-1.0.8-RELEASE/result.json",
       "type": "evidence",
       "required": true,
       "mutable": false,

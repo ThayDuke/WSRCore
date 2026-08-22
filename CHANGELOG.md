@@ -1,5 +1,10 @@
 # WSR Core Changelog
 
+## [1.0.8] - 2026-08-20
+- Added Section 10: Autonomous Task Ledger & Subagent Protocol to GEMINI.md and AG_GLOBAL_RULES.md.
+- Standardized Orchestrator - Subagent Worker pattern for large-scale tasks (>= 20 items / batch processing).
+- Defined safe context threshold gate (>= 60%) and seamless session handoff via persistent disk ledger.
+
 ## [1.0.7] - 2026-07-20
 - Fixed `wsr_doctor.py` to support Git submodule metadata by skipping root `.git` files.
 

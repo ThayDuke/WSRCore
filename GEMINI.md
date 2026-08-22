@@ -114,3 +114,15 @@
 - Output: Điểm số (0-100), trạng thái (PASS/WARN/FAIL), 3 bước QA thủ công.
 - Rẽ nhánh DEC: Bản cục bộ DEC bổ sung kiểm tra đồng bộ theme Youth/Elegant.
 
+
+## 10. Autonomous Task Ledger & Subagent Protocol (Giao thức Task Ledger & Điều phối Subagent)
+- **Áp dụng cho tác vụ quy mô lớn:** Áp dụng bắt buộc khi số lượng mục tiêu xử lý từ 20 mục trở lên hoặc tập dữ liệu lớn có nguy cơ làm đầy context chat.
+- **Mô hình Orchestrator - Subagent Worker:**
+  - **Main Agent (Orchestrator):** Đóng vai trò tổng chỉ huy, chỉ quản lý tiến độ qua file `task_ledger.json` (hoặc `DOCS/Planning/planning_*.md`), tuyệt đối không đọc dữ liệu thô hàng loạt vào context chat chính.
+  - **Worker Subagent:** Được sinh ra để xử lý từng đơn vị tác vụ (batch/file). Subagent khởi động với context 0% sạch hoàn toàn, nạp luật WSRCore, đọc file mục tiêu, xử lý, ghi đè file vật lý, và tự động hủy context sau khi hoàn thành.
+  - **Biên lai kết quả (Receipt):** Subagent chỉ trả về biên lai 1 dòng (ví dụ: `File X: 50 items PASS`) để Main Agent cập nhật trạng thái `DONE`.
+- **Cơ chế Ngắt phiên & Handoff an toàn (Context Threshold Gate):**
+  - Khi Context chat chính đạt ngưỡng $\ge 60\%$, Agent bắt buộc dừng lại, cập nhật ledger ra file vật lý, ghi checkpoint và hướng dẫn User mở chat mới gõ `/reload` để tiếp tục.
+  - Phiên mới nạp lại trạng thái từ ledger trên ổ đĩa, đảm bảo 0% context drift và 100% tuân thủ WSRCore.
+
+

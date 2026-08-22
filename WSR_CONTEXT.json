@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "packageName": "WSR-Core",
-  "version": "1.0.7",
-  "buildId": "WSR-CORE-1.0.7-RELEASE",
-  "manifestSha256": "8d4628c46dcb20fdcdc429adbf94c5cacfdce79403a5f25a4d91e5b11da4f2cb",
+  "version": "1.0.8",
+  "buildId": "WSR-CORE-1.0.8-RELEASE",
+  "manifestSha256": "4c16731f5e9cc0cfc008b7a415cdab05460999132b114072b777f35616f53968",
   "policyFiles": [
     "GEMINI.md",
     "global_rules/AG_GLOBAL_RULES.md"
@@ -224,8 +224,8 @@
     "6. JIT memory references"
   ],
   "tokenBudget": {
-    "startupMax": 12000,
-    "estimatedTokens": 10336
+    "startupMax": 15000,
+    "estimatedTokens": 12200
   },
   "projectOverlayContract": {
     "enabled": true,
