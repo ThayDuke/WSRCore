@@ -1,0 +1,56 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "WSR Session Descriptor v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "buildId",
+    "updatedAt"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "buildId": {
+      "type": "string",
+      "pattern": "^WSR-CORE-\\d+\\.\\d+\\.\\d+-(REVIEW|RELEASE-CANDIDATE|RELEASE)$"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "activeWorkflow": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+$"
+    },
+    "capabilityIds": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9][a-z0-9-]*$"
+      },
+      "uniqueItems": true
+    },
+    "activePlan": {
+      "type": "string",
+      "pattern": "^(?![\\\\/])(?![A-Za-z]:)(?!.*(^|[\\\\/])\\.\\.([\\\\/]|$)).+$"
+    },
+    "checkpointFiles": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^(?![\\\\/])(?![A-Za-z]:)(?!.*(^|[\\\\/])\\.\\.([\\\\/]|$)).+$"
+      },
+      "uniqueItems": true
+    },
+    "lessonFiles": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^(?![\\\\/])(?![A-Za-z]:)(?!.*(^|[\\\\/])\\.\\.([\\\\/]|$)).+$"
+      },
+      "uniqueItems": true
+    }
+  }
+}

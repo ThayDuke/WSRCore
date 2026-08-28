@@ -1,0 +1,69 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "WSR Audit Report v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "auditVersion", "mode", "root", "categories", "coverage", "gatePassed", "thresholdBreached", "releaseEligible", "summary", "findings", "skipped", "doctor"],
+  "properties": {
+    "schemaVersion": {"const": 1},
+    "auditVersion": {"type": "string"},
+    "mode": {"enum": ["quick", "deep"]},
+    "root": {"type": "string"},
+    "categories": {"type": "array", "uniqueItems": true, "items": {"enum": ["integrity", "structure", "minimality", "dependency", "resource", "ide"]}},
+    "coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["discoveredFiles", "auditedFiles", "skippedFiles", "coverageRatio", "deleted", "renamed"],
+      "properties": {
+        "discoveredFiles": {"type": "integer", "minimum": 0},
+        "auditedFiles": {"type": "integer", "minimum": 0},
+        "skippedFiles": {"type": "integer", "minimum": 0},
+        "coverageRatio": {"type": "number", "minimum": 0, "maximum": 1},
+        "deleted": {"type": "array", "items": {"type": "string"}},
+        "renamed": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "gatePassed": {"type": "boolean"},
+    "thresholdBreached": {"type": "boolean"},
+    "releaseEligible": {"type": "boolean"},
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["score", "scoreVersion", "status", "failOn", "counts", "categoryCounts", "estimatedLineReduction", "estimatedDependencyReduction", "unknownEstimateCount"],
+      "properties": {
+        "score": {"type": "integer", "minimum": 0, "maximum": 100},
+        "scoreVersion": {"const": "severity-v1"},
+        "status": {"enum": ["PASS", "WARN", "FAIL"]},
+        "failOn": {"enum": ["BLOCKER", "HIGH", "MEDIUM", "LOW"]},
+        "counts": {"type": "object", "additionalProperties": {"type": "integer", "minimum": 0}},
+        "categoryCounts": {"type": "object", "additionalProperties": {"type": "integer", "minimum": 0}},
+        "estimatedLineReduction": {"type": "integer", "minimum": 0},
+        "estimatedDependencyReduction": {"type": "integer", "minimum": 0},
+        "unknownEstimateCount": {"type": "integer", "minimum": 0}
+      }
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["ruleId", "category", "severity", "confidence", "path", "line", "message", "evidence", "recommendation", "estimatedLineReduction", "estimatedDependencyReduction"],
+        "properties": {
+          "ruleId": {"type": "string"},
+          "category": {"enum": ["integrity", "structure", "minimality", "dependency", "resource", "ide"]},
+          "severity": {"enum": ["BLOCKER", "HIGH", "MEDIUM", "LOW", "INFO"]},
+          "confidence": {"enum": ["high", "medium", "low"]},
+          "path": {"type": "string"},
+          "line": {"type": ["integer", "null"]},
+          "message": {"type": "string"},
+          "evidence": {"type": "object"},
+          "recommendation": {"type": "string"},
+          "estimatedLineReduction": {"type": ["integer", "null"]},
+          "estimatedDependencyReduction": {"type": ["integer", "null"]}
+        }
+      }
+    },
+    "skipped": {"type": "object"},
+    "doctor": {"type": "object"}
+  }
+}

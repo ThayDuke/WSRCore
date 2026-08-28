@@ -1,5 +1,31 @@
 # WSR Core Changelog
 
+## [1.5.0-review] - 2026-08-28
+- Added mandatory context percentage reporting after every response.
+- Added projected task preflight and early handoff guidance.
+- Preserved 60% warning, 75% handoff, and 85% critical thresholds.
+
+## [1.4.1-review] - 2026-08-28
+- Refactored oversized clean, doctor and reload entrypoints.
+
+## [1.4.0-review] - 2026-08-27
+- Restored 1.0.8 Caveman UX, approval allowlist, alert mapping and plan continuation semantics.
+- Added bounded `/goal`, Goal ledger/schema, scope guard, task receipts and Codex/Antigravity native handshakes.
+- Added context thresholds, approval parser, conformance fixtures, strict Goal Doctor gate and evidence-bound packaging.
+
+## [1.2.0-review] - 2026-08-27
+- Rebuilt `wsr-audit` as a deterministic, read-only six-category audit.
+- Added stable findings, severity scoring, report schema, dependency checks, and fixtures.
+- Preserved the existing CLI and separated Audit from Doctor, Debt, and Review.
+
+## [1.1.0-review] - 2026-08-27
+- Replaced bulk startup loading with five enforced layers and per-profile token budgets.
+- Made `WSR_CONTEXT.json` the only command registry and reduced the kernel to seven rule IDs.
+- Added session descriptor v1 with workspace containment and no persisted authority.
+- Added adapter v3 multi-root bindings for native Codex and Antigravity discovery.
+- Removed false `LOADED` receipts; added `VERIFIED`, `RESUME_READY` and `RESTART_REQUIRED`.
+- Added native-path, collision, orphan, semantic-version and duplicate-rule gates.
+
 ## [1.0.8] - 2026-08-20
 - Added Section 10: Autonomous Task Ledger & Subagent Protocol to GEMINI.md and AG_GLOBAL_RULES.md.
 - Standardized Orchestrator - Subagent Worker pattern for large-scale tasks (>= 20 items / batch processing).

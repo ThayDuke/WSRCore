@@ -1,0 +1,86 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "WSR Goal Ledger and Task Receipt v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "contract",
+    "goalId",
+    "objective",
+    "authorizedAt",
+    "authorizationSource",
+    "scope",
+    "allowedPaths",
+    "approvalMode",
+    "backupResponsibility",
+    "autoCheckpointApproval",
+    "tasks"
+  ],
+  "properties": {
+    "schemaVersion": {"const": 1},
+    "contract": {"type": "string", "const": "goal-v1"},
+    "state": {"type": "string", "enum": ["GOAL_AUTHORIZED", "GOAL_NEW", "BLOCKED", "DONE"]},
+    "goalId": {"type": "string", "pattern": "^goal-[a-f0-9]{16,64}$"},
+    "objective": {"type": "string", "minLength": 1},
+    "authorizedAt": {"type": "string", "format": "date-time"},
+    "authorizationSource": {"type": "string", "enum": ["/goal", "Goal", "Goal:"]},
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["allowedPaths"],
+      "properties": {
+        "allowedPaths": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^(?![\\/])(?![A-Za-z]:)(?!.*(?:^|[\\/])\\.\\.(?:[\\/]|$)).+$"}
+        }
+      }
+    },
+    "allowedPaths": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"type": "string", "pattern": "^(?![\\/])(?![A-Za-z]:)(?!.*(?:^|[\\/])\\.\\.(?:[\\/]|$)).+$"}
+    },
+    "approvalMode": {"type": "string", "const": "goal"},
+    "backupResponsibility": {"type": "string", "const": "user"},
+    "autoCheckpointApproval": {"type": "boolean", "const": true},
+    "tasks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["taskId", "goalId", "owner", "allowedPaths", "dependencies", "acceptance", "status", "receipt"],
+        "properties": {
+          "taskId": {"type": "string", "minLength": 1},
+          "goalId": {"type": "string", "pattern": "^goal-[a-f0-9]{16,64}$"},
+          "owner": {"type": "string", "minLength": 1},
+          "allowedPaths": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {"type": "string", "pattern": "^(?![\\/])(?![A-Za-z]:)(?!.*(?:^|[\\/])\\.\\.(?:[\\/]|$)).+$"}
+          },
+          "dependencies": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
+          "acceptance": {"type": "string", "minLength": 1},
+          "status": {"type": "string", "enum": ["PENDING", "RUNNING", "DONE", "BLOCKED"]},
+          "receipt": {
+            "type": ["object", "null"],
+            "additionalProperties": false,
+            "required": ["schemaVersion", "contract", "taskId", "goalId", "status", "filesChanged", "checksRun", "findings", "nextDependency"],
+            "properties": {
+              "schemaVersion": {"const": 1},
+              "contract": {"type": "string", "const": "goal-task-v1"},
+              "taskId": {"type": "string", "minLength": 1},
+              "goalId": {"type": "string", "pattern": "^goal-[a-f0-9]{16,64}$"},
+              "status": {"type": "string", "enum": ["DONE", "BLOCKED", "RUNNING"]},
+              "filesChanged": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
+              "checksRun": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
+              "findings": {"type": "array", "items": {"type": "string"}},
+              "nextDependency": {"type": ["string", "null"]}
+            }
+          }
+        }
+      }
+    }
+  }
+}

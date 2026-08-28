@@ -3,14 +3,32 @@ import sys
 sys.dont_write_bytecode = True
 import zipfile
 import json
+import tempfile
 import wsr_common
 import wsr_doctor
+
+STATUS_SUFFIXES = {
+    "Released": "RELEASE",
+    "Review": "REVIEW",
+}
+
+def _artifact_source(artifact):
+    """Return one canonical, package-relative artifact source."""
+    source = artifact.get("source")
+    if not isinstance(source, str) or not source:
+        raise ValueError("Artifact source must be a non-empty string")
+    normalized = source.replace('\\', '/')
+    if normalized != source or any(part in {"", ".", ".."} for part in normalized.split('/')):
+        raise ValueError(f"Artifact source is not canonical: {source}")
+    if not wsr_common.validate_relative_path(normalized):
+        raise ValueError(f"Artifact source escapes package root: {source}")
+    return normalized
 
 def run_doctor_preflight(package_root):
     """Run JIT doctor checks directly to verify package state before packaging."""
     try:
         results, gates_passed, gates_total = wsr_doctor.run_doctor_checks(
-            package_root, strict=False, is_json=True, runtime_mode=False
+            package_root, strict=True, is_json=True, runtime_mode=False
         )
         if results["status"] != "PASS":
             return False, f"Doctor checks failed: {results['blockers']}"
@@ -24,14 +42,15 @@ def generate_checksums_file(package_root, manifest):
     for art in manifest.get("artifacts", []):
         if art["id"] == "wsr-checksums":
             continue
-            
-        src_path = os.path.join(package_root, art["source"])
+
+        source = _artifact_source(art)
+        src_path = wsr_common.safe_resolve_path(package_root, source)
         if os.path.exists(src_path):
-            checksums[art["source"]] = wsr_common.calculate_sha256(src_path)
+            checksums[source] = wsr_common.calculate_sha256(src_path)
             
     # Write atomic
     checksums_file = manifest.get("checksumsFile", "WSR_CHECKSUMS.json")
-    resolved_path = os.path.join(package_root, checksums_file)
+    resolved_path = wsr_common.safe_resolve_path(package_root, checksums_file)
     
     content = json.dumps(checksums, indent=2, sort_keys=True, ensure_ascii=False)
     wsr_common.atomic_write_text(resolved_path, content)
@@ -39,7 +58,7 @@ def generate_checksums_file(package_root, manifest):
 
 def validate_identity_ledger(package_root, manifest):
     """Reject missing or reused build identities before package mutation."""
-    ledger_path = os.path.join(package_root, "release_identity_ledger.json")
+    ledger_path = wsr_common.safe_resolve_path(package_root, "release_identity_ledger.json")
     with open(ledger_path, "r", encoding="utf-8") as stream:
         ledger = json.load(stream)
     package_content_hash = wsr_common.calculate_package_content_hash(package_root, manifest)
@@ -61,19 +80,19 @@ def verify_zip_archive(zip_filepath, manifest, checksums):
         zip_namelist = zipf.namelist()
         
         # Build normalized POSIX names list
-        manifest_sources = [a["source"].replace('\\', '/') for a in manifest.get("artifacts", [])]
+        manifest_sources = [_artifact_source(a) for a in manifest.get("artifacts", [])]
         
         # Verify inventory completeness
         for ms in manifest_sources:
             if ms not in zip_namelist:
                 raise RuntimeError(f"ZIP Verification Error: Artifact '{ms}' missing from built ZIP archive")
                 
+        checksums_file = manifest.get("checksumsFile", "WSR_CHECKSUMS.json")
         for zn in zip_namelist:
             if zn not in manifest_sources:
                 raise RuntimeError(f"ZIP Verification Error: File '{zn}' in ZIP is not registered in manifest inventory")
                 
             # Verify checksum (except generated files)
-            checksums_file = manifest.get("checksumsFile", "WSR_CHECKSUMS.json")
             if zn == checksums_file:
                 continue
                 
@@ -102,6 +121,11 @@ def main():
     packageName = manifest.get("packageName", "WSR_Package")
     version = manifest.get("version", "1.0.0")
     buildId = manifest.get("buildId", "N_A")
+    status = manifest.get("status")
+    status_suffix = STATUS_SUFFIXES.get(status)
+    if not status_suffix:
+        print(f"[-] Unsupported package status: {status}", file=sys.stderr)
+        sys.exit(wsr_common.EXIT_INVALID_ARGS)
 
     try:
         validate_identity_ledger(package_root, manifest)
@@ -133,8 +157,10 @@ def main():
             raise RuntimeError("Repository DOCS directory not found")
         repo_root = parent
     output_dir = os.path.join(repo_root, "DOCS")
-    zip_filename = f"{packageName}_{version}.zip"
-    zip_filepath = os.path.join(output_dir, zip_filename)
+    zip_filename = f"{packageName}_{version}-{status_suffix}.zip"
+    zip_filepath = wsr_common.safe_resolve_path(output_dir, zip_filename)
+    # Never overwrite a prior archive in place; replace is atomic and only happens
+    # after the temporary archive has passed inventory and checksum verification.
     
     print(f"[*] Packaging {packageName} (v{version}) with Build ID: {buildId}...")
     print(f"[*] Output ZIP path: {zip_filepath}")
@@ -142,11 +168,16 @@ def main():
     # Get sorted manifest artifacts to achieve deterministic ordering
     sorted_artifacts = sorted(manifest.get("artifacts", []), key=lambda x: x["source"].replace('\\', '/'))
     
+    temp_zip_path = None
     try:
-        with zipfile.ZipFile(zip_filepath, 'w', zipfile.ZIP_DEFLATED) as zipf:
+        temp_fd, temp_zip_path = tempfile.mkstemp(
+            prefix=f".{zip_filename}.", suffix=".tmp", dir=output_dir,
+        )
+        os.close(temp_fd)
+        with zipfile.ZipFile(temp_zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
             for art in sorted_artifacts:
-                rel_path = art["source"].replace('\\', '/')
-                abs_path = os.path.join(package_root, rel_path)
+                rel_path = _artifact_source(art)
+                abs_path = wsr_common.safe_resolve_path(package_root, rel_path)
                 
                 # Check file existence
                 if not os.path.exists(abs_path):
@@ -168,7 +199,9 @@ def main():
                 zipf.writestr(zinfo, content)
                 
         # 5. Post-build verification
-        verify_zip_archive(zip_filepath, manifest, checksums)
+        verify_zip_archive(temp_zip_path, manifest, checksums)
+        os.replace(temp_zip_path, zip_filepath)
+        temp_zip_path = None
         
         print("="*60)
         print("WSR PACKAGING SUCCESSFUL")
@@ -182,9 +215,9 @@ def main():
         
     except Exception as e:
         print(f"[-] Packaging failed during ZIP creation or verification: {e}", file=sys.stderr)
-        if os.path.exists(zip_filepath):
+        if temp_zip_path and os.path.exists(temp_zip_path):
             try:
-                os.remove(zip_filepath)
+                os.remove(temp_zip_path)
             except:
                 pass
         sys.exit(wsr_common.EXIT_IO_TRANSACTION_ERROR)

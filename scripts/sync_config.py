@@ -1,103 +1,125 @@
-import os
-import sys
-sys.dont_write_bytecode = True
-import shutil
 import argparse
-import json
-import wsr_common
-import subprocess
 import hashlib
+import json
+import os
+import shutil
+import subprocess
+import sys
 import time
 
+sys.dont_write_bytecode = True
+
+import wsr_common
+
+
+ADAPTER_KEYS = {
+    "schemaVersion", "adapterId", "runtimeFamily", "enabled", "supportLevel",
+    "roots", "discoveryPrecedence", "artifactMappings", "router", "state",
+    "capabilities", "legacyRoots", "unsupportedFeatures",
+}
+
+
 def run_doctor_preflight(package_root):
-    """Run wsr_doctor.py as a subprocess to ensure the package passes health gates."""
-    doctor_path = os.path.join(package_root, "scripts", "wsr_doctor.py")
-    if not os.path.exists(doctor_path):
-        return False, "wsr_doctor.py not found in scripts", wsr_common.EXIT_FAIL_FINDING
-    
+    doctor = os.path.join(package_root, "scripts", "wsr_doctor.py")
+    if not os.path.isfile(doctor):
+        return False, "wsr_doctor.py not found", wsr_common.EXIT_FAIL_FINDING
     env = os.environ.copy()
     env["PYTHONDONTWRITEBYTECODE"] = "1"
-    
-    res = subprocess.run([sys.executable, doctor_path, "--path", package_root, "--source-mode"], capture_output=True, env=env)
-    if res.returncode != 0:
-        return False, res.stdout.decode('utf-8', errors='ignore'), res.returncode
-    return True, "", wsr_common.EXIT_SUCCESS
+    result = subprocess.run(
+        [sys.executable, doctor, "--path", package_root, "--source-mode", "--strict", "--json"],
+        capture_output=True, text=True, encoding="utf-8", errors="strict", env=env, check=False,
+    )
+    return result.returncode == 0, result.stdout or result.stderr, result.returncode
+
 
 def load_adapter_config(package_root, adapter_name, manifest):
-    """Load an exact v2 adapter and reject ambiguous legacy contracts."""
-    adapter_rel = f"adapters/{adapter_name}.json"
+    adapter_rel = "adapters/{0}.json".format(adapter_name)
     if adapter_rel not in manifest.get("adapters", []):
-        raise ValueError(f"Adapter '{adapter_name}' is not declared by the manifest")
-    adapter_path = os.path.join(package_root, adapter_rel)
-    if not os.path.exists(adapter_path):
-        raise FileNotFoundError(f"Adapter config not found at {adapter_path}")
-    with open(adapter_path, "r", encoding="utf-8") as f:
-        adapter = json.load(f)
-    required = {
-        "schemaVersion", "adapterId", "runtimeFamily", "enabled",
-        "supportLevel", "defaultTargetRoot", "targetRootEnvironmentVariable",
-        "requiresExplicitTargetRoot", "logicalRoots", "discoveryPrecedence",
-        "artifactMappings", "routerContract", "activeMarkerContract",
-        "unsupportedFeatures"
-    }
-    if adapter.get("schemaVersion") != 2 or set(adapter) != required:
-        raise ValueError(f"Adapter '{adapter_name}' does not satisfy the exact v2 contract")
+        raise ValueError("Adapter '{0}' is not declared".format(adapter_name))
+    with open(os.path.join(package_root, adapter_rel), "r", encoding="utf-8") as stream:
+        adapter = json.load(stream)
+    if adapter.get("schemaVersion") != 3 or set(adapter) != ADAPTER_KEYS:
+        raise ValueError("Adapter '{0}' does not satisfy the exact v3 contract".format(adapter_name))
     if adapter.get("adapterId") != adapter_name:
-        raise ValueError(f"Adapter identity mismatch: expected '{adapter_name}'")
+        raise ValueError("Adapter identity mismatch: {0}".format(adapter_name))
     return adapter
 
+
+def _resolve_root(spec, override=None):
+    value = override
+    if not value and spec.get("environmentVariable"):
+        value = os.environ.get(spec["environmentVariable"])
+    if not value:
+        value = spec.get("default")
+    if not value:
+        if spec.get("requiresExplicit"):
+            raise ValueError("Adapter root requires an explicit override")
+        raise ValueError("Adapter root could not be resolved")
+    return os.path.realpath(os.path.abspath(os.path.expanduser(value)))
+
+
+def resolve_roots(adapter_config, config_override=None, root_overrides=None):
+    overrides = dict(root_overrides or {})
+    if config_override:
+        overrides["config"] = config_override
+    roots = {}
+    for name, spec in adapter_config.get("roots", {}).items():
+        roots[name] = _resolve_root(spec, overrides.get(name))
+    unknown = set(overrides) - set(roots)
+    if unknown:
+        raise ValueError("Unknown root override(s): {0}".format(sorted(unknown)))
+    return roots
+
+
 def get_target_root(adapter_config, cli_target_root):
-    """Resolve an explicit, environment, or declared default target root."""
-    if cli_target_root:
-        root = os.path.realpath(os.path.abspath(os.path.expanduser(cli_target_root)))
-    else:
-        root = None
-    env_var = adapter_config.get("targetRootEnvironmentVariable")
-    if root is None and env_var:
-        env_val = os.environ.get(env_var)
-        if env_val:
-            root = os.path.realpath(os.path.abspath(os.path.expanduser(env_val)))
-    if root is None and adapter_config.get("defaultTargetRoot"):
-        root = os.path.realpath(os.path.abspath(os.path.expanduser(adapter_config["defaultTargetRoot"])))
-    if root is None and adapter_config.get("requiresExplicitTargetRoot", True):
-        raise ValueError(f"Target root resolution failed. Adapter requires explicit target root or environment variable '{env_var}'")
-    if root is None:
-        raise ValueError("Target root resolution failed; implicit current-directory fallback is forbidden")
-    if "user-home-install" in adapter_config.get("unsupportedFeatures", []) and root == os.path.realpath(os.path.expanduser("~")):
-        raise PermissionError(f"Adapter '{adapter_config['adapterId']}' forbids deployment to the user home")
-    return root
+    return resolve_roots(adapter_config, config_override=cli_target_root)["config"]
+
 
 def resolve_logical_roots(target_root, adapter_config):
-    """Resolve every logical root beneath the selected target boundary."""
-    resolved = {}
-    for name, relative_path in adapter_config.get("logicalRoots", {}).items():
-        if not wsr_common.validate_relative_path(relative_path):
-            raise ValueError(f"Logical root '{name}' must be target-relative: {relative_path}")
-        resolved[name] = wsr_common.safe_resolve_path(target_root, relative_path)
-    return resolved
+    return resolve_roots(adapter_config, config_override=target_root)
+
 
 def select_mapping(artifact, mappings):
-    """Prefer artifact-specific mappings, then fall back to artifact type."""
     for mapping in mappings:
         if mapping.get("artifactId") == artifact.get("id"):
             return mapping
     for mapping in mappings:
-        if mapping.get("artifactType") == artifact.get("type"):
+        if not mapping.get("artifactId") and mapping.get("artifactType") == artifact.get("type"):
             return mapping
     return None
 
+
+def command_index(context):
+    rows = []
+    for name, item in sorted(context.get("commandMap", {}).items()):
+        suffix = " -> /{0}".format(item["aliasOf"]) if item.get("aliasOf") else ""
+        rows.append("- `/{0}`{1} => `{2}`: {3}".format(
+            name, suffix, item.get("workflow", ""), item.get("description", ""),
+        ))
+    return "\n".join(rows)
+
+
 def render_router(package_root, manifest):
     package_root = os.path.realpath(os.path.abspath(package_root))
-    template_path = os.path.join(package_root, "bootstrap", "router.md.template")
+    template_path = wsr_common.safe_resolve_path(package_root, "bootstrap/router.md.template")
+    kernel_path = wsr_common.safe_resolve_path(package_root, "GEMINI.md")
+    context_path = wsr_common.safe_resolve_path(
+        package_root, manifest.get("contextFile", "WSR_CONTEXT.json"),
+    )
     with open(template_path, "r", encoding="utf-8") as stream:
         rendered = stream.read()
-    manifest_hash = wsr_common.calculate_sha256(os.path.join(package_root, "WSR_MANIFEST.json"))
+    with open(kernel_path, "r", encoding="utf-8") as stream:
+        kernel = stream.read().strip()
+    with open(context_path, "r", encoding="utf-8") as stream:
+        context = json.load(stream)
     replacements = {
         "{{PACKAGE_NAME}}": manifest.get("packageName", "WSR-Core"),
         "{{VERSION}}": manifest.get("version", "unknown"),
         "{{BUILD_ID}}": manifest.get("buildId", "unknown"),
         "{{ACTIVE_SOURCE_ROOT}}": package_root.replace("\\", "/"),
-        "{{MANIFEST_SHA256}}": manifest_hash,
+        "{{MANIFEST_SHA256}}": wsr_common.calculate_sha256(os.path.join(package_root, "WSR_MANIFEST.json")),
+        "{{KERNEL}}": kernel,
+        "{{COMMAND_INDEX}}": command_index(context),
     }
     for token, value in replacements.items():
         rendered = rendered.replace(token, str(value))
@@ -105,504 +127,405 @@ def render_router(package_root, manifest):
         raise ValueError("Router template contains unresolved placeholders")
     return rendered
 
-def compute_checksums(package_root, manifest):
-    """Load or calculate checksums for manifest inventory."""
-    checksums = {}
-    checksums_file = manifest.get("checksumsFile", "WSR_CHECKSUMS.json")
-    checksums_path = os.path.join(package_root, checksums_file)
-    
-    if os.path.exists(checksums_path):
-        try:
-            with open(checksums_path, "r", encoding="utf-8") as f:
-                checksums = json.load(f)
-        except:
-            pass
-            
-    # Calculate JIT if missing
-    for art in manifest.get("artifacts", []):
-        src_path = os.path.join(package_root, art["source"])
-        if art["source"] not in checksums and os.path.exists(src_path):
-            try:
-                checksums[art["source"]] = wsr_common.calculate_sha256(src_path)
-            except:
-                pass
-    return checksums
 
-def build_deployment_plan(package_root, target_root, manifest, adapter_config, checksums):
-    """Construct a collision-free v2 plan rooted at logical destinations."""
-    target_root = os.path.realpath(os.path.abspath(target_root))
-    plan = []
-    logical_roots = resolve_logical_roots(target_root, adapter_config)
+def compute_checksums(package_root, manifest):
+    result = {}
+    path = wsr_common.safe_resolve_path(
+        package_root, manifest.get("checksumsFile", "WSR_CHECKSUMS.json"),
+    )
+    if os.path.isfile(path):
+        try:
+            with open(path, "r", encoding="utf-8") as stream:
+                result.update(json.load(stream))
+        except (OSError, ValueError):
+            pass
+    for artifact in manifest.get("artifacts", []):
+        source = artifact.get("source")
+        if not source:
+            continue
+        source_path = wsr_common.safe_resolve_path(package_root, source)
+        if source and source not in result and os.path.isfile(source_path):
+            result[source] = wsr_common.calculate_sha256(source_path)
+    return result
+
+
+def _mapping_relative(source, mapping):
+    parts = source.replace("\\", "/").split("/")
+    if mapping.get("stripTopLevel") and len(parts) > 1:
+        parts = parts[1:]
+    prefix = mapping.get("relativePath", "")
+    return os.path.join(prefix, *parts) if prefix else os.path.join(*parts)
+
+
+def _operation(artifact_id, source_path, destination, root_name, root_path, source_hash, mutable, rendered=None):
+    relative = os.path.relpath(destination, root_path).replace("\\", "/")
+    wsr_common.safe_resolve_path(root_path, relative)
+    exists = os.path.isfile(destination)
+    destination_hash = wsr_common.calculate_sha256(destination) if exists else "N/A"
+    action = "unchanged" if exists and destination_hash == source_hash else ("update" if exists else "create")
+    item = {
+        "id": artifact_id,
+        "source_path": source_path,
+        "destination_path": destination,
+        "root": root_name,
+        "root_path": root_path,
+        "relative_destination": "{0}:{1}".format(root_name, relative),
+        "current_state": "Drift" if exists and action == "update" else ("Exists" if exists else "Missing"),
+        "desired_state": "Unchanged" if action == "unchanged" else action.title(),
+        "action": action,
+        "src_checksum": source_hash,
+        "dest_checksum": destination_hash,
+        "mutable": mutable,
+    }
+    if rendered is not None:
+        item["rendered_content"] = rendered
+    return item
+
+
+def build_deployment_plan(package_root, target_root, manifest, adapter_config, checksums, root_overrides=None):
+    package_root = os.path.realpath(os.path.abspath(package_root))
+    roots = resolve_roots(adapter_config, config_override=target_root, root_overrides=root_overrides)
     mappings = adapter_config.get("artifactMappings", [])
     destinations = {}
+    plan = []
 
-    for art in manifest.get("artifacts", []):
-        mapping = select_mapping(art, mappings)
+    for artifact in manifest.get("artifacts", []):
+        if not artifact.get("deploy", False):
+            continue
+        mapping = select_mapping(artifact, mappings)
         if mapping is None:
             continue
-        src_rel = art["source"]
-        src_abs = os.path.join(package_root, src_rel)
-        root_name = mapping.get("logicalRoot")
-        if root_name not in logical_roots:
-            raise ValueError(f"Unknown logical root '{root_name}' for artifact '{art['id']}'")
-        dest_prefix = mapping.get("relativePath", "")
-        if dest_prefix.endswith('/') or dest_prefix.endswith('\\'):
-            parts = src_rel.replace('\\', '/').split('/')
-            dest_rel = os.path.join(dest_prefix, *parts[1:]) if len(parts) > 1 else os.path.join(dest_prefix, parts[0])
-        else:
-            dest_rel = dest_prefix or os.path.basename(src_rel)
-        try:
-            dest_abs = wsr_common.safe_resolve_path(logical_roots[root_name], dest_rel)
-        except ValueError as e:
-            raise ValueError(f"Adapter '{adapter_config.get('adapterId')}' mapping containment violation for artifact '{art['id']}' (mapped: '{dest_rel}'): {e}")
-        normalized_dest = os.path.normcase(os.path.realpath(dest_abs))
-        if normalized_dest in destinations:
-            raise ValueError(f"Destination collision: '{art['id']}' and '{destinations[normalized_dest]}' map to '{dest_abs}'")
-        destinations[normalized_dest] = art["id"]
-        current_state = "Missing"
-        desired_state = "Unchanged"
-        action = "unchanged"
-        dest_checksum = "N/A"
-        
-        src_checksum = checksums.get(src_rel, "N/A")
-        if src_checksum == "N/A" and os.path.exists(src_abs):
-            src_checksum = wsr_common.calculate_sha256(src_abs)
-            
-        if os.path.exists(dest_abs):
-            current_state = "Exists"
-            dest_checksum = wsr_common.calculate_sha256(dest_abs)
-            if src_checksum != dest_checksum:
-                current_state = "Drift"
-                desired_state = "Update"
-                action = "update"
-        else:
-            desired_state = "Create"
-            action = "create"
-            
-        plan.append({
-            "id": art["id"],
-            "source_path": src_abs,
-            "destination_path": dest_abs,
-            "relative_destination": os.path.relpath(dest_abs, target_root).replace('\\', '/'),
-            "current_state": current_state,
-            "desired_state": desired_state,
-            "action": action,
-            "src_checksum": src_checksum,
-            "dest_checksum": dest_checksum,
-            "mutable": art.get("mutable", True)
-        })
+        root_name = mapping.get("root")
+        if root_name not in roots:
+            raise ValueError("Unknown root '{0}' for '{1}'".format(root_name, artifact["id"]))
+        source_rel = artifact["source"]
+        source_path = wsr_common.safe_resolve_path(package_root, source_rel)
+        if not os.path.isfile(source_path):
+            if artifact.get("required"):
+                raise ValueError("Required artifact missing: {0}".format(source_rel))
+            continue
+        relative = _mapping_relative(source_rel, mapping)
+        destination = wsr_common.safe_resolve_path(roots[root_name], relative)
+        key = os.path.normcase(os.path.realpath(destination))
+        if key in destinations:
+            raise ValueError("Destination collision: '{0}' and '{1}'".format(artifact["id"], destinations[key]))
+        destinations[key] = artifact["id"]
+        source_hash = checksums.get(source_rel) or wsr_common.calculate_sha256(source_path)
+        plan.append(_operation(
+            artifact["id"], source_path, destination, root_name, roots[root_name],
+            source_hash, artifact.get("mutable", True),
+        ))
 
-    router = adapter_config.get("routerContract", {})
-    if router.get("type") == "absolute":
-        router_rel = router.get("path", "")
-        if not wsr_common.validate_relative_path(router_rel):
-            raise ValueError(f"Router path must be target-relative: {router_rel}")
-        router_dest = wsr_common.safe_resolve_path(target_root, router_rel)
-        normalized_dest = os.path.normcase(os.path.realpath(router_dest))
-        if normalized_dest in destinations:
-            raise ValueError(f"Router destination collision with '{destinations[normalized_dest]}': {router_dest}")
-        rendered = render_router(package_root, manifest)
-        rendered_hash = hashlib.sha256(rendered.encode("utf-8")).hexdigest()
-        existing_hash = wsr_common.calculate_sha256(router_dest) if os.path.exists(router_dest) else "N/A"
-        plan.append({
-            "id": "active-router", "source_path": None,
-            "destination_path": router_dest,
-            "relative_destination": os.path.relpath(router_dest, target_root).replace('\\', '/'),
-            "current_state": "Exists" if os.path.exists(router_dest) else "Missing",
-            "desired_state": "Unchanged" if existing_hash == rendered_hash else ("Update" if os.path.exists(router_dest) else "Create"),
-            "action": "unchanged" if existing_hash == rendered_hash else ("update" if os.path.exists(router_dest) else "create"),
-            "src_checksum": rendered_hash, "dest_checksum": existing_hash,
-            "mutable": True, "rendered_content": rendered
-        })
+    router = adapter_config["router"]
+    router_root = roots[router["root"]]
+    router_destination = wsr_common.safe_resolve_path(router_root, router["path"])
+    key = os.path.normcase(os.path.realpath(router_destination))
+    if key in destinations:
+        raise ValueError("Router destination collision with '{0}'".format(destinations[key]))
+    rendered = render_router(package_root, manifest)
+    rendered_hash = hashlib.sha256(rendered.encode("utf-8")).hexdigest()
+    plan.append(_operation(
+        "active-router", None, router_destination, router["root"], router_root,
+        rendered_hash, True, rendered=rendered,
+    ))
     return plan
 
+
 def public_operation(operation):
-    """Remove internal rendered payloads from reports."""
-    return {key: value for key, value in operation.items() if key != "rendered_content"}
+    return {key: value for key, value in operation.items() if key not in {"rendered_content", "root_path"}}
+
 
 def calculate_inventory_hash(plan):
-    rows = [f"{op['id']}:{op['src_checksum']}:{op['relative_destination']}" for op in plan]
+    rows = ["{0}:{1}:{2}".format(op["id"], op["src_checksum"], op["relative_destination"]) for op in plan]
     return hashlib.sha256("\n".join(sorted(rows)).encode("utf-8")).hexdigest()
 
+
+def parse_root_overrides(values):
+    result = {}
+    for value in values or []:
+        if "=" not in value:
+            raise ValueError("Root override must use NAME=PATH")
+        name, path = value.split("=", 1)
+        if not name or not path or name in result:
+            raise ValueError("Invalid or duplicate root override: {0}".format(value))
+        result[name] = path
+    return result
+
+
+def _verify_destination(operation):
+    relative = os.path.relpath(operation["destination_path"], operation["root_path"])
+    return wsr_common.safe_resolve_path(operation["root_path"], relative)
+
+
+def _write_marker(staging_dir, adapter, manifest, package_root, roots, plan, transaction_id):
+    state = adapter["state"]
+    marker_path = wsr_common.safe_resolve_path(roots[state["root"]], state["path"])
+    content = {
+        "schemaVersion": 1,
+        "adapterIdentity": adapter["adapterId"],
+        "packageVersion": manifest["version"],
+        "buildId": manifest["buildId"],
+        "manifestHash": wsr_common.calculate_sha256(os.path.join(package_root, "WSR_MANIFEST.json")),
+        "inventoryHash": calculate_inventory_hash(plan),
+        "routerHash": next(op["src_checksum"] for op in plan if op["id"] == "active-router"),
+        "logicalRoots": roots,
+        "installTimestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        "transactionId": transaction_id,
+    }
+    staged = os.path.join(staging_dir, "active-marker.json")
+    wsr_common.atomic_write_text(staged, json.dumps(content, indent=2))
+    return marker_path, staged
+
+
+def _write_transaction_journal(staging, journal):
+    journal["updatedAt"] = time.time()
+    path = wsr_common.safe_resolve_path(staging, "transaction.json")
+    wsr_common.atomic_write_text(path, json.dumps(journal, indent=2, sort_keys=True))
+
+
+def _recover_transaction(staging, roots, allow_recent=False):
+    journal_path = wsr_common.safe_resolve_path(staging, "transaction.json")
+    with open(journal_path, "r", encoding="utf-8", errors="strict") as stream:
+        journal = json.load(stream)
+    if journal.get("schemaVersion") != 1 or not isinstance(journal.get("operations"), list):
+        raise RuntimeError("Transaction journal violates v1 contract: {0}".format(journal_path))
+    if not allow_recent and time.time() - float(journal.get("updatedAt", 0)) < 60:
+        raise RuntimeError("Another WSR transaction may still be active: {0}".format(staging))
+
+    def paths(record):
+        root_name = record.get("root")
+        relative = record.get("relative")
+        if root_name not in roots or not isinstance(relative, str):
+            raise RuntimeError("Transaction journal references an unknown destination root")
+        destination = wsr_common.safe_resolve_path(roots[root_name], relative)
+        backup_relative = record.get("backupRelative")
+        backup = (
+            wsr_common.safe_resolve_path(roots[root_name], backup_relative)
+            if backup_relative else None
+        )
+        return destination, backup
+
+    records = list(journal["operations"])
+    if journal.get("marker"):
+        records.append(journal["marker"])
+    if journal.get("committed"):
+        for record in records:
+            _, backup = paths(record)
+            if backup and os.path.isfile(backup):
+                os.remove(backup)
+    else:
+        for record in reversed(records):
+            destination, backup = paths(record)
+            if record.get("hadDestination"):
+                if backup and os.path.isfile(backup):
+                    if os.path.isfile(destination):
+                        os.remove(destination)
+                    os.replace(backup, destination)
+                elif not (
+                    os.path.isfile(destination)
+                    and wsr_common.calculate_sha256(destination) == record.get("previousChecksum")
+                ):
+                    raise RuntimeError("Original destination cannot be recovered: {0}".format(destination))
+            elif os.path.isfile(destination):
+                os.remove(destination)
+
+    shutil.rmtree(staging)
+
+
+def apply_plan(package_root, adapter, manifest, roots, plan):
+    changes = [op for op in plan if op["action"] != "unchanged"]
+    config_root = roots["config"]
+    os.makedirs(config_root, exist_ok=True)
+    for name in sorted(os.listdir(config_root)):
+        if not name.startswith(".wsr_staging_"):
+            continue
+        stale = wsr_common.safe_resolve_path(config_root, name)
+        if not os.path.isdir(stale):
+            raise RuntimeError("Invalid WSR staging entry: {0}".format(stale))
+        _recover_transaction(stale, roots)
+
+    transaction_id = "{0}_{1}_{2}".format(manifest["buildId"], time.time_ns(), os.getpid())
+    staging = wsr_common.safe_resolve_path(
+        config_root, ".wsr_staging_{0}".format(transaction_id),
+    )
+    os.makedirs(staging)
+    staged = []
+    journal = {
+        "schemaVersion": 1,
+        "transactionId": transaction_id,
+        "createdAt": time.time(),
+        "committed": False,
+        "operations": [],
+        "marker": None,
+    }
+    _write_transaction_journal(staging, journal)
+    try:
+        for index, operation in enumerate(changes):
+            staged_path = wsr_common.safe_resolve_path(staging, "{0:04d}".format(index))
+            if "rendered_content" in operation:
+                wsr_common.atomic_write_text(staged_path, operation["rendered_content"])
+            else:
+                shutil.copy2(operation["source_path"], staged_path)
+            if wsr_common.calculate_sha256(staged_path) != operation["src_checksum"]:
+                raise RuntimeError("Staging checksum mismatch for {0}".format(operation["id"]))
+            staged.append((staged_path, operation))
+
+        for staged_path, operation in staged:
+            destination = _verify_destination(operation)
+            os.makedirs(os.path.dirname(destination), exist_ok=True)
+            if os.path.exists(destination) and not os.path.isfile(destination):
+                raise RuntimeError("Destination is not a regular file: {0}".format(destination))
+            had_destination = os.path.isfile(destination)
+            backup = None
+            backup_relative = None
+            previous_checksum = None
+            if had_destination:
+                previous_checksum = wsr_common.calculate_sha256(destination)
+                backup = "{0}.wsr_backup_{1}_tmp".format(destination, transaction_id)
+                if os.path.exists(backup):
+                    raise RuntimeError("Backup already exists: {0}".format(backup))
+                backup_relative = os.path.relpath(backup, operation["root_path"]).replace("\\", "/")
+                wsr_common.safe_resolve_path(operation["root_path"], backup_relative)
+            journal["operations"].append({
+                "root": operation["root"],
+                "relative": os.path.relpath(destination, operation["root_path"]).replace("\\", "/"),
+                "hadDestination": had_destination,
+                "previousChecksum": previous_checksum,
+                "backupRelative": backup_relative,
+            })
+            _write_transaction_journal(staging, journal)
+            if backup:
+                os.replace(destination, backup)
+            shutil.copy2(staged_path, destination)
+            if wsr_common.calculate_sha256(destination) != operation["src_checksum"]:
+                raise RuntimeError("Destination checksum mismatch for {0}".format(operation["id"]))
+
+        marker_path, marker_staged = _write_marker(staging, adapter, manifest, package_root, roots, plan, transaction_id)
+        os.makedirs(os.path.dirname(marker_path), exist_ok=True)
+        if os.path.exists(marker_path) and not os.path.isfile(marker_path):
+            raise RuntimeError("Active marker is not a regular file: {0}".format(marker_path))
+        marker_had_destination = os.path.isfile(marker_path)
+        marker_backup = None
+        marker_backup_relative = None
+        marker_previous_checksum = None
+        state = adapter["state"]
+        marker_root = roots[state["root"]]
+        if marker_had_destination:
+            marker_previous_checksum = wsr_common.calculate_sha256(marker_path)
+            marker_backup = "{0}.wsr_backup_{1}_tmp".format(marker_path, transaction_id)
+            marker_backup_relative = os.path.relpath(marker_backup, marker_root).replace("\\", "/")
+            wsr_common.safe_resolve_path(marker_root, marker_backup_relative)
+        journal["marker"] = {
+            "root": state["root"],
+            "relative": os.path.relpath(marker_path, marker_root).replace("\\", "/"),
+            "hadDestination": marker_had_destination,
+            "previousChecksum": marker_previous_checksum,
+            "backupRelative": marker_backup_relative,
+        }
+        _write_transaction_journal(staging, journal)
+        if marker_backup:
+            os.replace(marker_path, marker_backup)
+        shutil.copy2(marker_staged, marker_path)
+        if wsr_common.calculate_sha256(marker_path) != wsr_common.calculate_sha256(marker_staged):
+            raise RuntimeError("Active marker checksum mismatch")
+
+        journal["committed"] = True
+        _write_transaction_journal(staging, journal)
+        try:
+            _recover_transaction(staging, roots, allow_recent=True)
+        except Exception as cleanup_error:
+            print("WSR Sync cleanup deferred: {0}".format(cleanup_error), file=sys.stderr)
+        return {
+            "schemaVersion": 1,
+            "transactionId": transaction_id,
+            "status": "COMMITTED",
+            "changed": len(changes),
+            "inventoryHash": calculate_inventory_hash(plan),
+        }
+    except Exception as error:
+        try:
+            _recover_transaction(staging, roots, allow_recent=True)
+        except Exception as recovery_error:
+            raise RuntimeError(
+                "Transaction failed: {0}; recovery failed: {1}".format(error, recovery_error)
+            ) from recovery_error
+        raise
+
+
 def main():
-    parser = argparse.ArgumentParser(description="WSR Configuration Deployment Synchronizer")
-    parser.add_argument('--adapter', required=True, help="Target platform adapter name (e.g. gemini, codex)")
-    parser.add_argument('--target-root', default=None, help="Explicit target root directory")
-    parser.add_argument('--json', action='store_true', help="Output deployment plan as JSON")
-    parser.add_argument('--apply', action='store_true', help="Execute changes to target configuration")
-    parser.add_argument('--approval-token', default=None, help="Approval token matching manifest buildId")
-    parser.add_argument('--allow-review', action='store_true', help="Bypass Review package restriction")
-    
+    parser = argparse.ArgumentParser(description="WSR v3 multi-root configuration synchronizer")
+    parser.add_argument("--adapter", required=True)
+    parser.add_argument("--target-root", help="Legacy alias for config root override")
+    parser.add_argument("--root-override", action="append", help="Repeatable NAME=PATH root override")
+    parser.add_argument("--json", action="store_true")
+    parser.add_argument("--apply", action="store_true")
+    parser.add_argument("--approval-token")
+    parser.add_argument("--allow-review", action="store_true")
     args = parser.parse_args()
-    
-    is_json = args.json
-    is_apply = args.apply
-    
+
     package_root = wsr_common.get_package_root()
-    
-    # 1. Load manifest
+    report = {"status": "BLOCKED"}
     try:
         manifest = wsr_common.load_manifest(package_root)
-    except Exception as e:
-        if is_json:
-            wsr_common.print_json_report({"status": "FAIL", "message": f"Manifest load failure: {e}"})
-        else:
-            print(f"[-] Error: Failed to load manifest: {e}", file=sys.stderr)
-        sys.exit(wsr_common.EXIT_INVALID_ARGS)
-        
-    build_id = manifest.get("buildId")
-    manifest_status = manifest.get("status", "Review")
-    
-    # 2. Run Preflight Health Doctor check
-    doctor_ok, doctor_err, doc_exit_code = run_doctor_preflight(package_root)
-    if not doctor_ok:
-        if is_json:
-            wsr_common.print_json_report({"status": "FAIL", "message": "Preflight doctor check failed", "details": doctor_err})
-        else:
-            print("[-] Safety Gate: Doctor check failed. Package is unhealthy!", file=sys.stderr)
-            print(doctor_err, file=sys.stderr)
-        sys.exit(doc_exit_code)
-        
-    # 3. Load Adapter
-    try:
-        adapter_config = load_adapter_config(package_root, args.adapter, manifest)
-    except Exception as e:
-        if is_json:
-            wsr_common.print_json_report({"status": "FAIL", "message": str(e)})
-        else:
-            print(f"[-] Error: {e}", file=sys.stderr)
-        sys.exit(wsr_common.EXIT_INVALID_ARGS)
-        
-    # Check if adapter is enabled
-    if not adapter_config.get("enabled", False):
-        if is_json:
-            wsr_common.print_json_report({"status": "FAIL", "message": f"Adapter '{args.adapter}' is disabled"})
-        else:
-            print(f"[-] Safety Gate: Adapter '{args.adapter}' is disabled in configuration.", file=sys.stderr)
-        sys.exit(wsr_common.EXIT_SAFETY_REJECTION)
-        
-    # Resolve Target Root
-    try:
-        target_root = get_target_root(adapter_config, args.target_root)
-        if not target_root:
-            raise ValueError("Target root could not be resolved.")
-    except PermissionError as e:
-        if is_json:
-            wsr_common.print_json_report({"status": "REJECTED", "message": str(e)})
-        else:
-            print(f"[-] Safety Gate: {e}", file=sys.stderr)
-        sys.exit(wsr_common.EXIT_SAFETY_REJECTION)
-    except Exception as e:
-        if is_json:
-            wsr_common.print_json_report({"status": "FAIL", "message": str(e)})
-        else:
-            print(f"[-] Error: {e}", file=sys.stderr)
-        sys.exit(wsr_common.EXIT_INVALID_ARGS)
-        
-    
-    # 5. Build Deployment Plan
-    report = {
-        "status": "PLAN",
-        "adapter": args.adapter,
-        "target_root": target_root,
-        "build_id": build_id,
-        "total_operations": 0,
-        "changes_count": 0,
-        "plan": [],
-        "execution_log": []
-    }
-    try:
+        adapter = load_adapter_config(package_root, args.adapter, manifest)
+        if not adapter.get("enabled"):
+            raise PermissionError("Adapter '{0}' is disabled".format(args.adapter))
+        root_overrides = parse_root_overrides(args.root_override)
+        roots = resolve_roots(adapter, config_override=args.target_root, root_overrides=root_overrides)
+
+        healthy, detail, code = run_doctor_preflight(package_root)
+        if not healthy:
+            raise RuntimeError("Doctor preflight failed: {0}".format(detail.strip()))
+
         checksums = compute_checksums(package_root, manifest)
-        plan = build_deployment_plan(package_root, target_root, manifest, adapter_config, checksums)
-    except ValueError as e:
-        report["status"] = "REJECTED"
-        report["message"] = str(e)
-        if is_json:
-            wsr_common.print_json_report(report)
-        else:
-            print(f"[-] Safety Gate: Rejection! {e}", file=sys.stderr)
-        sys.exit(wsr_common.EXIT_SAFETY_REJECTION)
-    
-    # Check if anything to deploy
-    changes_needed = [op for op in plan if op["action"] != "unchanged"]
-    
-    report["total_operations"] = len(plan)
-    report["changes_count"] = len(changes_needed)
-    report["plan"] = [public_operation(op) for op in plan]
-    
-    if not is_apply:
-        if is_json:
-            wsr_common.print_json_report(report)
-        else:
-            print("="*60)
-            print(f"WSR DEPLOYMENT PLAN - DRY RUN ({args.adapter.upper()})")
-            print("="*60)
-            print(f"Target Root: {target_root}")
-            print(f"Build ID:    {build_id}")
-            print(f"Changes:     {len(changes_needed)} / {len(plan)} files")
-            print("-"*60)
-            for op in plan:
-                print(f" - [{op['action'].upper()}] {op['relative_destination']} (Id: {op['id']})")
-            print("="*60)
-            print("To execute changes, run with --apply --approval-token <buildId>")
-            print("="*60)
-        sys.exit(wsr_common.EXIT_SUCCESS)
-        
-    # APPLY MODE
-    # 0. Manifest Status Verification (Review Package apply check)
-    if manifest_status == "Review" and not args.allow_review:
-        report["status"] = "REJECTED"
-        report["message"] = "Applying a package in 'Review' status requires '--allow-review'"
-        if is_json:
-            wsr_common.print_json_report(report)
-        else:
-            print("[-] Safety Gate: Package is in 'Review' status. Deploying config requires '--allow-review'", file=sys.stderr)
-        sys.exit(wsr_common.EXIT_SAFETY_REJECTION)
-
-    # 1. Approval Token Verification
-    if not args.approval_token or args.approval_token != build_id:
-        report["status"] = "REJECTED"
-        report["message"] = "Invalid or missing --approval-token"
-        if is_json:
-            wsr_common.print_json_report(report)
-        else:
-            print(f"[-] Safety Gate: Rejection! Token '{args.approval_token}' does not match buildId '{build_id}'", file=sys.stderr)
-        sys.exit(wsr_common.EXIT_SAFETY_REJECTION)
-        
-    # 2. Start Transaction
-    report["status"] = "EXECUTING"
-    
-    # Generate unique transaction ID using buildId and timestamp
-    transaction_id = f"{build_id}_{int(time.time())}"
-    staging_dir = os.path.join(target_root, f".wsr_staging_{transaction_id}")
-    
-    # Reject if staging folder already exists
-    if os.path.exists(staging_dir):
-        report["status"] = "REJECTED"
-        report["message"] = f"Staging directory already exists: {staging_dir}"
-        if is_json:
-            wsr_common.print_json_report(report)
-        else:
-            print(f"[-] Safety Gate: Staging directory already exists: {staging_dir}", file=sys.stderr)
-        sys.exit(wsr_common.EXIT_IO_TRANSACTION_ERROR)
-        
-    os.makedirs(staging_dir, exist_ok=True)
-    
-    staged_files = []
-    backup_files = []
-    
-    journal_path = os.path.join(staging_dir, "transaction_journal.json")
-    
-    try:
-        # Step 1: Copy to staging and verify source checksum JIT
-        for op in changes_needed:
-            src_path = op["source_path"]
-            src_checksum = op["src_checksum"]
-            
-            stage_file = os.path.join(staging_dir, op["id"])
-            if "rendered_content" in op:
-                wsr_common.atomic_write_text(stage_file, op["rendered_content"])
-            else:
-                shutil.copy2(src_path, stage_file)
-            staged_files.append((stage_file, op["destination_path"]))
-            
-            # Verify staging checksum
-            staged_chk = wsr_common.calculate_sha256(stage_file)
-            if staged_chk != src_checksum:
-                raise RuntimeError(f"Checksum mismatch in staging for {op['id']}: expected {src_checksum}, got {staged_chk}")
-                
-        # Write initial journal
-        journal_data = {
-            "transaction_id": transaction_id,
-            "staged_files": [{"stage": sf, "dest": dp} for sf, dp in staged_files],
-            "backup_files": []
+        plan = build_deployment_plan(package_root, roots["config"], manifest, adapter, checksums, root_overrides)
+        changes = [op for op in plan if op["action"] != "unchanged"]
+        router_changed = any(op["id"] == "active-router" and op["action"] != "unchanged" for op in plan)
+        report = {
+            "status": "PLAN",
+            "adapter": args.adapter,
+            "roots": roots,
+            "build_id": manifest.get("buildId"),
+            "total_operations": len(plan),
+            "changes_count": len(changes),
+            "restart_required": router_changed,
+            "plan": [public_operation(op) for op in plan],
         }
-        with open(journal_path, "w", encoding="utf-8") as jf:
-            json.dump(journal_data, jf, indent=2)
-            
-        # Step 2: Backup existing files (rename)
-        for stage_file, dest_path in staged_files:
-            # Check target containment via realpath/commonpath before writing
-            wsr_common.safe_resolve_path(target_root, os.path.relpath(dest_path, target_root))
-            
-            if os.path.exists(dest_path):
-                # Unique backup name utilizing transaction_id
-                dest_dir = os.path.dirname(dest_path)
-                dest_name = os.path.basename(dest_path)
-                backup_path = os.path.join(dest_dir, f"{dest_name}.wsr_backup_{transaction_id}_tmp")
-                
-                # Reject if backup path already exists to avoid overwriting unmanaged data
-                if os.path.exists(backup_path):
-                    raise RuntimeError(f"Backup file path already exists: {backup_path}")
-                    
-                os.replace(dest_path, backup_path)
-                backup_files.append((dest_path, backup_path))
-                
-                # Update journal on disk immediately
-                journal_data["backup_files"].append({"dest": dest_path, "backup": backup_path})
-                with open(journal_path, "w", encoding="utf-8") as jf:
-                    json.dump(journal_data, jf, indent=2)
-                    
-        # Step 3: Copy staged files to final destination and verify checksum
-        for stage_file, dest_path in staged_files:
-            # Revalidate containment immediately before write
-            wsr_common.safe_resolve_path(target_root, os.path.relpath(dest_path, target_root))
-            
-            # Create subdirs if needed
-            os.makedirs(os.path.dirname(dest_path), exist_ok=True)
-            shutil.copy2(stage_file, dest_path)
-            
-            # Verify destination checksum
-            final_chk = wsr_common.calculate_sha256(dest_path)
-            matching_op = next(op for op in plan if op["destination_path"] == dest_path)
-            expected_chk = matching_op["src_checksum"]
-            if final_chk != expected_chk:
-                raise RuntimeError(f"Checksum verification failed at destination: {dest_path}. Expected {expected_chk}, got {final_chk}")
-                
-        # Step 3.5: Write the adapter-declared active marker with journal tracking
-        manifest_version = manifest.get("version", "1.0.0")
-        manifest_sha = wsr_common.calculate_sha256(os.path.join(package_root, "WSR_MANIFEST.json"))
-        marker_relative_path = adapter_config.get("activeMarkerContract", {}).get("path", "")
-        if not wsr_common.validate_relative_path(marker_relative_path):
-            raise RuntimeError(f"Active marker path must be target-relative: {marker_relative_path}")
-        active_marker_path = wsr_common.safe_resolve_path(target_root, marker_relative_path)
-        marker_backup_path = None
-        if os.path.exists(active_marker_path):
-            marker_backup_path = f"{active_marker_path}.wsr_backup_{transaction_id}_tmp"
-            os.replace(active_marker_path, marker_backup_path)
-            journal_data["marker_backup"] = marker_backup_path
-            with open(journal_path, "w", encoding="utf-8") as jf:
-                json.dump(journal_data, jf, indent=2)
 
-        logical_roots = {
-            name: os.path.relpath(path, target_root).replace('\\', '/')
-            for name, path in resolve_logical_roots(target_root, adapter_config).items()
-        }
-        router_operation = next((op for op in plan if op["id"] == "active-router"), None)
-        active_marker_content = {
-            "schemaVersion": 1,
-            "adapterIdentity": args.adapter,
-            "packageVersion": manifest_version,
-            "buildId": build_id,
-            "manifestHash": manifest_sha,
-            "inventoryHash": calculate_inventory_hash(plan),
-            "routerHash": router_operation["src_checksum"] if router_operation else "none",
-            "logicalRoots": logical_roots,
-            "installTimestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-            "transactionId": transaction_id
-        }
-        marker_stage_path = os.path.join(staging_dir, "active-marker.json")
-        marker_json = json.dumps(active_marker_content, indent=2)
-        wsr_common.atomic_write_text(marker_stage_path, marker_json)
-        marker_stage_hash = wsr_common.calculate_sha256(marker_stage_path)
-        journal_data["marker_stage"] = marker_stage_path
-        journal_data["marker_destination"] = active_marker_path
-        journal_data["marker_checksum"] = marker_stage_hash
-        journal_data["marker_write_started"] = True
-        with open(journal_path, "w", encoding="utf-8") as jf:
-            json.dump(journal_data, jf, indent=2)
-        os.makedirs(os.path.dirname(active_marker_path), exist_ok=True)
-        shutil.copy2(marker_stage_path, active_marker_path)
-        if wsr_common.calculate_sha256(active_marker_path) != marker_stage_hash:
-            raise RuntimeError("Active marker checksum verification failed")
-        journal_data["active_marker_written"] = True
-        with open(journal_path, "w", encoding="utf-8") as jf:
-            json.dump(journal_data, jf, indent=2)
+        if args.apply:
+            if manifest.get("status") == "Review" and not args.allow_review:
+                raise PermissionError("Review deployment requires --allow-review")
+            if args.approval_token != manifest.get("buildId"):
+                raise PermissionError("Invalid or missing --approval-token")
+            receipt = apply_plan(package_root, adapter, manifest, roots, plan)
+            report["status"] = "SUCCESS"
+            report["applied"] = receipt["changed"]
+            report["receipt"] = receipt
 
-        # Step 4: Success - clean up backups (journaled only)
-        if marker_backup_path and os.path.exists(marker_backup_path):
-            os.remove(marker_backup_path)
-        for dest_path, backup_path in backup_files:
-            if os.path.exists(backup_path):
-                os.remove(backup_path)
-                
-        # Clean own staging directory only (not rmtree on complete destination)
-        shutil.rmtree(staging_dir, ignore_errors=True)
-        
-        report["status"] = "SUCCESS"
-        if is_json:
+        if args.json:
             wsr_common.print_json_report(report)
         else:
-            print(f"[+] Successfully deployed {len(changes_needed)} changes to {target_root}")
-            
-    except Exception as e:
-        # TRANSACTION FAILED - ROLLBACK!
-        report["status"] = "ROLLBACK"
-        report["error"] = str(e)
-        
-        rollback_errors = []
-        
-        # Read journal if exists to guarantee we only rollback what was recorded
-        j_staged = staged_files
-        j_backups = backup_files
-        marker_backup = None
-        marker_written = False
-        if os.path.exists(journal_path):
-            try:
-                with open(journal_path, "r", encoding="utf-8") as jf:
-                    j_dict = json.load(jf)
-                j_staged = [(item["stage"], item["dest"]) for item in j_dict.get("staged_files", [])]
-                j_backups = [(item["dest"], item["backup"]) for item in j_dict.get("backup_files", [])]
-                marker_backup = j_dict.get("marker_backup")
-                marker_written = j_dict.get("active_marker_written", False) or j_dict.get("marker_write_started", False)
-            except Exception as j_err:
-                report["execution_log"].append(f"Failed to read transaction journal: {j_err}")
-                
-        # 0. Rollback active marker if affected
-        marker_relative_path = adapter_config.get("activeMarkerContract", {}).get("path", "")
-        target_marker = wsr_common.safe_resolve_path(target_root, marker_relative_path)
-        if marker_backup and os.path.exists(marker_backup):
-            try:
-                if os.path.exists(target_marker):
-                    os.remove(target_marker)
-                os.replace(marker_backup, target_marker)
-            except Exception as mb_err:
-                rollback_errors.append(f"Restore marker failed: {mb_err}")
-        elif marker_written and os.path.exists(target_marker):
-            try:
-                os.remove(target_marker)
-            except Exception as mb_err:
-                rollback_errors.append(f"Cleanup marker failed: {mb_err}")
-
-        # 1. Restore backups in REVERSE order
-        for dest_path, backup_path in reversed(j_backups):
-            if os.path.exists(backup_path):
-                try:
-                    if os.path.exists(dest_path):
-                        os.remove(dest_path)
-                    os.replace(backup_path, dest_path)
-                except Exception as rollback_err:
-                    rollback_errors.append(f"Restore failed for {dest_path}: {rollback_err}")
-                    
-        # 2. Remove successfully copied new files that were created (not backed up) in REVERSE order
-        for stage_file, dest_path in reversed(j_staged):
-            was_backed_up = any(dest == dest_path for dest, _ in j_backups)
-            if not was_backed_up and os.path.exists(dest_path):
-                try:
-                    os.remove(dest_path)
-                except Exception as rm_err:
-                    rollback_errors.append(f"Remove failed for newly created {dest_path}: {rm_err}")
-                    
-        # 3. Clean up own staging directory
-        shutil.rmtree(staging_dir, ignore_errors=True)
-        
-        if rollback_errors:
-            report["status"] = "PARTIAL_FAIL"
-            report["rollback_errors"] = rollback_errors
-            report["execution_log"].extend(rollback_errors)
-            
-        if is_json:
+            print("WSR SYNC {0}: {1} change(s)".format(report["status"], report["changes_count"]))
+            for operation in report["plan"]:
+                print(" - [{0}] {1}".format(operation["action"].upper(), operation["relative_destination"]))
+            if report.get("restart_required"):
+                print("RESTART_REQUIRED: start a new IDE session after apply")
+        return wsr_common.EXIT_SUCCESS
+    except PermissionError as error:
+        report.update({"status": "REJECTED", "message": str(error)})
+        if args.json:
             wsr_common.print_json_report(report)
         else:
-            print(f"[-] Transaction Error: {e}", file=sys.stderr)
-            if rollback_errors:
-                print(f"[-] Rollback Partial Fail: {rollback_errors}", file=sys.stderr)
-            else:
-                print("[-] Rollback executed successfully.", file=sys.stderr)
-                
-        sys.exit(wsr_common.EXIT_IO_TRANSACTION_ERROR)
-        
-    sys.exit(wsr_common.EXIT_SUCCESS)
+            print("WSR Sync REJECTED: {0}".format(error), file=sys.stderr)
+        return wsr_common.EXIT_SAFETY_REJECTION
+    except (OSError, ValueError, RuntimeError, json.JSONDecodeError) as error:
+        report.update({"status": "BLOCKED", "message": str(error)})
+        if args.json:
+            wsr_common.print_json_report(report)
+        else:
+            print("WSR Sync BLOCKED: {0}".format(error), file=sys.stderr)
+        return wsr_common.EXIT_FAIL_FINDING
 
-if __name__ == '__main__':
-    main()
+
+if __name__ == "__main__":
+    sys.exit(main())

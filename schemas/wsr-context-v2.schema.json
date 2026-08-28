@@ -1,0 +1,199 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "WSR Context v2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "packageName",
+    "version",
+    "buildId",
+    "manifestSha256",
+    "policyFile",
+    "commandMap",
+    "skillIndex",
+    "loadProfiles",
+    "precedenceRules",
+    "tokenBudget",
+    "contextThreshold",
+    "contextTelemetry",
+    "projectOverlayContract",
+    "resumeContract",
+    "goalContract",
+    "nativeContracts"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 2
+    },
+    "packageName": {
+      "type": "string",
+      "const": "WSR-Core"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "buildId": {
+      "type": "string",
+      "pattern": "^WSR-CORE-\\d+\\.\\d+\\.\\d+-(REVIEW|RELEASE-CANDIDATE|RELEASE)$"
+    },
+    "manifestSha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "policyFile": {
+      "type": "string",
+      "pattern": "^(?![\\\\/])(?![A-Za-z]:)(?!.*(^|[\\\\/])\\.\\.([\\\\/]|$)).+$"
+    },
+    "commandMap": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["workflow", "description", "readOnly", "approvalRequired", "requiredProfile"],
+        "properties": {
+          "workflow": {"type": "string", "pattern": "^global_workflows/[a-z0-9-]+\\.md$"},
+          "description": {"type": "string", "minLength": 1},
+          "readOnly": {"type": "boolean"},
+          "approvalRequired": {"type": "boolean"},
+          "requiredProfile": {"type": "string", "enum": ["command", "task"]},
+          "entrypoint": {"type": "string", "pattern": "^scripts/[a-z0-9_-]+\\.py$"},
+          "aliasOf": {"type": "string", "pattern": "^[a-z0-9-]+$"},
+          "mode": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "skillIndex": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["capabilityId", "name", "description", "trigger", "path", "contentHash", "scope", "priority"],
+        "properties": {
+          "capabilityId": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
+          "name": {"type": "string", "minLength": 1},
+          "description": {"type": "string", "minLength": 1},
+          "trigger": {"type": "string", "minLength": 1},
+          "path": {"type": "string", "pattern": "^(?![\\\\/])(?![A-Za-z]:)(?!.*(^|[\\\\/])\\.\\.([\\\\/]|$)).+$"},
+          "contentHash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "references": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {"type": "string", "pattern": "^(?![\\\\/])(?![A-Za-z]:)(?!.*(^|[\\\\/])\\.\\.([\\\\/]|$)).+$"}
+          },
+          "scope": {"type": "string", "enum": ["global", "project"]},
+          "priority": {"type": "integer", "minimum": 0}
+        }
+      }
+    },
+    "loadProfiles": {
+      "type": "object",
+      "required": [
+        "startup",
+        "command",
+        "task",
+        "resume",
+        "diagnostic"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "startup": {"type": "object", "additionalProperties": false, "required": ["layers", "maxTokens"], "properties": {"layers": {"type": "array", "uniqueItems": true, "items": {"type": "string"}}, "maxTokens": {"type": "integer", "minimum": 1}}},
+        "command": {"type": "object", "additionalProperties": false, "required": ["layers", "maxTokens"], "properties": {"layers": {"type": "array", "uniqueItems": true, "items": {"type": "string"}}, "maxTokens": {"type": "integer", "minimum": 1}}},
+        "task": {"type": "object", "additionalProperties": false, "required": ["layers", "maxTokens"], "properties": {"layers": {"type": "array", "uniqueItems": true, "items": {"type": "string"}}, "maxTokens": {"type": "integer", "minimum": 1}}},
+        "resume": {"type": "object", "additionalProperties": false, "required": ["layers", "maxTokens"], "properties": {"layers": {"type": "array", "uniqueItems": true, "items": {"type": "string"}}, "maxTokens": {"type": "integer", "minimum": 1}}},
+        "diagnostic": {"type": "object", "additionalProperties": false, "required": ["layers", "maxTokens", "explicitOnly"], "properties": {"layers": {"type": "array", "uniqueItems": true, "items": {"type": "string"}}, "maxTokens": {"type": "integer", "minimum": 1}, "explicitOnly": {"type": "boolean"}}}
+      }
+    },
+    "precedenceRules": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "enum": ["safety", "closest_project_rule", "active_workflow", "matched_skill", "resume_reference"]
+      }
+    },
+    "tokenBudget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["estimator", "enforcedPerProfile"],
+      "properties": {
+        "estimator": {"type": "string", "const": "ceil(utf8_chars/4)"},
+        "enforcedPerProfile": {"type": "boolean", "const": true}
+      }
+    },
+    "contextThreshold": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["warningPercent", "handoffPercent", "criticalPercent", "action"],
+      "properties": {
+        "warningPercent": {"type": "integer", "minimum": 1, "maximum": 100},
+        "handoffPercent": {"type": "integer", "minimum": 1, "maximum": 100},
+        "criticalPercent": {"type": "integer", "minimum": 1, "maximum": 100},
+        "action": {"type": "string", "const": "checkpoint_then_stop"}
+      }
+    },
+    "contextTelemetry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["reportEveryResponse", "lineFormat", "measurementPriority", "fallback", "preflight"],
+      "properties": {
+        "reportEveryResponse": {"type": "boolean", "const": true},
+        "lineFormat": {"type": "string", "const": "[Context: ~X% | Trạng thái: ...]"},
+        "measurementPriority": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "enum": ["native", "estimate", "unavailable"]}
+        },
+        "fallback": {"type": "string", "enum": ["estimate", "unavailable"]},
+        "preflight": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["enabled", "warningPercent", "safetyMarginPercent"],
+          "properties": {
+            "enabled": {"type": "boolean", "const": true},
+            "warningPercent": {"type": "integer", "minimum": 1, "maximum": 100},
+            "safetyMarginPercent": {"type": "integer", "minimum": 0, "maximum": 50}
+          }
+        }
+      }
+    },
+    "projectOverlayContract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["enabled", "overlayPath"],
+      "properties": {
+        "enabled": {"type": "boolean"},
+        "overlayPath": {"type": "string", "pattern": "^(?![\\\\/])(?![A-Za-z]:)(?!.*(^|[\\\\/])\\.\\.([\\\\/]|$)).+$"}
+      }
+    },
+    "resumeContract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema", "defaultPath", "approvalPersistence", "workspaceContainmentRequired"],
+      "properties": {
+        "schema": {"type": "string", "pattern": "^schemas/[a-z0-9-]+\\.schema\\.json$"},
+        "defaultPath": {"type": "string", "pattern": "^(?![\\\\/])(?![A-Za-z]:)(?!.*(^|[\\\\/])\\.\\.([\\\\/]|$)).+$"},
+        "approvalPersistence": {"type": "boolean", "const": false},
+        "workspaceContainmentRequired": {"type": "boolean", "const": true}
+      }
+    },
+    "goalContract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema", "parser", "receiptContract", "autoCheckpointApproval", "backupResponsibility"],
+      "properties": {
+        "schema": {"type": "string", "pattern": "^schemas/wsr-goal-v1\\.schema\\.json$"},
+        "parser": {"type": "string", "pattern": "^scripts/[a-z0-9_-]+\\.py:[a-z0-9_]+$"},
+        "receiptContract": {"type": "string", "const": "goal-task-v1"},
+        "autoCheckpointApproval": {"type": "boolean", "const": true},
+        "backupResponsibility": {"type": "string", "const": "user"}
+      }
+    },
+    "nativeContracts": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {"type": "object"}
+    }
+  }
+}

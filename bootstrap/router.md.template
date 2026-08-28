@@ -1,13 +1,12 @@
-# WSR Core Active Router Template
+# {{PACKAGE_NAME}} {{VERSION}} — {{BUILD_ID}}
 
-> [!IMPORTANT]
-> **Active WSR Core Identity:** {{PACKAGE_NAME}} v{{VERSION}} ({{BUILD_ID}})
-> **Active Source Root:** `file:///{{ACTIVE_SOURCE_ROOT}}`
-> **Active Manifest SHA-256:** `{{MANIFEST_SHA256}}`
+Source: `{{ACTIVE_SOURCE_ROOT}}`
+Manifest: `{{MANIFEST_SHA256}}`
 
-## Directives
+{{KERNEL}}
 
-1. Load primary safety policies from `{{ACTIVE_SOURCE_ROOT}}/GEMINI.md`.
-2. Load workspace rules from `{{ACTIVE_SOURCE_ROOT}}/global_rules/AG_GLOBAL_RULES.md`.
-3. Route slash commands directly to `{{ACTIVE_SOURCE_ROOT}}/global_workflows/`.
-4. Load capabilities from `{{ACTIVE_SOURCE_ROOT}}/skills/`.
+## Command index
+
+{{COMMAND_INDEX}}
+
+Mọi đường dẫn trong index và workflow được tính từ Source ở trên. Chỉ đọc workflow khi lệnh được gọi; chỉ đọc skill khi tác vụ khớp mô tả. Sau khi đồng bộ router, khởi động phiên IDE mới để native loader nạp lại chỉ dẫn.

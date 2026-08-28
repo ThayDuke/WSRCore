@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 1,
+  "cases": [
+    {"id": "clean-utf8", "kind": "text", "content": "hello\n", "expect": []},
+    {"id": "replacement-char", "kind": "text", "content": "bad \ufffd\n", "expect": ["INT-002"]},
+    {"id": "python-syntax", "kind": "python", "content": "def broken(:\n  pass\n", "expect": ["INT-003"]},
+    {"id": "json-syntax", "kind": "json", "content": "{bad}\n", "expect": ["INT-003"]},
+    {"id": "unreachable", "kind": "python", "content": "def f():\n  return 1\n  dead = 2\n", "expect": ["MIN-003"]},
+    {"id": "unused-import", "kind": "python", "content": "import json\n\ndef f():\n  return 1\n", "expect": ["DEP-001"]},
+    {"id": "duplicate-rule", "kind": "markdown", "content": "- SAFE-01: first\n- SAFE-01: second\n", "expect": ["STR-001"]},
+    {"id": "large-symbol", "kind": "python", "content": "__REPEAT__:121", "expect": ["MIN-002"]},
+    {"id": "alias-redirect", "kind": "markdown", "name": "ho.md", "content": "# Alias\nAlias /pl.\n", "expect": []},
+    {"id": "hardcoded-runtime", "kind": "markdown", "name": "pl.md", "content": "Use .agents/scripts/tool.py\n", "expect": ["STR-003"]},
+    {"id": "clean-json", "kind": "json", "content": "{\"ok\": true}\n", "expect": []},
+    {"id": "future-import", "kind": "python", "content": "from __future__ import annotations\n\ndef f():\n  return 1\n", "expect": []},
+    {"id": "all-reexport", "kind": "python", "content": "import json\n__all__ = ['json']\n", "expect": []},
+    {"id": "all-tuple-reexport", "kind": "python", "content": "from json import dumps\n__all__ = ('dumps',)\n", "expect": []},
+    {"id": "all-augmented-reexport", "kind": "python", "content": "import json\n__all__ = []\n__all__ += ['json']\n", "expect": []},
+    {"id": "all-does-not-reexport", "kind": "python", "content": "import json\n__all__ = ['other']\n", "expect": ["DEP-001"]},
+    {"id": "star-import", "kind": "python", "content": "from json import *\n", "expect": []},
+    {"id": "alias-short", "kind": "markdown", "name": "ho.md", "content": "# Alias\nRead pl.md.\n", "expect": []},
+    {"id": "workflow-logical-path", "kind": "markdown", "name": "audit.md", "content": "Use the logical audit entrypoint.\n", "expect": []},
+    {"id": "meaning-differs", "kind": "markdown", "name": "audit.md", "content": "This policy is intentionally different from another policy.\n", "expect": []},
+    {"id": "local-import", "kind": "python", "content": "import json\n\ndef f():\n  return json.loads('{}')\n", "expect": []},
+    {"id": "used-import", "kind": "python", "content": "import json\n\ndef f():\n  return json.loads('{}')\n", "expect": []},
+    {"id": "short-symbol", "kind": "python", "content": "def f():\n  return 1\n", "expect": []},
+    {"id": "reachable-after-if", "kind": "python", "content": "def f(x):\n  if x:\n    return 1\n  return 2\n", "expect": []},
+    {"id": "plain-home", "kind": "markdown", "name": "audit.md", "content": "The workspace root is selected by the adapter.\n", "expect": []},
+    {"id": "clean-yaml", "kind": "text", "content": "description: audit\n", "expect": []},
+    {"id": "clean-html", "kind": "text", "content": "<p>audit</p>\n", "expect": []},
+    {"id": "clean-css", "kind": "text", "content": "body { color: black; }\n", "expect": []},
+    {"id": "clean-planning", "kind": "markdown", "name": "plan.md", "content": "# Plan\nShort plan.\n", "expect": []},
+    {"id": "clean-workflow-alias", "kind": "markdown", "name": "ho.md", "content": "# Alias\nRedirect only.\n", "expect": []},
+    {"id": "clean-rule-reference", "kind": "markdown", "name": "audit.md", "content": "See SAFE-01 for the canonical rule.\n", "expect": []},
+    {"id": "clean-python-class", "kind": "python", "content": "class A:\n  pass\n", "expect": []},
+    {"id": "clean-toml", "kind": "text", "content": "name = 'wsr'\n", "expect": []}
+  ],
+  "dependencyCases": [
+    {
+      "id": "pyproject-declared",
+      "files": {
+        "pyproject.toml": "[project]\nrequires-python = \">=3.11\"\ndependencies = [\n  \"requests>=2\",\n]\n",
+        "app.py": "import requests\n"
+      },
+      "expect": []
+    },
+    {
+      "id": "pyproject-stdlib-candidate",
+      "files": {
+        "pyproject.toml": "[project]\nrequires-python = \">=3.11, <4\"\ndependencies = [\"tomli>=2\"]\n",
+        "app.py": "import tomli\n"
+      },
+      "expect": ["DEP-004"]
+    },
+    {
+      "id": "pyproject-ambiguous-python",
+      "files": {
+        "pyproject.toml": "[project]\nrequires-python = \"~=3.11\"\ndependencies = [\"tomli>=2\"]\n",
+        "app.py": "import tomli\n"
+      },
+      "expect": []
+    },
+    {
+      "id": "dependency-duplicate",
+      "files": {
+        "requirements.txt": "requests>=2\n",
+        "constraints.txt": "requests<3\n"
+      },
+      "expect": ["DEP-002"]
+    },
+    {
+      "id": "dependency-excluded-dir",
+      "files": {
+        "requirements.txt": "requests>=2\n",
+        "node_modules/requirements.txt": "requests<3\n"
+      },
+      "expect": []
+    },
+    {
+      "id": "dependency-undeclared",
+      "files": {
+        "app.py": "import orbital_sdk\n",
+        "Installation_guide.txt": "orbital-sdk setup guide\n"
+      },
+      "expect": ["DEP-003"]
+    }
+  ]
+}

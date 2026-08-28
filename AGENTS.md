@@ -1,19 +1,12 @@
-# WSR Core 1.0.7-RELEASE — Agent Loader Contract
+# WSR Core 1.5.0 — Review Package Rules
 
-> [!IMPORTANT]
-> Đây là nguồn WSR Core chính thức ở trạng thái `Released`.
-> Cursor và Claude nằm ngoài phạm vi hỗ trợ của bản phát hành này.
-
-- Router được `sync_config.py` render từ `bootstrap/router.md.template`.
-- Router chứa source root tuyệt đối, build ID và manifest SHA-256.
-- Không dò `GEMINI.md`, workflow hoặc skill bằng đường dẫn tương đối từ CWD.
-- Trước mọi tác vụ, nạp toàn bộ `GEMINI.md` từ active source root.
-- Với slash command, nạp đúng workflow được khai báo trong `WSR_CONTEXT.json`.
-- Với task capability, nạp đúng skill và references có `capabilityId` được chọn.
-- Chỉ profile `diagnostic` được phép nạp toàn bộ inventory.
-- Marker runtime phải validate theo `schemas/wsr-active-v1.schema.json`.
-- Codex, Gemini và Antigravity dùng native roots riêng.
-- Generic chỉ được triển khai trong workspace với `--target-root` tường minh.
-
-Các lệnh quản trị chuẩn: `/audit`, `/backup`, `/br`, `/clean`, `/commit`,
-`/pl`, `/reload`, `/sync`, `/wsr` và `/ho`.
+- Đọc và tuân thủ `GEMINI.md`; đây là nguồn luật chung duy nhất.
+- Tra lệnh trong `WSR_CONTEXT.json`, rồi chỉ đọc workflow tương ứng trong `global_workflows/`.
+- Chỉ đọc toàn bộ `SKILL.md` khi mô tả skill khớp tác vụ.
+- Không sửa bản RELEASE khác; gói này là WSR-Core 1.5.0 REVIEW.
+- REVIEW chỉ nạp khi có `--allow-review`; không coi REVIEW là RELEASE.
+- Giữ UX 1.0.8: prompt thường là `DISCUSSION`; chỉ allowlist phê duyệt trực tiếp mới thành `APPROVED`.
+- Prompt `/pl` chưa được duyệt phải cập nhật cùng plan và tăng phiên bản `vN`; không tạo plan trùng tên.
+- Plan, checkpoint, session và receipt không cấp hoặc lưu quyền phê duyệt.
+- `/goal`, `Goal ` và `Goal:` ở đầu prompt kích hoạt Goal trong phạm vi giới hạn.
+- Codex/Antigravity dùng Goal native; thiếu capability thì chạy một task local.

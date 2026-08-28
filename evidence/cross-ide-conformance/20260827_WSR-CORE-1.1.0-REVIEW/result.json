@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 2,
+  "buildId": "WSR-CORE-1.1.0-REVIEW",
+  "status": "PASS",
+  "sourceDoctor": {
+    "status": "PASS",
+    "score": 100,
+    "gates": "28/28"
+  },
+  "deepAudit": {
+    "status": "PASS",
+    "score": 100
+  },
+  "profiles": {
+    "startup": {
+      "roles": [
+        "kernel",
+        "command_index"
+      ],
+      "estimatedTokens": 574,
+      "maxTokens": 1000
+    },
+    "command": {
+      "estimatedTokens": 672,
+      "maxTokens": 1800
+    },
+    "task": {
+      "estimatedTokens": 1006,
+      "maxTokens": 6000,
+      "skillMode": "selected-only"
+    },
+    "resume": {
+      "estimatedTokens": 1094,
+      "maxTokens": 4000,
+      "authorityPersistenceRejected": true
+    },
+    "diagnostic": {
+      "estimatedTokens": 76608,
+      "maxTokens": 100000,
+      "explicitOnly": true
+    }
+  },
+  "adapters": {
+    "codex": {
+      "dryRun": "PASS",
+      "operations": 35,
+      "collisions": 0,
+      "router": "~/.codex/AGENTS.md",
+      "workflowMode": "command-index",
+      "skillRoot": "~/.agents/skills",
+      "sandboxApply": "PASS",
+      "runtimeDoctor": {
+        "status": "PASS",
+        "score": 100,
+        "gates": "29/29"
+      },
+      "skillBundleAssets": 4
+    },
+    "antigravity": {
+      "dryRun": "PASS",
+      "operations": 35,
+      "collisions": 0,
+      "router": "~/.gemini/GEMINI.md",
+      "workflowRoot": "~/.gemini/config/global_workflows",
+      "skillRoot": "~/.gemini/antigravity/skills",
+      "sandboxApply": "PASS",
+      "runtimeDoctor": {
+        "status": "PASS",
+        "score": 100,
+        "gates": "29/29"
+      },
+      "skillBundleAssets": 4
+    }
+  },
+  "runtimeGlobalTouched": false,
+  "createdAt": "2026-08-27T10:45:00+07:00"
+}

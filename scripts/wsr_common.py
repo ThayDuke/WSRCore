@@ -4,6 +4,8 @@ sys.dont_write_bytecode = True
 import json
 import hashlib
 import tempfile
+import datetime
+import re
 
 # Standardized exit codes
 EXIT_SUCCESS = 0
@@ -180,3 +182,253 @@ def format_alert(alert_type, title, message=None):
         for msg_line in message.split("\n"):
             lines.append(f"> {msg_line}")
     return "\n".join(lines)
+
+
+CONTEXT_STATE_LABELS = {
+    "NORMAL": "An toàn",
+    "WARNING": "Gần đầy",
+    "HANDOFF_REQUIRED": "Cần handoff",
+    "CRITICAL": "Nguy cơ tràn",
+    "UNAVAILABLE": "Chưa đo được",
+}
+
+
+def context_state_for_percent(usage_percent, thresholds=None):
+    """Map a bounded context percentage to the WSR threshold state."""
+    thresholds = thresholds or {}
+    if usage_percent >= thresholds.get("criticalPercent", 85):
+        return "CRITICAL"
+    if usage_percent >= thresholds.get("handoffPercent", 75):
+        return "HANDOFF_REQUIRED"
+    if usage_percent >= thresholds.get("warningPercent", 60):
+        return "WARNING"
+    return "NORMAL"
+
+
+def make_context_report(used_tokens, window_tokens, thresholds=None, source="estimate", projected_tokens=0):
+    """Create the stable context telemetry and preflight report."""
+    if not isinstance(used_tokens, (int, float)) or not isinstance(window_tokens, (int, float)):
+        raise ValueError("Context usage requires numeric token counts")
+    if used_tokens < 0 or window_tokens <= 0 or projected_tokens < 0:
+        raise ValueError("Context token counts must be non-negative and window must be positive")
+    thresholds = thresholds or {}
+    percent = min(100, max(0, round((used_tokens / window_tokens) * 100)))
+    projected = min(100, max(0, round(((used_tokens + projected_tokens) / window_tokens) * 100)))
+    state = context_state_for_percent(percent, thresholds)
+    projected_state = context_state_for_percent(projected, thresholds)
+    confidence = "high" if source == "native" else "medium"
+    remaining = max(0, int(window_tokens - used_tokens))
+    return {
+        "contextUsagePercent": percent,
+        "contextState": state,
+        "contextStateLabel": CONTEXT_STATE_LABELS[state],
+        "contextMeasurementSource": source,
+        "contextConfidence": confidence,
+        "contextUsedTokens": int(used_tokens),
+        "contextWindowTokens": int(window_tokens),
+        "contextRemainingTokens": remaining,
+        "contextProjectedPercent": projected,
+        "contextProjectedState": projected_state,
+        "contextPreflightWarning": projected >= thresholds.get("warningPercent", 60),
+        "contextLine": "[Context: ~{0}% | Trạng thái: {1}]".format(percent, CONTEXT_STATE_LABELS[state]),
+    }
+
+
+# Goal orchestration is deliberately dependency-free so every adapter can use
+# the same parser and receipt contract without importing runtime-specific code.
+GOAL_PREFIX = re.compile(r"^(?P<token>/goal|goal)(?P<separator>\s+|:\s*)(?P<objective>.*)$", re.I)
+GOAL_DEFINITION = re.compile(r"^(?:what(?:\s+is|'s)\s+goal|(?:goal\s+)?(?:nghĩa|la|là)\s+gì)\s*\??$", re.I)
+GOAL_PATH_PATTERN = re.compile(r"^(?![\\/])(?![A-Za-z]:)(?!.*(?:^|[\\/])\.\.(?:[\\/]|$)).+$")
+APPROVAL_ALLOWLIST = frozenset({
+    "ok", "làm đi", "duyệt", "ok duyệt", "ok làm đi",
+    "được rồi làm đi", "duyệt phương án", "làm đi bạn",
+})
+
+
+def is_explicit_approval(prompt):
+    """Return True only for the exact, bounded 1.0.8 approval allowlist."""
+    if not isinstance(prompt, str):
+        return False
+    normalized = " ".join(prompt.strip().casefold().split())
+    if not normalized or any(mark in normalized for mark in ("?", "chưa", "không", "có nên")):
+        return False
+    return normalized in APPROVAL_ALLOWLIST
+
+
+def _goal_timestamp(value=None):
+    if value is not None:
+        return value
+    return datetime.datetime.now(datetime.timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+
+
+def parse_goal_prompt(prompt, authorized_at=None, allowed_paths=None, goal_id=None):
+    """Parse a leading /goal, ``Goal `` or ``Goal:`` authorization.
+
+    Returns a normalized goal ledger record, or ``None`` for ordinary,
+    empty, definition-question, or non-leading Goal text.
+    """
+    if not isinstance(prompt, str):
+        return None
+    match = GOAL_PREFIX.match(prompt.strip())
+    if not match:
+        return None
+    objective = match.group("objective").strip()
+    if not objective or objective.endswith("?") or GOAL_DEFINITION.fullmatch(objective):
+        return None
+    source_token = match.group("token")
+    source = "/goal" if source_token.lower() == "/goal" else (
+        "Goal:" if match.group("separator").lstrip().startswith(":") else "Goal"
+    )
+    paths = list(dict.fromkeys(allowed_paths or []))
+    if any(not isinstance(path, str) or not GOAL_PATH_PATTERN.fullmatch(path) for path in paths):
+        raise ValueError("Goal allowedPaths must be workspace-relative")
+    digest = hashlib.sha256((source + "\n" + objective).encode("utf-8")).hexdigest()
+    return {
+        "schemaVersion": 1,
+        "contract": "goal-v1",
+        "state": "GOAL_AUTHORIZED",
+        "goalId": goal_id or "goal-" + digest[:16],
+        "objective": objective,
+        "authorizedAt": _goal_timestamp(authorized_at),
+        "authorizationSource": source,
+        "scope": {"allowedPaths": paths},
+        "allowedPaths": paths,
+        "approvalMode": "goal",
+        "backupResponsibility": "user",
+        "autoCheckpointApproval": True,
+        "tasks": [],
+    }
+
+
+def goal_path_allowed(goal, path):
+    """Return whether a workspace-relative path is inside the Goal scope."""
+    if not isinstance(goal, dict) or not isinstance(path, str) or not validate_relative_path(path):
+        return False
+    allowed = goal.get("allowedPaths")
+    if allowed is None:
+        allowed = (goal.get("scope") or {}).get("allowedPaths", [])
+    if not allowed:
+        return False
+    candidate = os.path.normcase(os.path.normpath(path)).replace("\\", "/")
+    for root in allowed:
+        if not isinstance(root, str) or not GOAL_PATH_PATTERN.fullmatch(root):
+            continue
+        normalized = os.path.normcase(os.path.normpath(root)).replace("\\", "/").rstrip("/")
+        if normalized in ("", ".") or candidate == normalized or candidate.startswith(normalized + "/"):
+            return True
+    return False
+
+
+def make_goal_task(goal, task_id, owner, allowed_paths, acceptance, dependencies=None, status="PENDING"):
+    """Build one bounded Goal task record for native or fallback dispatch."""
+    if not isinstance(goal, dict) or not goal.get("goalId"):
+        raise ValueError("Goal task requires a goalId")
+    paths = list(dict.fromkeys(allowed_paths or []))
+    if not paths or any(not isinstance(path, str) or not GOAL_PATH_PATTERN.fullmatch(path) for path in paths):
+        raise ValueError("Goal task allowedPaths must be workspace-relative")
+    if not isinstance(acceptance, str) or not acceptance.strip():
+        raise ValueError("Goal task acceptance must be non-empty")
+    return {
+        "taskId": str(task_id),
+        "goalId": goal["goalId"],
+        "owner": str(owner),
+        "allowedPaths": paths,
+        "dependencies": list(dict.fromkeys(dependencies or [])),
+        "acceptance": acceptance.strip(),
+        "status": status,
+        "receipt": None,
+    }
+
+
+def make_goal_receipt(task, files_changed=None, checks_run=None, findings=None, next_dependency=None, status=None):
+    """Build the short, auditable receipt returned by a Goal subagent."""
+    if not isinstance(task, dict) or not task.get("taskId") or not task.get("goalId"):
+        raise ValueError("Goal receipt requires taskId and goalId")
+    return {
+        "schemaVersion": 1,
+        "contract": "goal-task-v1",
+        "taskId": task["taskId"],
+        "goalId": task["goalId"],
+        "status": status or task.get("status", "DONE"),
+        "filesChanged": list(dict.fromkeys(files_changed or [])),
+        "checksRun": list(dict.fromkeys(checks_run or [])),
+        "findings": list(findings or []),
+        "nextDependency": next_dependency,
+    }
+
+
+def create_goal_ledger(goal, tasks=None):
+    """Attach bounded tasks to a parsed Goal and validate the checkpoint record."""
+    if isinstance(goal, str):
+        goal = parse_goal_prompt(goal)
+    if not isinstance(goal, dict):
+        raise ValueError("Goal ledger requires an authorized Goal")
+    ledger = dict(goal)
+    ledger["tasks"] = list(tasks if tasks is not None else goal.get("tasks", []))
+    valid, detail = validate_goal_ledger(ledger)
+    if not valid:
+        raise ValueError(detail)
+    return ledger
+
+
+def validate_goal_receipt(receipt, task=None):
+    """Validate the minimal subagent receipt and its task/Goal identity."""
+    if not isinstance(receipt, dict):
+        return False, "Goal receipt must be an object"
+    required = {"schemaVersion", "contract", "taskId", "goalId", "status",
+                "filesChanged", "checksRun", "findings", "nextDependency"}
+    if set(receipt) != required:
+        return False, "Goal receipt violates the exact goal-task-v1 contract"
+    if receipt.get("schemaVersion") != 1 or receipt.get("contract") != "goal-task-v1":
+        return False, "Goal receipt identity mismatch"
+    if receipt.get("status") not in {"DONE", "BLOCKED", "RUNNING"}:
+        return False, "Goal receipt status is invalid"
+    for key in ("filesChanged", "checksRun", "findings"):
+        if not isinstance(receipt.get(key), list) or any(not isinstance(item, str) for item in receipt[key]):
+            return False, "Goal receipt {0} must be a string list".format(key)
+    if receipt.get("nextDependency") is not None and not isinstance(receipt["nextDependency"], str):
+        return False, "Goal receipt nextDependency must be string or null"
+    if task is not None and (receipt.get("taskId") != task.get("taskId") or receipt.get("goalId") != task.get("goalId")):
+        return False, "Goal receipt task identity mismatch"
+    return True, ""
+
+
+def validate_goal_ledger(ledger):
+    """Validate Goal scope and authority invariants before dispatch or checkpoint."""
+    if not isinstance(ledger, dict):
+        return False, "Goal ledger must be an object"
+    required = {"schemaVersion", "contract", "goalId", "objective", "authorizedAt",
+                "authorizationSource", "scope", "allowedPaths", "approvalMode",
+                "backupResponsibility", "autoCheckpointApproval", "tasks"}
+    allowed_keys = required | {"state"}
+    if set(ledger) - allowed_keys or not required.issubset(ledger):
+        return False, "Goal ledger violates the exact v1 contract"
+    if ledger.get("schemaVersion") != 1 or ledger.get("contract") != "goal-v1":
+        return False, "Goal ledger identity mismatch"
+    if not ledger.get("objective", "").strip() or ledger.get("approvalMode") != "goal":
+        return False, "Goal objective or approval mode is invalid"
+    if ledger.get("backupResponsibility") != "user" or ledger.get("autoCheckpointApproval") is not True:
+        return False, "Goal checkpoint/backup semantics are invalid"
+    paths = ledger.get("allowedPaths")
+    if not isinstance(paths, list) or paths != (ledger.get("scope") or {}).get("allowedPaths"):
+        return False, "Goal scope paths are inconsistent"
+    if any(not isinstance(path, str) or not GOAL_PATH_PATTERN.fullmatch(path) for path in paths):
+        return False, "Goal scope escapes workspace"
+    serialized = json.dumps(ledger, ensure_ascii=False, sort_keys=True).lower()
+    if any(term in serialized for term in ("approvaltoken", "permission", "secret")):
+        return False, "Goal ledger may not persist authority or secrets"
+    task_ids = set()
+    for task in ledger.get("tasks", []):
+        if not isinstance(task, dict) or task.get("taskId") in task_ids:
+            return False, "Goal task IDs must be unique"
+        task_ids.add(task.get("taskId"))
+        if task.get("goalId") != ledger.get("goalId"):
+            return False, "Goal task identity mismatch"
+        for path in task.get("allowedPaths", []):
+            if not goal_path_allowed({"allowedPaths": paths}, path):
+                return False, "Goal task scope exceeds Goal scope"
+        if task.get("receipt") is not None:
+            receipt_ok, receipt_detail = validate_goal_receipt(task["receipt"], task)
+            if not receipt_ok:
+                return False, receipt_detail
+    return True, ""

@@ -10,13 +10,16 @@
       ]
     },
     "packageName": {
-      "type": "string"
+      "type": "string",
+      "const": "WSR-Core"
     },
     "version": {
-      "type": "string"
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
     },
     "buildId": {
-      "type": "string"
+      "type": "string",
+      "pattern": "^WSR-CORE-\\d+\\.\\d+\\.\\d+-(REVIEW|RELEASE-CANDIDATE|RELEASE)$"
     },
     "status": {
       "type": "string",
@@ -38,91 +41,65 @@
     },
     "compatibilityLayouts": {
       "type": "array",
+      "uniqueItems": true,
       "items": {
-        "type": "string"
+        "type": "string",
+        "enum": [".agents", ".codex", ".gemini"]
       }
     },
     "minimumPython": {
-      "type": "string"
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+$"
     },
     "policySource": {
-      "type": "string"
+      "type": "string",
+      "pattern": "^(?![\\\\/])(?![A-Za-z]:)(?!.*(^|[\\\\/])\\.\\.([\\\\/]|$)).+$"
     },
     "checksumsFile": {
-      "type": "string"
+      "type": "string",
+      "pattern": "^(?![\\\\/])(?![A-Za-z]:)(?!.*(^|[\\\\/])\\.\\.([\\\\/]|$)).+$"
     },
     "contextFile": {
-      "type": "string"
+      "type": "string",
+      "pattern": "^(?![\\\\/])(?![A-Za-z]:)(?!.*(^|[\\\\/])\\.\\.([\\\\/]|$)).+$"
     },
     "cleanWhitelist": {
       "type": "array",
+      "uniqueItems": true,
       "items": {
-        "type": "string"
+        "type": "string",
+        "pattern": "^(?![\\\\/])(?![A-Za-z]:)(?!.*(^|[\\\\/])\\.\\.([\\\\/]|$)).+$"
       }
     },
     "packageExclusions": {
       "type": "array",
+      "uniqueItems": true,
       "items": {
-        "type": "string"
-      }
-    },
-    "commands": {
-      "type": "object",
-      "additionalProperties": {
-        "type": "object",
-        "properties": {
-          "description": {
-            "type": "string"
-          },
-          "script": {
-            "type": "string"
-          },
-          "workflow": {
-            "type": "string"
-          },
-          "entrypoint": {
-            "type": "string"
-          },
-          "readOnly": {
-            "type": "boolean"
-          },
-          "mutating": {
-            "type": "boolean"
-          },
-          "approvalRequired": {
-            "type": "boolean"
-          },
-          "requiredProfile": {
-            "type": "string"
-          },
-          "options": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            }
-          }
-        },
-        "required": [
-          "description"
-        ]
+        "type": "string",
+        "pattern": "^(?![\\\\/])(?![A-Za-z]:)(?!.*(^|[\\\\/])\\.\\.([\\\\/]|$)).+$"
       }
     },
     "adapters": {
       "type": "array",
+      "uniqueItems": true,
       "items": {
-        "type": "string"
+        "type": "string",
+        "pattern": "^adapters/[a-z0-9-]+\\.json$"
       }
     },
     "artifacts": {
       "type": "array",
       "items": {
         "type": "object",
+        "additionalProperties": false,
         "properties": {
           "id": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9-]*$"
           },
           "source": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^(?![\\\\/])(?![A-Za-z]:)(?!.*(^|[\\\\/])\\.\\.([\\\\/]|$)).+$"
           },
           "type": {
             "type": "string",
@@ -149,15 +126,19 @@
           },
           "targets": {
             "type": "array",
+            "uniqueItems": true,
             "items": {
-              "type": "string"
+              "type": "string",
+              "enum": ["codex", "gemini", "antigravity", "claude", "cursor", "generic"]
             }
           },
           "owner": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "encoding": {
-            "type": "string"
+            "type": "string",
+            "enum": ["UTF-8"]
           }
         },
         "required": [
@@ -185,9 +166,9 @@
     "minimumPython",
     "policySource",
     "checksumsFile",
+    "contextFile",
     "cleanWhitelist",
     "packageExclusions",
-    "commands",
     "adapters",
     "artifacts"
   ],

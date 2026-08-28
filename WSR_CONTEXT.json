@@ -1,17 +1,20 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "packageName": "WSR-Core",
-  "version": "1.0.8",
-  "buildId": "WSR-CORE-1.0.8-RELEASE",
-  "manifestSha256": "4c16731f5e9cc0cfc008b7a415cdab05460999132b114072b777f35616f53968",
-  "policyFiles": [
-    "GEMINI.md",
-    "global_rules/AG_GLOBAL_RULES.md"
-  ],
+  "version": "1.5.0",
+  "buildId": "WSR-CORE-1.5.0-REVIEW",
+  "manifestSha256": "21a77d141637ea681e8826ffb6566382343e7547cc5955ceb7b8af5f2490f8b9",
   "commandMap": {
+    "goal": {
+      "workflow": "global_workflows/goal.md",
+      "description": "Authorize one bounded Goal execution and its task receipts",
+      "readOnly": false,
+      "approvalRequired": true,
+      "requiredProfile": "task"
+    },
     "audit": {
       "workflow": "global_workflows/audit.md",
-      "description": "Run static syntax, encoding, and integrity audits",
+      "description": "Run deterministic integrity, structure, minimality, dependency, resource, and IDE audits",
       "readOnly": true,
       "approvalRequired": false,
       "requiredProfile": "command",
@@ -78,20 +81,22 @@
     },
     "ho": {
       "workflow": "global_workflows/ho.md",
-      "description": "Handoff workflow for session transfer",
+      "description": "Alias /pl ở chế độ handoff",
       "readOnly": true,
       "approvalRequired": false,
-      "requiredProfile": "command"
+      "requiredProfile": "command",
+      "aliasOf": "pl",
+      "mode": "handoff"
     }
   },
   "skillIndex": [
     {
       "capabilityId": "wsr-audit",
       "name": "WSR Audit Skill",
-      "description": "Integrity and syntax audit standards for WSRCore",
+      "description": "Deterministic six-category WSR audit standards",
       "trigger": "audit, static check, syntax check",
       "path": "skills/wsr-audit/SKILL.md",
-      "contentHash": "990712eb25d5eeb9c18ea2244187e46fb5481ba9f5fe5c96dee07d5879d6ecc3",
+      "contentHash": "d299aafd8df337c1be1c1c34af5908aaa79619b7b7858876f5d76916798121fa",
       "scope": "global",
       "priority": 10
     },
@@ -196,39 +201,118 @@
     }
   ],
   "loadProfiles": {
-    "startup": [
-      "policy"
-    ],
-    "command": [
-      "policy",
-      "active_workflow"
-    ],
-    "task": [
-      "policy",
-      "active_workflow",
-      "matched_skill"
-    ],
-    "diagnostic": [
-      "policy",
-      "all_workflows",
-      "all_skills",
-      "all_documents"
-    ]
+    "startup": {
+      "layers": [
+        "kernel",
+        "command_index"
+      ],
+      "maxTokens": 1000
+    },
+    "command": {
+      "layers": [
+        "kernel",
+        "command_index",
+        "active_workflow"
+      ],
+      "maxTokens": 1800
+    },
+    "task": {
+      "layers": [
+        "kernel",
+        "command_index",
+        "active_workflow",
+        "matched_skills"
+      ],
+      "maxTokens": 6000
+    },
+    "resume": {
+      "layers": [
+        "kernel",
+        "command_index",
+        "session_descriptor",
+        "session_references"
+      ],
+      "maxTokens": 4000
+    },
+    "diagnostic": {
+      "layers": [
+        "all_declared_artifacts"
+      ],
+      "maxTokens": 100000,
+      "explicitOnly": true
+    }
   },
   "precedenceRules": [
-    "1. Safety policy core (GEMINI.md, AG_GLOBAL_RULES.md)",
-    "2. Project AGENTS.md closest to working file",
-    "3. Project WSR overlay if declared",
-    "4. Workflow of active slash command",
-    "5. Skill activated by trigger",
-    "6. JIT memory references"
+    "safety",
+    "closest_project_rule",
+    "active_workflow",
+    "matched_skill",
+    "resume_reference"
   ],
   "tokenBudget": {
-    "startupMax": 15000,
-    "estimatedTokens": 12200
+    "estimator": "ceil(utf8_chars/4)",
+    "enforcedPerProfile": true
+  },
+  "contextThreshold": {
+    "warningPercent": 60,
+    "handoffPercent": 75,
+    "criticalPercent": 85,
+    "action": "checkpoint_then_stop"
+  },
+  "contextTelemetry": {
+    "reportEveryResponse": true,
+    "lineFormat": "[Context: ~X% | Trạng thái: ...]",
+    "measurementPriority": ["native", "estimate"],
+    "fallback": "estimate",
+    "preflight": {
+      "enabled": true,
+      "warningPercent": 60,
+      "safetyMarginPercent": 5
+    }
   },
   "projectOverlayContract": {
     "enabled": true,
     "overlayPath": ".agents/WSR_ACTIVE.json"
+  },
+  "policyFile": "GEMINI.md",
+  "resumeContract": {
+    "schema": "schemas/wsr-session-v1.schema.json",
+    "defaultPath": ".agents/memory/wsr-session.json",
+    "approvalPersistence": false,
+    "workspaceContainmentRequired": true
+  },
+  "goalContract": {
+    "schema": "schemas/wsr-goal-v1.schema.json",
+    "parser": "scripts/wsr_common.py:parse_goal_prompt",
+    "receiptContract": "goal-task-v1",
+    "autoCheckpointApproval": true,
+    "backupResponsibility": "user"
+  },
+  "nativeContracts": {
+    "codex": {
+      "router": "~/.codex/AGENTS.md",
+      "skills": "~/.agents/skills",
+      "workflowRouting": "command-index",
+      "goalSupport": "native",
+      "goalEntrypoint": "native-goal",
+      "subagentDispatch": true,
+      "receiptContract": "goal-task-v1",
+      "maxParallelTasks": 4
+    },
+    "antigravity": {
+      "router": "~/.gemini/GEMINI.md",
+      "workflows": "~/.gemini/config/global_workflows",
+      "skills": "~/.gemini/antigravity/skills",
+      "workspaceRules": ".agents/rules",
+      "workspaceWorkflows": ".agents/workflows",
+      "workspaceSkills": ".agents/skills",
+      "maxRuleChars": 12000,
+      "maxWorkflowChars": 12000,
+      "goalSupport": "native",
+      "goalEntrypoint": "native-goal",
+      "subagentDispatch": true,
+      "receiptContract": "goal-task-v1",
+      "maxParallelTasks": 4
+    }
   }
 }

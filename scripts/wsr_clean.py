@@ -2,7 +2,6 @@ import os
 import argparse
 import sys
 sys.dont_write_bytecode = True
-import json
 import wsr_common
 
 JUNK_FILENAMES = {'.ds_store', 'thumbs.db', 'desktop.ini'}
@@ -110,129 +109,148 @@ def scan_junk_files(project_root, manifest):
                     
     return junk_candidates
 
-def main():
+def parse_args():
     parser = argparse.ArgumentParser(description="WSR Clean Hardening Utility")
     parser.add_argument('--root', type=str, default=None, help="Project root to clean")
     parser.add_argument('--json', action='store_true', help="Output report in JSON format")
-    
-    # Mutually exclusive flags
     parser.add_argument('--apply', action='store_true', help="Execute deletion of junk files")
     parser.add_argument('--delete', action='store_true', help="Deprecated alias for --apply")
-    
     parser.add_argument('--approval-token', type=str, default=None, help="Approval token matching manifest buildId")
-    
-    args = parser.parse_args()
-    
-    is_apply = args.apply or args.delete
-    is_json = args.json
-    
-    if args.root:
-        project_root = os.path.abspath(args.root)
-    else:
-        project_root = wsr_common.get_package_root()
-        
+    return parser.parse_args()
+
+
+def load_manifest_or_exit(project_root, is_json):
     try:
-        manifest = wsr_common.load_manifest(project_root)
+        return wsr_common.load_manifest(project_root)
     except Exception as e:
         if is_json:
             wsr_common.print_json_report({"status": "FAIL", "message": f"Failed to load manifest: {e}"})
         else:
             print(f"[-] Error: Failed to load manifest: {e}", file=sys.stderr)
         sys.exit(wsr_common.EXIT_INVALID_ARGS)
-        
-    build_id = manifest.get("buildId")
-    
-    # Scan for candidates
-    candidates = scan_junk_files(project_root, manifest)
-    total_size = sum(c["size"] for c in candidates)
-    
-    report = {
+
+
+def build_report(manifest, candidates):
+    return {
         "status": "SCAN",
         "total_files": len(candidates),
-        "total_bytes": total_size,
+        "total_bytes": sum(candidate["size"] for candidate in candidates),
         "protected_roots": manifest.get("cleanWhitelist", []),
         "candidates": candidates,
         "deletions": []
     }
-    
-    # Warning for deprecated --delete flag
-    if args.delete and not is_json:
-        print("[!] WARNING: --delete is a deprecated alias. Use --apply instead.", file=sys.stderr)
-        
-    if is_apply:
-        # Approval Token Validation
-        if not args.approval_token or args.approval_token != build_id:
-            report["status"] = "REJECTED"
-            report["message"] = "Invalid or missing --approval-token"
-            if is_json:
-                wsr_common.print_json_report(report)
-            else:
-                print(f"[-] Safety Gate: Rejection! Token '{args.approval_token}' does not match buildId '{build_id}'", file=sys.stderr)
-            sys.exit(wsr_common.EXIT_SAFETY_REJECTION)
-            
-        # Execute deletions
-        report["status"] = "SUCCESS"
-        deleted_count = 0
-        for cand in candidates:
-            # Revalidate file before removing
-            abs_path = cand["absolute_path"]
-            rel_path = cand["relative_path"]
-            
-            # Double check containment
-            try:
-                wsr_common.safe_resolve_path(project_root, rel_path)
-            except ValueError as e:
-                report["deletions"].append({"file": rel_path, "status": "FAILED", "error": f"Path containment violation: {e}"})
-                report["status"] = "PARTIAL_FAIL"
-                continue
-                
-            if os.path.exists(abs_path):
-                try:
-                    # Double check metadata size hasn't drifted wildly or if file was replaced
-                    current_size = os.path.getsize(abs_path)
-                    if abs(current_size - cand["size"]) > 1024 * 1024: # 1MB drift safety limit
-                        raise RuntimeError("File size drifted significantly since scan.")
-                        
-                    os.remove(abs_path)
-                    deleted_count += 1
-                    report["deletions"].append({"file": rel_path, "status": "DELETED"})
-                except Exception as e:
-                    report["deletions"].append({"file": rel_path, "status": "FAILED", "error": str(e)})
-                    report["status"] = "PARTIAL_FAIL"
-            else:
-                report["deletions"].append({"file": rel_path, "status": "ALREADY_GONE"})
-                
-        if is_json:
-            wsr_common.print_json_report(report)
-        else:
-            if report["status"] == "PARTIAL_FAIL":
-                print(f"[-] Clean completed with partial failures. Log: {report['deletions']}", file=sys.stderr)
-            else:
-                print(f"[+] Successfully deleted {deleted_count} junk files.")
-                
-        if report["status"] == "PARTIAL_FAIL":
-            sys.exit(wsr_common.EXIT_IO_TRANSACTION_ERROR)
+
+
+def validate_approval_or_exit(args, build_id, report):
+    if args.approval_token and args.approval_token == build_id:
+        return
+    report["status"] = "REJECTED"
+    report["message"] = "Invalid or missing --approval-token"
+    if args.json:
+        wsr_common.print_json_report(report)
     else:
-        # Scan-only mode
-        if is_json:
-            wsr_common.print_json_report(report)
-        else:
-            print("="*60)
-            print("WSR CLEAN SCAN REPORT (READ-ONLY)")
-            print("="*60)
-            print(f"Project Root: {project_root}")
-            print(f"Protected Whitelist: {manifest.get('cleanWhitelist')}")
-            print("-"*60)
-            if not candidates:
-                print("No junk files found. Project is clean!")
-            else:
-                print(f"Found {len(candidates)} junk files (Total {total_size} bytes):")
-                for cand in candidates:
-                    print(f" - {cand['relative_path']} ({cand['size']} bytes) - Reason: {cand['reason']}")
-            print("="*60)
-            print("To execute deletions, run with --apply --approval-token <buildId>")
-            print("="*60)
-            
+        print(
+            f"[-] Safety Gate: Rejection! Token '{args.approval_token}' "
+            f"does not match buildId '{build_id}'",
+            file=sys.stderr,
+        )
+    sys.exit(wsr_common.EXIT_SAFETY_REJECTION)
+
+
+def delete_candidates(project_root, candidates, report):
+    report["status"] = "SUCCESS"
+    deleted_count = 0
+    for candidate in candidates:
+        abs_path = candidate["absolute_path"]
+        rel_path = candidate["relative_path"]
+        try:
+            wsr_common.safe_resolve_path(project_root, rel_path)
+        except ValueError as error:
+            report["deletions"].append({
+                "file": rel_path,
+                "status": "FAILED",
+                "error": f"Path containment violation: {error}",
+            })
+            report["status"] = "PARTIAL_FAIL"
+            continue
+        if not os.path.exists(abs_path):
+            report["deletions"].append({"file": rel_path, "status": "ALREADY_GONE"})
+            continue
+        try:
+            current_size = os.path.getsize(abs_path)
+            if abs(current_size - candidate["size"]) > 1024 * 1024:
+                raise RuntimeError("File size drifted significantly since scan.")
+            os.remove(abs_path)
+            deleted_count += 1
+            report["deletions"].append({"file": rel_path, "status": "DELETED"})
+        except Exception as error:
+            report["deletions"].append({"file": rel_path, "status": "FAILED", "error": str(error)})
+            report["status"] = "PARTIAL_FAIL"
+    return deleted_count
+
+
+def emit_apply_report(report, is_json, deleted_count):
+    if is_json:
+        wsr_common.print_json_report(report)
+    elif report["status"] == "PARTIAL_FAIL":
+        print(f"[-] Clean completed with partial failures. Log: {report['deletions']}", file=sys.stderr)
+    else:
+        print(f"[+] Successfully deleted {deleted_count} junk files.")
+
+
+def emit_scan_report(project_root, manifest, report, is_json):
+    if is_json:
+        wsr_common.print_json_report(report)
+        return
+    candidates = report["candidates"]
+    print("="*60)
+    print("WSR CLEAN SCAN REPORT (READ-ONLY)")
+    print("="*60)
+    print(f"Project Root: {project_root}")
+    print(f"Protected Whitelist: {manifest.get('cleanWhitelist')}")
+    print("-"*60)
+    if not candidates:
+        print("No junk files found. Project is clean!")
+    else:
+        print(f"Found {len(candidates)} junk files (Total {report['total_bytes']} bytes):")
+        for candidate in candidates:
+            print(
+                f" - {candidate['relative_path']} ({candidate['size']} bytes) "
+                f"- Reason: {candidate['reason']}"
+            )
+    print("="*60)
+    print("To execute deletions, run with --apply --approval-token <buildId>")
+    print("="*60)
+
+
+def main():
+    args = parse_args()
+    is_apply = args.apply or args.delete
+    project_root = os.path.abspath(args.root) if args.root else wsr_common.get_package_root()
+    manifest = load_manifest_or_exit(project_root, args.json)
+    candidates = scan_junk_files(project_root, manifest)
+    report = build_report(manifest, candidates)
+
+    if args.delete and not args.json:
+        print("[!] WARNING: --delete is a deprecated alias. Use --apply instead.", file=sys.stderr)
+
+    if not is_apply:
+        emit_scan_report(project_root, manifest, report, args.json)
+        sys.exit(wsr_common.EXIT_SUCCESS)
+
+    build_id = manifest.get("buildId")
+    validate_approval_or_exit(args, build_id, report)
+    deleted_count = delete_candidates(project_root, candidates, report)
+    report["receipt"] = {
+        "schemaVersion": 1,
+        "status": report["status"],
+        "buildId": build_id,
+        "scanned": len(candidates),
+        "deleted": deleted_count,
+    }
+    emit_apply_report(report, args.json, deleted_count)
+    if report["status"] == "PARTIAL_FAIL":
+        sys.exit(wsr_common.EXIT_IO_TRANSACTION_ERROR)
     sys.exit(wsr_common.EXIT_SUCCESS)
 
 if __name__ == '__main__':

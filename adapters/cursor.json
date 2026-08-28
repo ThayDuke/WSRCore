@@ -1,34 +1,41 @@
 {
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "adapterId": "cursor",
   "runtimeFamily": "cursor",
   "enabled": false,
-  "supportLevel": "unsupported",
-  "defaultTargetRoot": "",
-  "targetRootEnvironmentVariable": "WSR_WORKSPACE_ROOT",
-  "requiresExplicitTargetRoot": true,
-  "logicalRoots": {
-    "policyRoot": ".cursor",
-    "rulesRoot": ".cursor/rules",
-    "workflowsRoot": ".cursor/workflows",
-    "skillsRoot": ".cursor/skills",
-    "scriptsRoot": ".cursor/scripts",
-    "stateRoot": ".cursor"
+  "supportLevel": "disabled",
+  "roots": {
+    "config": {
+      "default": null,
+      "environmentVariable": null,
+      "requiresExplicit": true
+    }
   },
   "discoveryPrecedence": [],
   "artifactMappings": [],
-  "routerContract": {
-    "type": "none",
-    "path": ""
+  "router": {
+    "root": "config",
+    "path": "AGENTS.md",
+    "family": "cursor",
+    "native": false
   },
-  "activeMarkerContract": {
-    "required": false,
-    "path": ""
+  "state": {
+    "root": "config",
+    "path": ".wsr-active.json"
   },
+  "capabilities": {
+    "nativeInstructions": false,
+    "nativeSlashWorkflows": false,
+    "nativeProgressiveSkills": false,
+    "restartAfterRouterChange": true,
+    "goalSupport": "unsupported",
+    "goalEntrypoint": "none",
+    "subagentDispatch": false,
+    "receiptContract": "goal-task-v1",
+    "maxParallelTasks": 1
+  },
+  "legacyRoots": [],
   "unsupportedFeatures": [
-    "block-jit",
-    "user-home-install",
-    "dry-run",
-    "apply"
+    "not-release-gated"
   ]
 }

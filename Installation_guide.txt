@@ -1,27 +1,10 @@
-WSR CORE 1.0.7 — HƯỚNG DẪN CÀI ĐẶT ĐA IDE
+WSR Core 1.5.0 REVIEW
 
-1. Xác minh source package
-   python scripts/wsr_doctor.py --source-mode --strict
-
-2. Chọn adapter và target root
-   Codex: CODEX_HOME hoặc ~/.codex
-   Gemini: GEMINI_HOME hoặc ~/.gemini
-   Antigravity: GEMINI_HOME hoặc ~/.gemini; dữ liệu native nằm dưới config/
-   Generic: bắt buộc --target-root hoặc WSR_WORKSPACE_ROOT; chỉ workspace
-   Cursor: disabled, unsupported và ngoài phạm vi 1.0.6
-   Claude: unsupported
-
-3. Xem kế hoạch, không ghi file
-   python scripts/sync_config.py --adapter generic --target-root <workspace>
-
-4. Apply sau khi người dùng phê duyệt build Released
-   python scripts/sync_config.py --adapter generic --target-root <workspace> --apply --approval-token WSR-CORE-1.0.6-RELEASE
-
-5. Xác minh runtime marker và drift
-   python scripts/wsr_doctor.py --runtime-mode --adapter generic --target-root <workspace> --strict
-
-6. Reload chọn lọc
-   python scripts/wsr_reload.py --source-root <package> --adapter generic --target-root <workspace> --profile task --capability wsr-review --allow-review --json
-
-Router và marker được ghi transactionally. Nếu apply lỗi, sync khôi phục file
-cũ hoặc xóa file mới. Không dùng package root hoặc CWD làm target fallback.
+1. Chạy Doctor strict và Deep Audit trong thư mục package.
+2. Dry-run adapter vào sandbox.
+3. Codex: config root ~/.codex; skill root ~/.agents/skills.
+4. Antigravity: config root ~/.gemini; workflow config/global_workflows; skill antigravity/skills.
+5. Apply REVIEW chỉ khi có quyền hiện tại, --allow-review và approval token đúng build.
+6. Khởi động phiên IDE mới nếu router đổi.
+7. Mọi phản hồi phải có dòng `[Context: ~X% | Trạng thái: ...]`.
+8. Preflight task lớn; chia nhỏ hoặc handoff khi usage dự kiến từ 60%.

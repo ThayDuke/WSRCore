@@ -37,6 +37,54 @@
       "buildId": "WSR-CORE-1.0.8-RELEASE",
       "status": "Released",
       "contentHash": "5d9e4673162f31cd0a1fe4a2c455f64e001bd6e55b1026edcde282a016da7a00"
+    },
+    {
+      "version": "1.1.0",
+      "buildId": "WSR-CORE-1.1.0-REVIEW",
+      "status": "Review",
+      "contentHash": "b459cd50d6007f8049d90305bf612eb5b60fff740f02f54f230b21a8c7058f5e"
+    },
+    {
+      "version": "1.2.0",
+      "buildId": "WSR-CORE-1.2.0-REVIEW",
+      "status": "Review",
+      "contentHash": "22dcf23fd6dd0a3e4cf11b2a7ea9b2c69f0197020bc9a05a50ee371e714e8c9d"
+    },
+    {
+      "version": "1.3.0",
+      "buildId": "WSR-CORE-1.3.0-REVIEW",
+      "status": "Review",
+      "contentHash": "ee5e5f542adf276bc056bd081ebd780809fd186c867c49b085a5edcd6f2a9b05"
+    },
+    {
+      "version": "1.4.0",
+      "buildId": "WSR-CORE-1.4.0-REVIEW",
+      "status": "Review",
+      "contentHash": "398b328a5adad3b8a9c1e697bbdb61d873c104a7e104c27149198a00bbdd4ae3"
+    },
+    {
+      "version": "1.4.0",
+      "buildId": "WSR-CORE-1.4.0-RELEASE",
+      "status": "Released",
+      "contentHash": "43af1f9a811ac2e1ab5dd4f6a0150ab1c229d0048f7879ea21b7c243f45e1343"
+    },
+    {
+      "version": "1.4.1",
+      "buildId": "WSR-CORE-1.4.1-REVIEW",
+      "status": "Review",
+      "contentHash": "0318fd77951fe01e61c77588b0094720f82502c5dffe3c02d26ed1c6c8f25233"
+    },
+    {
+      "version": "1.4.1",
+      "buildId": "WSR-CORE-1.4.1-RELEASE",
+      "status": "Released",
+      "contentHash": "d4d4a20bbff2b58293754621020b111aa3dbfa2e2008170b3a8dac11265db4ba"
+    },
+    {
+      "version": "1.5.0",
+      "buildId": "WSR-CORE-1.5.0-REVIEW",
+      "status": "Review",
+      "contentHash": "118631518ed8645dd1f3c4d258c2a58debb51ca9780e2e6ad5daba8d302531f4"
     }
   ]
 }

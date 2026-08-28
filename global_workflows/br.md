@@ -1,23 +1,23 @@
----
-description: Trigger brainstorm mode for discussions and minimal proposal review
----
+# /br
 
-# Quy trình Brainstorm `/br` (WSR Core 1.0)
+Trao đổi và làm rõ mục tiêu. Mọi prompt chat thông thường mặc định chạy workflow này.
 
-Khi người dùng thảo luận hoặc hỏi đáp chung (mặc định chat xử lý như `/br`):
+## Trạng thái
 
-## Quy định thực thi
-1. **Tuyệt đối cấm tự ý sửa đổi code:** Chỉ được sử dụng các công cụ đọc.
-2. **Tuyệt đối cấm in code block:** Chỉ được liệt kê danh sách file tác động và gạch đầu dòng tính năng.
-3. **Giới hạn hiển thị:**
-   - Sử dụng ngôn ngữ tiếng Việt, phong cách Caveman (cực ngắn, dưới 20 từ/dòng, không từ nối).
-   - Alert format:
-     - `[HIỂU_YÊU_CẦU]` -> `> [!TIP]`
-     - `[PHƯƠNG_PHÁP]` -> `> [!NOTE]`
-     - `[CẢNH_BÁO]` -> `> [!WARNING]`
-     - `[ĐỀ_XUẤT_TỐI_ƯU]` -> chữ thường.
-4. **Dòng trạng thái cuối cùng:**
-   - Luôn đặt dòng Context trước Important.
-   - Dòng cuối tuyệt đối là:
-     `> [!IMPORTANT]`
-     `> VUI LÒNG XEM XÉT VÀ PHÊ DUYỆT!`
+- Mặc định là `DISCUSSION`: chỉ đọc, phân tích, đề xuất; không sửa file hoặc chạy lệnh gây thay đổi.
+- `tiếp đi`, `tiếp tục`, `được rồi`, `ừ` và câu tương tự không phải phê duyệt.
+- Chỉ chuyển `APPROVED` khi prompt là một tín hiệu allowlist chính xác,
+  không phân biệt hoa thường, tối đa bốn từ:
+  `ok`, `làm đi`, `duyệt`, `ok duyệt`, `ok làm đi`, `được rồi làm đi`,
+  `duyệt phương án`, `làm đi bạn`.
+- Câu phủ định, nghi vấn hoặc điều kiện không được phê duyệt,
+  dù có chứa từ trùng allowlist.
+
+## Định dạng
+
+- Dùng tiếng Việt, phong cách Caveman, tối đa 20 từ mỗi dòng.
+- Không in code block. Kết quả trước; nêu lựa chọn ngắn và tác động.
+- `[HIỂU_YÊU_CẦU]` dùng `> [!TIP]`; `[PHƯƠNG_PHÁP]` dùng `> [!NOTE]`.
+- `[CẢNH_BÁO]` dùng `> [!WARNING]`; đề xuất tối ưu và neo hồi quy dùng văn bản thường.
+- Mọi phản hồi kết thúc bằng dòng context: `[Context: ~X% | Trạng thái: ...]`.
+- Báo cáo hoàn thành thêm artifact, bằng chứng kiểm tra và tối đa ba bước QA.

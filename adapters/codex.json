@@ -1,56 +1,116 @@
 {
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "adapterId": "codex",
   "runtimeFamily": "codex",
   "enabled": true,
-  "supportLevel": "native",
-  "defaultTargetRoot": "~/.codex",
-  "targetRootEnvironmentVariable": "CODEX_HOME",
-  "requiresExplicitTargetRoot": false,
-  "logicalRoots": {
-    "policyRoot": ".",
-    "rulesRoot": "rules",
-    "workflowsRoot": "workflows",
-    "skillsRoot": "skills",
-    "scriptsRoot": "scripts",
-    "stateRoot": "."
+  "supportLevel": "primary-native",
+  "roots": {
+    "config": {
+      "default": "~/.codex",
+      "environmentVariable": "CODEX_HOME",
+      "requiresExplicit": false
+    },
+    "skills": {
+      "default": "~/.agents/skills",
+      "environmentVariable": null,
+      "requiresExplicit": false
+    }
   },
   "discoveryPrecedence": [
-    "AGENTS.md",
-    ".codex/AGENTS.md",
-    "~/.codex/AGENTS.md"
+    "~/.codex/AGENTS.override.md",
+    "~/.codex/AGENTS.md",
+    "<workspace>/AGENTS.override.md",
+    "<workspace>/AGENTS.md"
   ],
   "artifactMappings": [
     {
+      "artifactId": "global-skill-liquid-glass-readme",
+      "artifactType": "document",
+      "root": "skills",
+      "relativePath": "",
+      "stripTopLevel": true,
+      "native": true
+    },
+    {
+      "artifactId": "global-skill-stitch-design",
+      "artifactType": "document",
+      "root": "skills",
+      "relativePath": "",
+      "stripTopLevel": true,
+      "native": true
+    },
+    {
+      "artifactId": "global-skill-dec-dev-openai",
+      "artifactType": "document",
+      "root": "skills",
+      "relativePath": "",
+      "stripTopLevel": true,
+      "native": true
+    },
+    {
+      "artifactId": "global-skill-liquid-glass-web-doc",
+      "artifactType": "document",
+      "root": "skills",
+      "relativePath": "",
+      "stripTopLevel": true,
+      "native": true
+    },
+    {
       "artifactType": "rule",
-      "logicalRoot": "rulesRoot",
-      "relativePath": "global_rules/AG_GLOBAL_RULES.md"
+      "root": "config",
+      "relativePath": "wsr/rules",
+      "stripTopLevel": true,
+      "native": false
     },
     {
       "artifactType": "workflow",
-      "logicalRoot": "workflowsRoot",
-      "relativePath": "./"
+      "root": "config",
+      "relativePath": "wsr/workflows",
+      "stripTopLevel": true,
+      "native": false
     },
     {
       "artifactType": "skill",
-      "logicalRoot": "skillsRoot",
-      "relativePath": "./"
+      "root": "skills",
+      "relativePath": "",
+      "stripTopLevel": true,
+      "native": true
     },
     {
       "artifactType": "script",
-      "logicalRoot": "scriptsRoot",
-      "relativePath": "./"
+      "root": "config",
+      "relativePath": "wsr/scripts",
+      "stripTopLevel": true,
+      "native": false
     }
   ],
-  "routerContract": {
-    "type": "absolute",
-    "path": "AGENTS.md"
+  "router": {
+    "root": "config",
+    "path": "AGENTS.md",
+    "family": "codex",
+    "native": true
   },
-  "activeMarkerContract": {
-    "required": true,
-    "path": ".wsr-active.json"
+  "state": {
+    "root": "config",
+    "path": "wsr/.wsr-active.json"
   },
+  "capabilities": {
+    "nativeInstructions": true,
+    "nativeSlashWorkflows": false,
+    "nativeProgressiveSkills": true,
+    "restartAfterRouterChange": true,
+    "goalSupport": "native",
+    "goalEntrypoint": "native-goal",
+    "subagentDispatch": true,
+    "receiptContract": "goal-task-v1",
+    "maxParallelTasks": 4,
+    "maxInstructionBytes": 32768
+  },
+  "legacyRoots": [
+    "~/.codex/workflows",
+    "~/.codex/skills"
+  ],
   "unsupportedFeatures": [
-    "block-jit"
+    "native-custom-slash-workflows"
   ]
 }

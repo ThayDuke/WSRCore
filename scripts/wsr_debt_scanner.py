@@ -3,7 +3,6 @@ import sys
 sys.dont_write_bytecode = True
 import re
 import argparse
-import json
 import subprocess
 import wsr_common
 
@@ -128,16 +127,38 @@ def scan_file(filepath, project_root):
 
 def get_git_changed_files(root_dir):
     try:
-        res = subprocess.run(['git', 'status', '--porcelain'], cwd=root_dir, capture_output=True, text=True)
-        if res.returncode != 0:
-            raise RuntimeError(f"git status failed: {res.stderr}")
-        files = []
-        for line in res.stdout.splitlines():
-            if len(line) > 3:
-                # Format: XY path
-                filepath = line[3:].strip()
-                files.append(os.path.normpath(os.path.join(root_dir, filepath)))
-        return files
+        scan_root = os.path.realpath(os.path.abspath(root_dir))
+        probe = subprocess.run(
+            ['git', '-C', scan_root, 'rev-parse', '--show-toplevel'],
+            capture_output=True,
+        )
+        if probe.returncode != 0:
+            raise RuntimeError(os.fsdecode(probe.stderr).strip() or "git repository discovery failed")
+        repo_root = os.path.realpath(os.path.abspath(os.fsdecode(probe.stdout).strip()))
+        if os.path.commonpath([repo_root, scan_root]) != repo_root:
+            raise RuntimeError("Scan root is outside the discovered Git repository")
+        scope = os.path.relpath(scan_root, repo_root).replace('\\', '/')
+        pathspec = '.' if scope == '.' else scope
+        files = set()
+        commands = (
+            ['diff', '--name-only', '-z'],
+            ['diff', '--cached', '--name-only', '-z'],
+            ['ls-files', '--others', '--exclude-standard', '-z'],
+        )
+        for args in commands:
+            result = subprocess.run(
+                ['git', '-C', repo_root] + args + ['--', pathspec],
+                capture_output=True,
+            )
+            if result.returncode != 0:
+                raise RuntimeError(os.fsdecode(result.stderr).strip() or "git changed-file discovery failed")
+            for raw_path in result.stdout.split(b'\0'):
+                if not raw_path:
+                    continue
+                filepath = os.path.realpath(os.path.join(repo_root, os.fsdecode(raw_path)))
+                if os.path.commonpath([scan_root, filepath]) == scan_root:
+                    files.add(filepath)
+        return sorted(files)
     except Exception as e:
         raise RuntimeError(f"Failed to query git status: {e}")
 

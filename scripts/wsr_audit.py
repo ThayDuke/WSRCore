@@ -1,359 +1,270 @@
-import os
-import sys
-sys.dont_write_bytecode = True
-import re
+"""WSR Audit v1.4: deterministic, read-only repository audit."""
+from __future__ import annotations
+
 import argparse
 import json
-import ast
+import os
 import subprocess
-import wsr_common
-import wsr_doctor
+import sys
+from pathlib import Path
 
-def check_utf8_and_mojibake(filepath):
-    """Kiểm tra file có UTF-8 hợp lệ và không chứa ký tự U+FFFD (mojibake)"""
+import wsr_audit_checks as checks
+
+sys.dont_write_bytecode = True
+
+EXCLUDED_DIRS = {".git", ".venv", "venv", "node_modules", "__pycache__", ".mypy_cache", ".pytest_cache", "dist", "build"}
+EXCLUDED_EXTENSIONS = {".zip", ".png", ".jpg", ".jpeg", ".gif", ".ico", ".mp3", ".mp4", ".wav", ".psd", ".woff", ".woff2", ".ttf", ".eot", ".pdf", ".webp", ".cer", ".db", ".sqlite", ".pyc"}
+
+
+def git_changed(root: Path) -> tuple[list[Path], dict]:
+    root = root.resolve()
+    probe = subprocess.run(
+        ("git", "-C", str(root), "rev-parse", "--show-toplevel"),
+        capture_output=True, check=False,
+    )
+    if probe.returncode:
+        raise RuntimeError(os.fsdecode(probe.stderr).strip() or "git repository discovery failed")
+    repo_root = Path(os.fsdecode(probe.stdout).strip()).resolve()
     try:
-        with open(filepath, 'rb') as f:
-            content_bytes = f.read()
-            
+        scope = root.relative_to(repo_root).as_posix()
+    except ValueError as exc:
+        raise RuntimeError("Audit root is outside the discovered Git repository") from exc
+    pathspec = scope or "."
+    files: set[Path] = set()
+    deleted: set[str] = set()
+    renamed: set[str] = set()
+
+    def relative_path(raw: bytes) -> tuple[Path, str] | None:
+        candidate = (repo_root / os.fsdecode(raw)).resolve()
         try:
-            content_str = content_bytes.decode('utf-8')
-        except UnicodeDecodeError as e:
-            return False, f"Lỗi giải mã UTF-8: {e}", ""
-            
-        if b'\xef\xbf\xbd' in content_bytes or '\ufffd' in content_str:
-            return False, "Phát hiện ký tự Mojibake (U+FFFD)", content_str
-            
-        return True, "OK", content_str
-    except Exception as e:
-        return False, f"Không thể đọc file: {e}", ""
+            relative = candidate.relative_to(root).as_posix()
+        except ValueError:
+            return None
+        return candidate, relative
 
-def check_python_syntax(filepath):
-    """Kiểm tra cú pháp Python bằng AST (không sinh bytecode)"""
+    for args in (("diff", "--name-status", "-z"), ("diff", "--cached", "--name-status", "-z")):
+        result = subprocess.run(("git", "-C", str(repo_root)) + args + ("--", pathspec), capture_output=True)
+        if result.returncode:
+            raise RuntimeError(os.fsdecode(result.stderr).strip() or "git command failed")
+        fields = result.stdout.split(b"\0")
+        if fields and not fields[-1]:
+            fields.pop()
+        index = 0
+        while index < len(fields):
+            status = os.fsdecode(fields[index])
+            index += 1
+            path_count = 2 if status.startswith(("R", "C")) else 1
+            if index + path_count > len(fields):
+                raise RuntimeError("Malformed NUL-delimited Git name-status output")
+            raw_paths = fields[index:index + path_count]
+            index += path_count
+            current = relative_path(raw_paths[-1])
+            previous = relative_path(raw_paths[0]) if path_count == 2 else current
+            if current is None:
+                continue
+            if status.startswith("D"):
+                deleted.add(current[1])
+            elif status.startswith(("R", "C")) and previous is not None:
+                renamed.add(f"{previous[1]} -> {current[1]}")
+                if current[0].is_file():
+                    files.add(current[0])
+            else:
+                if current[0].is_file():
+                    files.add(current[0])
+
+    untracked = subprocess.run(
+        ("git", "-C", str(repo_root), "ls-files", "--others", "--exclude-standard", "-z", "--", pathspec),
+        capture_output=True,
+    )
+    if untracked.returncode:
+        raise RuntimeError(os.fsdecode(untracked.stderr).strip() or "git untracked-file discovery failed")
+    for raw_path in untracked.stdout.split(b"\0"):
+        if not raw_path:
+            continue
+        current = relative_path(raw_path)
+        if current is not None and current[0].is_file():
+            files.add(current[0])
+    return sorted(files), {"deleted": sorted(deleted), "renamed": sorted(renamed)}
+
+
+def tree_files(root: Path) -> tuple[list[Path], dict[str, int]]:
+    files: list[Path] = []
+    skipped: dict[str, int] = {}
+    for current, dirs, names in os.walk(root, followlinks=False):
+        dirs[:] = [d for d in dirs if d not in EXCLUDED_DIRS]
+        for name in names:
+            path = Path(current) / name
+            if path.suffix.lower() in EXCLUDED_EXTENSIONS:
+                skipped["extension"] = skipped.get("extension", 0) + 1
+                continue
+            files.append(path.resolve())
+    return sorted(files), skipped
+
+
+def run_doctor(root: Path) -> tuple[list[dict], dict]:
+    if not (root / "WSR_MANIFEST.json").exists():
+        return [], {"ran": False, "reason": "WSR_MANIFEST.json not present"}
     try:
-        with open(filepath, 'r', encoding='utf-8') as f:
-            content = f.read()
-        ast.parse(content, filename=filepath)
-        return True, "OK"
-    except SyntaxError as e:
-        return False, f"Lỗi cú pháp Python: {e}"
-    except Exception as e:
-        return False, f"Lỗi parse Python: {e}"
+        import wsr_doctor
+        result, _, _ = wsr_doctor.run_doctor_checks(str(root), strict=True, is_json=True)
+    except Exception as exc:
+        return [{"ruleId": "INT-003", "category": "integrity", "severity": "BLOCKER", "confidence": "high", "path": "WSR_MANIFEST.json", "line": None, "message": "Doctor execution failed", "evidence": {"error": str(exc)}, "recommendation": "Fix Doctor execution before release", "estimatedLineReduction": None, "estimatedDependencyReduction": None}], {"ran": True, "error": str(exc)}
+    findings = []
+    for item in result.get("blockers", []):
+        findings.append({"ruleId": "DOCTOR-BLOCKER", "category": _doctor_category(item), "severity": "BLOCKER", "confidence": "high", "path": "WSR_MANIFEST.json", "line": None, "message": str(item), "evidence": {"doctor": "blocker"}, "recommendation": "Resolve the Doctor blocker", "estimatedLineReduction": None, "estimatedDependencyReduction": None})
+    for item in result.get("warnings", []):
+        findings.append({"ruleId": "DOCTOR-WARN", "category": _doctor_category(item), "severity": "MEDIUM", "confidence": "high", "path": "WSR_MANIFEST.json", "line": None, "message": str(item), "evidence": {"doctor": "warning"}, "recommendation": "Resolve or document the Doctor warning", "estimatedLineReduction": None, "estimatedDependencyReduction": None})
+    return findings, {"ran": True, "status": result.get("status"), "score": result.get("score"), "checks": len(result.get("checks", []))}
 
-def check_planning_doc(filepath):
-    """Kiểm tra file kế hoạch planning.md không chứa code block quá dài"""
-    try:
-        with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
-            lines = f.readlines()
-            
-        in_block = False
-        block_lines = 0
-        for line_num, line in enumerate(lines, 1):
-            if line.strip().startswith('```'):
-                if in_block:
-                    if block_lines > 25:
-                        return False, f"Cảnh báo: Code block dòng {line_num - block_lines} dài quá 25 dòng. Hãy dùng pseudocode."
-                    in_block = False
-                    block_lines = 0
-                else:
-                    in_block = True
-            elif in_block:
-                block_lines += 1
-                
-        return True, "OK"
-    except Exception as e:
-        return False, f"Lỗi đọc planning: {e}"
 
-def check_readme_drift(readme_path, gemini_path):
-    """Kiểm tra README.html có đồng bộ với GEMINI.md không"""
-    try:
-        if not os.path.exists(readme_path) or not os.path.exists(gemini_path):
-            return True, "Bỏ qua (thiếu file để đối chiếu)"
-            
-        with open(readme_path, 'r', encoding='utf-8', errors='ignore') as f:
-            readme = f.read()
-        with open(gemini_path, 'r', encoding='utf-8', errors='ignore') as f:
-            gemini = f.read()
-            
-        if ".agents" in gemini and ".codex" in readme and ".agents" not in readme:
-            return False, "README vẫn dùng .codex làm canonical folder trong khi GEMINI dùng .agents"
-            
-        return True, "OK"
-    except Exception as e:
-        return False, f"Lỗi check drift: {e}"
+def _doctor_category(text: str) -> str:
+    value = str(text).upper()
+    if any(x in value for x in ("ADAPTER", "NATIVE", "ROUTER")):
+        return "ide"
+    if any(x in value for x in ("PROFILE", "BUDGET", "KERNEL", "LOADING", "SIZE")):
+        return "resource"
+    return "integrity"
 
-def check_skill_start_blocks(skill_path):
-    """Kiểm tra nhãn START_BLOCK trong skill.md có khớp cấu trúc đóng mở không"""
-    try:
-        with open(skill_path, 'r', encoding='utf-8', errors='ignore') as f:
-            content = f.read()
-            
-        starts = re.findall(r'<!--\s*START_BLOCK:\s*(\w+)\s*-->', content)
-        ends = re.findall(r'<!--\s*END_BLOCK:\s*(\w+)\s*-->', content)
-        
-        if len(starts) != len(ends):
-            return False, f"Lệch số lượng nhãn START_BLOCK ({len(starts)}) và END_BLOCK ({len(ends)})"
-            
-        for s in starts:
-            if s not in ends:
-                return False, f"Thiếu nhãn kết thúc cho block: {s}"
-                
-        return True, "OK"
-    except Exception as e:
-        return False, f"Lỗi check skill block: {e}"
 
-def check_hardcoded_paths(filepath, content_str):
-    """Kiểm tra đường dẫn cứng DOCS/WSR-Core trong tài liệu và rules."""
-    filename = os.path.basename(filepath)
-    # Bỏ qua việc tự check trong các script scan chính nó
-    if filename in ["wsr_audit.py", "wsr_doctor.py", "wsr_clean.py"]:
-        return True, "OK"
-        
-    if "DOCS/WSR-Core" in content_str:
-        # Check if it is a genuine hardcoded path usage (not inside changelog for past references)
-        if filename != "CHANGELOG.md":
-            return False, "Phát hiện đường dẫn cứng DOCS/WSR-Core"
-            
-    return True, "OK"
+def dedup_sort(findings: list[checks.Finding | dict], root: Path) -> list[dict]:
+    result: dict[tuple, dict] = {}
+    for item in findings:
+        data = item.as_dict() if isinstance(item, checks.Finding) else item
+        if Path(str(data.get("path", ""))).is_absolute():
+            data = dict(data)
+            try:
+                data["path"] = Path(data["path"]).resolve().relative_to(root.resolve()).as_posix()
+            except ValueError:
+                data["path"] = Path(data["path"]).as_posix()
+        evidence = json.dumps(data.get("evidence", {}), sort_keys=True, ensure_ascii=False)
+        key = (data["ruleId"], data.get("path", ""), data.get("line"), evidence)
+        result[key] = data
+    severity_order = {"BLOCKER": 0, "HIGH": 1, "MEDIUM": 2, "LOW": 3, "INFO": 4}
+    return sorted(result.values(), key=lambda x: (severity_order.get(x.get("severity", "INFO"), 9), x.get("category", ""), x.get("ruleId", ""), x.get("path", "").lower(), x.get("line") is None, x.get("line") or 0))
 
-def get_git_changed_files(root_dir):
-    """Lấy danh sách files thay đổi từ Git, ném lỗi rõ ràng nếu lệnh thất bại"""
-    files = []
-    
-    res1 = subprocess.run(['git', 'diff', '--name-only'], cwd=root_dir, capture_output=True, text=True)
-    if res1.returncode != 0:
-        raise RuntimeError(f"git diff failed (exit code {res1.returncode}): {res1.stderr.strip()}")
-    files.extend([os.path.normpath(os.path.join(root_dir, f)) for f in res1.stdout.splitlines() if f])
-    
-    res2 = subprocess.run(['git', 'diff', '--cached', '--name-only'], cwd=root_dir, capture_output=True, text=True)
-    if res2.returncode != 0:
-        raise RuntimeError(f"git diff cached failed (exit code {res2.returncode}): {res2.stderr.strip()}")
-    files.extend([os.path.normpath(os.path.join(root_dir, f)) for f in res2.stdout.splitlines() if f])
-    
-    res3 = subprocess.run(['git', 'status', '--porcelain'], cwd=root_dir, capture_output=True, text=True)
-    if res3.returncode != 0:
-        raise RuntimeError(f"git status failed (exit code {res3.returncode}): {res3.stderr.strip()}")
-    for line in res3.stdout.splitlines():
-        if line.startswith('?? '):
-            files.append(os.path.normpath(os.path.join(root_dir, line[3:].strip())))
-            
-    return list(set(files))
 
-def main():
-    parser = argparse.ArgumentParser(description="WSR Audit Tool package-local v3")
-    parser.add_argument('--path', type=str, default=None, help="Thư mục cần quét")
-    parser.add_argument('--mode', type=str, choices=['quick', 'deep'], default='quick', help="Chế độ quét")
-    parser.add_argument('--json', action='store_true', help="Xuất kết quả JSON")
-    parser.add_argument('--changed', action='store_true', help="Chỉ quét các file thay đổi trong Git")
-    
-    args = parser.parse_args()
-    
-    if args.path:
-        scan_dir = os.path.abspath(args.path)
+def score(findings: list[dict], mode: str, coverage: dict, fail_on: str) -> tuple[int, str, bool]:
+    penalties: dict[str, int] = {}
+    for item in findings:
+        rule = item.get("ruleId", "UNKNOWN")
+        penalties[rule] = min(25, penalties.get(rule, 0) + checks.SEVERITY_WEIGHT.get(item.get("severity", "INFO"), 0))
+    value = max(0, min(100, 100 - sum(penalties.values())))
+    threshold = checks.SEVERITY_WEIGHT[fail_on.upper()]
+    threshold_breached = any(
+        checks.SEVERITY_WEIGHT.get(x.get("severity", "INFO"), 0) >= threshold
+        for x in findings
+    )
+    if mode == "deep" and coverage.get("auditedFiles", 0) == 0:
+        return value, "FAIL", True
+    if threshold_breached:
+        return value, "FAIL", True
+    if findings or (mode == "quick" and coverage.get("auditedFiles", 0) == 0):
+        return value, "WARN", False
+    return value, "PASS", False
+
+
+def audit(root: Path, mode: str, changed: bool, categories: set[str] | None, fail_on: str) -> dict:
+    metadata = {"deleted": [], "renamed": []}
+    if changed or mode == "quick":
+        files, metadata = git_changed(root)
+        skipped = {}
     else:
-        scan_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-        
-    project_root = wsr_common.get_package_root()
-    if args.path:
-        project_root = os.path.dirname(scan_dir)
-        
-    report = {
-        'summary': {'total_checked': 0, 'pass_count': 0, 'fail_count': 0, 'score': 100, 'status': 'FAIL'},
-        'results': []
+        files, skipped = tree_files(root)
+    text_files: list[tuple[Path, str]] = []
+    findings: list[checks.Finding | dict] = []
+    for path in files:
+        text, encoding_finding, binary = checks.read_text(path)
+        if binary:
+            skipped["binary_or_unsupported"] = skipped.get("binary_or_unsupported", 0) + 1
+            continue
+        if encoding_finding:
+            findings.append(encoding_finding)
+            continue
+        assert text is not None
+        text_files.append((path, text))
+        findings.extend(checks.file_findings(root, path, text))
+    if mode == "deep":
+        findings.extend(checks.duplicate_blocks(text_files))
+        findings.extend(checks.dependency_findings(root, text_files, EXCLUDED_DIRS))
+        doctor_findings, doctor = run_doctor(root)
+    else:
+        doctor_findings, doctor = [], {"ran": False, "reason": "quick mode"}
+    coverage = {"discoveredFiles": len(files), "auditedFiles": len(text_files), "skippedFiles": sum(skipped.values()), "coverageRatio": round(len(text_files) / len(files), 4) if files else 0.0, **metadata}
+    if coverage["auditedFiles"] == 0:
+        findings.append(checks.finding(
+            "INT-004", str(root), None, "Audit covered no supported text files",
+            {"mode": mode, "discoveredFiles": coverage["discoveredFiles"], "skippedFiles": coverage["skippedFiles"]},
+            "Provide an auditable path or include supported changed files",
+            severity="BLOCKER" if mode == "deep" else "INFO",
+        ))
+    findings = dedup_sort(findings + doctor_findings, root)
+    all_findings = findings
+    if categories:
+        findings = [x for x in findings if x.get("category") in categories]
+    value, status, threshold_breached = score(all_findings, mode, coverage, fail_on)
+    coverage_valid = coverage["auditedFiles"] > 0
+    gate_passed = coverage_valid and not threshold_breached
+    release_eligible = gate_passed and not categories
+    counts = {level: sum(1 for x in findings if x.get("severity") == level) for level in ("BLOCKER", "HIGH", "MEDIUM", "LOW", "INFO")}
+    category_counts = {category: sum(1 for x in findings if x.get("category") == category) for category in checks.CATEGORIES}
+    return {
+        "schemaVersion": 1,
+        "auditVersion": "1.4.1",
+        "mode": mode,
+        "root": root.as_posix(),
+        "categories": sorted(categories or set(checks.CATEGORIES)),
+        "coverage": coverage,
+        "gatePassed": gate_passed,
+        "thresholdBreached": threshold_breached,
+        "releaseEligible": release_eligible,
+        "summary": {
+            "score": value,
+            "scoreVersion": "severity-v1",
+            "status": status,
+            "failOn": fail_on.upper(),
+            "counts": counts,
+            "categoryCounts": category_counts,
+            "estimatedLineReduction": sum(x.get("estimatedLineReduction") or 0 for x in findings),
+            "estimatedDependencyReduction": sum(x.get("estimatedDependencyReduction") or 0 for x in findings),
+            "unknownEstimateCount": sum(
+                1 for x in findings
+                if x.get("estimatedLineReduction") is None
+                and x.get("estimatedDependencyReduction") is None
+            ),
+        },
+        "findings": findings,
+        "skipped": skipped,
+        "doctor": doctor,
     }
-    
-    # Đọc manifest
-    manifest = None
-    manifest_path = os.path.join(scan_dir, 'WSR_MANIFEST.json')
-    if os.path.exists(manifest_path):
-        try:
-            manifest = wsr_common.load_manifest(scan_dir)
-            # Check required artifacts exist
-            for art in manifest.get('artifacts', []):
-                if art.get('required', False):
-                    req_path = os.path.join(scan_dir, art['source'])
-                    if not os.path.exists(req_path):
-                        report['results'].append({
-                            'file': art['source'],
-                            'test': 'required_file_check',
-                            'status': 'FAIL',
-                            'message': f"Thiếu file bắt buộc theo manifest: {art['source']}"
-                        })
-        except Exception as e:
-            report['results'].append({
-                'file': 'WSR_MANIFEST.json',
-                'test': 'manifest_parse',
-                'status': 'FAIL',
-                'message': f"Lỗi đọc manifest: {e}"
-            })
-            
-    # Tái sử dụng Doctor checks trong Deep Mode
-    doctor_ran = False
-    if args.mode == 'deep':
-        doctor_ran = True
-        try:
-            doc_results, _, _ = wsr_doctor.run_doctor_checks(scan_dir, strict=False, is_json=True)
-            for blocker in doc_results.get("blockers", []):
-                report['results'].append({
-                    'file': 'manifest_schema',
-                    'test': 'Doctor_Gate',
-                    'status': 'FAIL',
-                    'message': f"Doctor Blocker: {blocker}"
-                })
-            for warning in doc_results.get("warnings", []):
-                report['results'].append({
-                    'file': 'manifest_schema',
-                    'test': 'Doctor_Warning',
-                    'status': 'WARN',
-                    'message': f"Doctor Warning: {warning}"
-                })
-        except Exception as e:
-            report['results'].append({
-                'file': 'wsr_doctor.py',
-                'test': 'Doctor_Execution',
-                'status': 'FAIL',
-                'message': f"Doctor execution failed during preflight: {e}"
-            })
-            
-    # Danh sách file quét
-    files_to_check = []
-    git_error_occurred = False
-    
-    if args.changed or args.mode == 'quick':
-        try:
-            changed_files = get_git_changed_files(project_root)
-            for f in changed_files:
-                if f.startswith(os.path.normpath(scan_dir)) and os.path.isfile(f):
-                    files_to_check.append(f)
-        except Exception as e:
-            git_error_occurred = True
-            report['results'].append({
-                'file': 'git',
-                'test': 'git_changed_files',
-                'status': 'FAIL',
-                'message': f"Git failure: {e}"
-            })
-    else:
-        # Deep mode: quét toàn bộ file trong scan_dir dựa trên manifest inventory
-        if manifest:
-            for art in manifest.get('artifacts', []):
-                # Bỏ qua generated checksums
-                if art['id'] == 'wsr-checksums':
-                    continue
-                full_path = os.path.join(scan_dir, art['source'])
-                if os.path.isfile(full_path):
-                    files_to_check.append(full_path)
-        else:
-            for root, dirs, files in os.walk(scan_dir, followlinks=False):
-                dirs[:] = [d for d in dirs if d not in {'.git', '.venv', '__pycache__', 'DATA', 'Temp', '.agents', '.codex'}]
-                for file in files:
-                    files_to_check.append(os.path.join(root, file))
-                    
-    # Bỏ qua các file nhị phân, zip, desktop.ini, pyc
-    ignore_extensions = ('.zip', '.png', '.jpg', '.ico', '.ini', '.gif', '.pyc', '.mp3', '.MP3', '.mp4', '.wav', '.psd', '.PSD', '.woff', '.woff2', '.ttf', '.TTF', '.eot', '.pdf', '.webp', '.WEBP', '.cer', '.CER')
-    files_to_check = [f for f in files_to_check if not f.endswith(ignore_extensions)]
-    
-    # Tiến hành audit từng file
-    for filepath in files_to_check:
-        rel_path = os.path.relpath(filepath, scan_dir).replace('\\', '/')
-        report['summary']['total_checked'] += 1
-        
-        # 1. Kiểm tra UTF-8 và Mojibake (Mọi file text)
-        utf8_ok, utf8_msg, content_str = check_utf8_and_mojibake(filepath)
-        if not utf8_ok:
-            report['results'].append({'file': rel_path, 'test': 'UTF8_Mojibake', 'status': 'FAIL', 'message': utf8_msg})
-            continue
-            
-        # Kiểm tra hardcoded paths (Chống build paths cứng)
-        path_ok, path_msg = check_hardcoded_paths(filepath, content_str)
-        if not path_ok:
-            report['results'].append({'file': rel_path, 'test': 'Hardcoded_Paths', 'status': 'FAIL', 'message': path_msg})
-            continue
-            
-        # 2. Kiểm tra syntax theo loại file
-        if filepath.endswith('.py'):
-            syntax_ok, syntax_msg = check_python_syntax(filepath)
-            if not syntax_ok:
-                report['results'].append({'file': rel_path, 'test': 'Python_Syntax', 'status': 'FAIL', 'message': syntax_msg})
-                continue
-                
-        # 3. Kiểm tra file kế hoạch planning
-        if 'planning_' in filepath.lower() and filepath.endswith('.md'):
-            plan_ok, plan_msg = check_planning_doc(filepath)
-            if not plan_ok:
-                report['results'].append({'file': rel_path, 'test': 'Planning_Format', 'status': 'FAIL', 'message': plan_msg})
-                continue
-                
-        # 4. Kiểm tra drift README.html
-        if rel_path == 'README.html':
-            gemini_path = os.path.join(scan_dir, 'GEMINI.md')
-            drift_ok, drift_msg = check_readme_drift(filepath, gemini_path)
-            if not drift_ok:
-                report['results'].append({'file': rel_path, 'test': 'Readme_Drift', 'status': 'FAIL', 'message': drift_msg})
-                continue
-                
-        # 5. Kiểm tra skill start blocks
-        if 'skills' in filepath and filepath.endswith('.md'):
-            block_ok, block_msg = check_skill_start_blocks(filepath)
-            if not block_ok:
-                report['results'].append({'file': rel_path, 'test': 'Skill_Start_Block', 'status': 'FAIL', 'message': block_msg})
-                continue
-                
-        report['results'].append({'file': rel_path, 'test': 'All_checks', 'status': 'PASS', 'message': 'OK'})
- 
-    # Tính điểm scorecard trung thực phản ánh mọi gate
-    fails = [r for r in report['results'] if r['status'] == 'FAIL']
-    report['summary']['fail_count'] = len(fails)
-    report['summary']['pass_count'] = max(0, report['summary']['total_checked'] - len([f for f in fails if f['test'] not in ['Doctor_Gate', 'required_file_check', 'manifest_parse']]))
-    
-    total_denom = report['summary']['total_checked']
-    # Cộng thêm các gate phi-file (Doctor gates, manifest parse, v.v.) vào denominator nếu thất bại
-    non_file_fails = len([f for f in fails if f['test'] in ['Doctor_Gate', 'required_file_check', 'manifest_parse']])
-    total_denom += non_file_fails
-    
-    if total_denom > 0:
-        score = int((report['summary']['pass_count'] / total_denom) * 100)
-        report['summary']['score'] = score
-        is_failed = len(fails) > 0 or git_error_occurred
-        report['summary']['status'] = 'FAIL' if is_failed or report['summary']['score'] < 100 else 'PASS'
-    else:
-        report['summary']['score'] = 0
-        report['summary']['status'] = 'WARN'
-        report['results'].append({
-            'file': 'inventory',
-            'test': 'zero_coverage_check',
-            'status': 'WARN',
-            'message': 'Zero files checked during audit — zero-coverage rejection'
-        })
-        if args.mode == 'deep':
-            report['summary']['status'] = 'FAIL'
-    
-    # Xuất kết quả
-    if args.json:
-        wsr_common.print_json_report(report)
-    else:
-        print("==================================================")
-        print("   WSR-AUDIT (WSR CORE)")
-        print("==================================================")
-        print(f"Tổng số file quét: {report['summary']['total_checked']}")
-        print(f"Thành công: {report['summary']['pass_count']} | Thất bại: {report['summary']['fail_count']}")
-        print("--------------------------------------------------")
-        
-        for r in report['results']:
-            if r['status'] == 'FAIL':
-                print(f"[FAIL] {r['file']} | {r['test']}: {r['message']}")
-            elif r['status'] == 'WARN':
-                print(f"[WARN] {r['file']} | {r['test']}: {r['message']}")
-            elif args.mode == 'deep':
-                print(f"[PASS] {r['file']} | {r['test']}")
-                
-        print("==================================================")
-        print("             WSR AUDIT SCORECARD")
-        print("==================================================")
-        print(f"Điểm số: {report['summary']['score']}/100")
-        print(f"Trạng thái: {report['summary']['status']}")
-        print("==================================================")
-        
-    sys.exit(wsr_common.EXIT_SUCCESS if report['summary']['status'] == 'PASS' else wsr_common.EXIT_FAIL_FINDING)
 
-if __name__ == '__main__':
-    main()
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="WSR Audit v1.4, deterministic and read-only")
+    parser.add_argument("--path", default=None)
+    parser.add_argument("--mode", choices=("quick", "deep"), default="quick")
+    parser.add_argument("--changed", action="store_true")
+    parser.add_argument("--json", action="store_true")
+    parser.add_argument("--category", action="append")
+    parser.add_argument("--fail-on", choices=("blocker", "high", "medium", "low"), default="high")
+    parser.add_argument("--explain")
+    args = parser.parse_args()
+    if args.explain:
+        rule = checks.RULES.get(args.explain.upper())
+        print(json.dumps({"ruleId": args.explain.upper(), "found": bool(rule), "definition": rule}, ensure_ascii=False, indent=2))
+        return 0 if rule else 2
+    report = audit(Path(args.path or ".").resolve(), args.mode, args.changed, set(args.category) if args.category else None, args.fail_on)
+    if args.json:
+        print(json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True))
+    else:
+        summary = report["summary"]
+        print(f"WSR-AUDIT {summary['status']} {summary['score']}/100 | files={report['coverage']['auditedFiles']}/{report['coverage']['discoveredFiles']}")
+        for item in report["findings"][:30]:
+            print(f"[{item['severity']}] {item['ruleId']} {item['path']}:{item.get('line') or '-'} — {item['message']}")
+        hidden = max(0, len(report["findings"]) - 30)
+        if hidden:
+            print(f"... {hidden} findings hidden; use --json for full output")
+    return 0 if report["gatePassed"] else 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

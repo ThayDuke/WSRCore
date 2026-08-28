@@ -10,34 +10,43 @@
       ]
     },
     "adapterIdentity": {
-      "type": "string"
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$"
     },
     "packageVersion": {
-      "type": "string"
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
     },
     "buildId": {
-      "type": "string"
+      "type": "string",
+      "pattern": "^WSR-CORE-\\d+\\.\\d+\\.\\d+-(REVIEW|RELEASE-CANDIDATE|RELEASE)$"
     },
     "manifestHash": {
-      "type": "string"
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
     },
     "inventoryHash": {
-      "type": "string"
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
     },
     "routerHash": {
-      "type": "string"
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
     },
     "logicalRoots": {
       "type": "object",
+      "minProperties": 1,
       "additionalProperties": {
         "type": "string"
       }
     },
     "installTimestamp": {
-      "type": "string"
+      "type": "string",
+      "format": "date-time"
     },
     "transactionId": {
-      "type": "string"
+      "type": "string",
+      "minLength": 1
     }
   },
   "required": [

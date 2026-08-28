@@ -1,34 +1,41 @@
 {
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "adapterId": "claude",
   "runtimeFamily": "claude",
   "enabled": false,
-  "supportLevel": "unsupported",
-  "defaultTargetRoot": "",
-  "targetRootEnvironmentVariable": "WSR_WORKSPACE_ROOT",
-  "requiresExplicitTargetRoot": true,
-  "logicalRoots": {
-    "policyRoot": ".claude",
-    "rulesRoot": ".claude/rules",
-    "workflowsRoot": ".claude/workflows",
-    "skillsRoot": ".claude/skills",
-    "scriptsRoot": ".claude/scripts",
-    "stateRoot": ".claude"
+  "supportLevel": "disabled",
+  "roots": {
+    "config": {
+      "default": null,
+      "environmentVariable": null,
+      "requiresExplicit": true
+    }
   },
   "discoveryPrecedence": [],
   "artifactMappings": [],
-  "routerContract": {
-    "type": "none",
-    "path": ""
+  "router": {
+    "root": "config",
+    "path": "CLAUDE.md",
+    "family": "claude",
+    "native": true
   },
-  "activeMarkerContract": {
-    "required": false,
-    "path": ""
+  "state": {
+    "root": "config",
+    "path": ".wsr-active.json"
   },
+  "capabilities": {
+    "nativeInstructions": true,
+    "nativeSlashWorkflows": false,
+    "nativeProgressiveSkills": false,
+    "restartAfterRouterChange": true,
+    "goalSupport": "unsupported",
+    "goalEntrypoint": "none",
+    "subagentDispatch": false,
+    "receiptContract": "goal-task-v1",
+    "maxParallelTasks": 1
+  },
+  "legacyRoots": [],
   "unsupportedFeatures": [
-    "block-jit",
-    "user-home-install",
-    "dry-run",
-    "apply"
+    "not-release-gated"
   ]
 }

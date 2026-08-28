@@ -1,0 +1,202 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "WSR Adapter v3",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "adapterId",
+    "runtimeFamily",
+    "enabled",
+    "supportLevel",
+    "roots",
+    "discoveryPrecedence",
+    "artifactMappings",
+    "router",
+    "state",
+    "capabilities",
+    "legacyRoots",
+    "unsupportedFeatures"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 3
+    },
+    "adapterId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "runtimeFamily": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$"
+    },
+    "enabled": {
+      "type": "boolean"
+    },
+    "supportLevel": {
+      "type": "string",
+      "enum": ["primary-native", "secondary-compatible", "secondary-emulated", "disabled"]
+    },
+    "roots": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "default",
+          "environmentVariable",
+          "requiresExplicit"
+        ],
+        "properties": {
+          "default": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "environmentVariable": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^[A-Z][A-Z0-9_]*$"
+          },
+          "requiresExplicit": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "discoveryPrecedence": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      }
+    },
+    "artifactMappings": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "artifactType",
+          "root",
+          "relativePath",
+          "stripTopLevel",
+          "native"
+        ],
+        "properties": {
+          "artifactId": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9-]*$"
+          },
+          "artifactType": {
+            "type": "string",
+            "enum": ["policy", "rule", "workflow", "skill", "script", "document", "generated", "test", "evidence"]
+          },
+          "root": {
+            "type": "string"
+          },
+          "relativePath": {
+            "type": "string",
+            "pattern": "^(?![\\\\/])(?![A-Za-z]:)(?!.*(^|[\\\\/])\\.\\.([\\\\/]|$)).*$"
+          },
+          "stripTopLevel": {
+            "type": "boolean"
+          },
+          "native": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "router": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "root",
+        "path",
+        "family",
+        "native"
+      ],
+      "properties": {
+        "root": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string",
+          "pattern": "^(?![\\\\/])(?![A-Za-z]:)(?!.*(^|[\\\\/])\\.\\.([\\\\/]|$)).+$"
+        },
+        "family": {
+          "type": "string"
+        },
+        "native": {
+          "type": "boolean"
+        }
+      }
+    },
+    "state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "root",
+        "path"
+      ],
+      "properties": {
+        "root": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string",
+          "pattern": "^(?![\\\\/])(?![A-Za-z]:)(?!.*(^|[\\\\/])\\.\\.([\\\\/]|$)).+$"
+        }
+      }
+    },
+    "capabilities": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "nativeInstructions",
+        "nativeSlashWorkflows",
+        "nativeProgressiveSkills",
+        "restartAfterRouterChange",
+        "goalSupport",
+        "goalEntrypoint",
+        "subagentDispatch",
+        "receiptContract",
+        "maxParallelTasks"
+      ],
+      "properties": {
+        "nativeInstructions": {"type": "boolean"},
+        "nativeSlashWorkflows": {"type": "boolean"},
+        "nativeProgressiveSkills": {"type": "boolean"},
+        "restartAfterRouterChange": {"type": "boolean"},
+        "goalSupport": {"type": "string", "enum": ["native", "unsupported", "emulated"]},
+        "goalEntrypoint": {"type": "string", "minLength": 1},
+        "subagentDispatch": {"type": "boolean"},
+        "receiptContract": {"type": "string", "const": "goal-task-v1"},
+        "maxParallelTasks": {"type": "integer", "minimum": 1},
+        "maxInstructionBytes": {"type": "integer", "minimum": 1},
+        "maxRuleChars": {"type": "integer", "minimum": 1},
+        "maxWorkflowChars": {"type": "integer", "minimum": 1}
+      }
+    },
+    "legacyRoots": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      }
+    },
+    "unsupportedFeatures": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

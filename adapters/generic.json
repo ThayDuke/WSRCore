@@ -1,54 +1,104 @@
 {
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "adapterId": "generic",
   "runtimeFamily": "generic",
   "enabled": true,
-  "supportLevel": "workspace",
-  "defaultTargetRoot": "",
-  "targetRootEnvironmentVariable": "WSR_WORKSPACE_ROOT",
-  "requiresExplicitTargetRoot": true,
-  "logicalRoots": {
-    "policyRoot": ".agents",
-    "rulesRoot": ".agents/global_rules",
-    "workflowsRoot": ".agents/global_workflows",
-    "skillsRoot": ".agents/skills",
-    "scriptsRoot": ".agents/scripts",
-    "stateRoot": ".agents"
+  "supportLevel": "secondary-emulated",
+  "roots": {
+    "config": {
+      "default": null,
+      "environmentVariable": null,
+      "requiresExplicit": true
+    }
   },
   "discoveryPrecedence": [
-    ".agents/AGENTS.md"
+    "<explicit-root>/AGENTS.md"
   ],
   "artifactMappings": [
     {
+      "artifactId": "global-skill-liquid-glass-readme",
+      "artifactType": "document",
+      "root": "config",
+      "relativePath": "skills",
+      "stripTopLevel": true,
+      "native": false
+    },
+    {
+      "artifactId": "global-skill-stitch-design",
+      "artifactType": "document",
+      "root": "config",
+      "relativePath": "skills",
+      "stripTopLevel": true,
+      "native": false
+    },
+    {
+      "artifactId": "global-skill-dec-dev-openai",
+      "artifactType": "document",
+      "root": "config",
+      "relativePath": "skills",
+      "stripTopLevel": true,
+      "native": false
+    },
+    {
+      "artifactId": "global-skill-liquid-glass-web-doc",
+      "artifactType": "document",
+      "root": "config",
+      "relativePath": "skills",
+      "stripTopLevel": true,
+      "native": false
+    },
+    {
       "artifactType": "rule",
-      "logicalRoot": "rulesRoot",
-      "relativePath": "global_rules/AG_GLOBAL_RULES.md"
+      "root": "config",
+      "relativePath": "wsr/rules",
+      "stripTopLevel": true,
+      "native": false
     },
     {
       "artifactType": "workflow",
-      "logicalRoot": "workflowsRoot",
-      "relativePath": "./"
+      "root": "config",
+      "relativePath": "workflows",
+      "stripTopLevel": true,
+      "native": false
     },
     {
       "artifactType": "skill",
-      "logicalRoot": "skillsRoot",
-      "relativePath": "./"
+      "root": "config",
+      "relativePath": "skills",
+      "stripTopLevel": true,
+      "native": false
     },
     {
       "artifactType": "script",
-      "logicalRoot": "scriptsRoot",
-      "relativePath": "./"
+      "root": "config",
+      "relativePath": "scripts",
+      "stripTopLevel": true,
+      "native": false
     }
   ],
-  "routerContract": {
-    "type": "absolute",
-    "path": ".agents/AGENTS.md"
+  "router": {
+    "root": "config",
+    "path": "AGENTS.md",
+    "family": "generic",
+    "native": false
   },
-  "activeMarkerContract": {
-    "required": true,
-    "path": ".agents/.wsr-active.json"
+  "state": {
+    "root": "config",
+    "path": ".wsr-active.json"
   },
+  "capabilities": {
+    "nativeInstructions": false,
+    "nativeSlashWorkflows": false,
+    "nativeProgressiveSkills": false,
+    "restartAfterRouterChange": true,
+    "goalSupport": "emulated",
+    "goalEntrypoint": "fallback-single-agent",
+    "subagentDispatch": false,
+    "receiptContract": "goal-task-v1",
+    "maxParallelTasks": 1
+  },
+  "legacyRoots": [],
   "unsupportedFeatures": [
-    "user-home-install"
+    "native-discovery"
   ]
 }

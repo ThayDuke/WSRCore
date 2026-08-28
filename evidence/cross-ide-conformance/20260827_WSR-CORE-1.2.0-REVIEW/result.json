@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 2,
+  "buildId": "WSR-CORE-1.2.0-REVIEW",
+  "status": "PASS",
+  "audit": {
+    "status": "WARN",
+    "score": 90,
+    "blockers": 0,
+    "high": 0,
+    "medium": 2,
+    "low": 2,
+    "note": "Remaining findings are conservative review signals in pre-existing utility files."
+  },
+  "doctor": {"status": "PASS", "score": 100, "gates": 29},
+  "fixtures": {"status": "PASS", "cases": 30},
+  "syntax": {"status": "PASS", "files": 4},
+  "adapters": {
+    "codex": {"status": "PASS", "operations": 36, "runtimeDoctor": "PASS"},
+    "antigravity": {"status": "PASS", "operations": 36, "runtimeDoctor": "PASS"}
+  }
+}

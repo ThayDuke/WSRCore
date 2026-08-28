@@ -1,46 +1,47 @@
-# WSR Core 1.0.7-RELEASE
+# WSR Core 1.5.0 REVIEW
 
-WSR Core là bộ policy, workflow, skill và công cụ kiểm soát dành cho nhiều
-IDE agent. Codex, Gemini và Antigravity có adapter native; generic adapter
-là lựa chọn workspace-scoped cho IDE agent khác.
+WSR Core 1.5.0 bổ sung báo cáo % context sau mọi phản hồi, preflight task lớn và progressive disclosure.
 
-## Cách nạp
+Mọi phản hồi kết thúc bằng `[Context: ~X% | Trạng thái: ...]`; WSR ưu tiên usage native,
+fallback estimator vẫn phải hiển thị tỷ lệ.
 
-Mỗi adapter khai báo logical roots tương đối dưới một target root đã xác minh.
-`sync_config.py` render router chứa active source root tuyệt đối, build ID và
-manifest hash. Agent vì vậy không cần dò release folder hoặc suy đoán từ CWD.
+## Hai adapter ưu tiên
 
-| Adapter | Target mặc định | Phạm vi |
-|---|---|---|
-| Codex | `CODEX_HOME`, sau đó `~/.codex` | Native |
-| Gemini | `GEMINI_HOME`, sau đó `~/.gemini` | Native |
-| Antigravity | `GEMINI_HOME`, sau đó `~/.gemini` | Native, dữ liệu dưới `config/` |
-| Generic | Chỉ `--target-root` hoặc `WSR_WORKSPACE_ROOT` | Workspace |
-| Cursor | Disabled, unsupported | Ngoài phạm vi 1.0.7 |
-| Claude | Unsupported | Không triển khai |
+| IDE | Router native | Workflow | Skill |
+|---|---|---|---|
+| Codex | `~/.codex/AGENTS.md` | index trong router, JIT từ package | `~/.agents/skills` |
+| Antigravity | `~/.gemini/GEMINI.md` | `~/.gemini/config/global_workflows` | `~/.gemini/antigravity/skills` |
 
-## Quy trình an toàn
+Codex và Antigravity dùng chung kernel, nhưng binding theo discovery native riêng. Gemini là compatibility adapter của cùng `gemini-family`; Claude và Cursor bị tắt.
 
-1. Chạy source Doctor:
-   `python scripts/wsr_doctor.py --source-mode --strict`.
-2. Xem dry-run:
-   `python scripts/sync_config.py --adapter generic --target-root <workspace>`.
-3. Apply chỉ sau phê duyệt:
-   `python scripts/sync_config.py --adapter generic --target-root <workspace> --apply --approval-token WSR-CORE-1.0.7-RELEASE`.
-4. Chạy runtime Doctor:
-   `python scripts/wsr_doctor.py --runtime-mode --adapter generic --target-root <workspace> --strict`.
-5. Reload theo profile và capability cần thiết; dùng `--confirm-loaded` chỉ sau
-   khi mọi required entry thực sự đã được agent đọc.
+## Layer
 
-Package giữ trạng thái `Released`. Việc apply vẫn cần approval token đúng build.
-Không có thao tác release nào tự ghi vào runtime global.
+- `startup`: kernel + command index, tối đa 1.000 token.
+- `command`: thêm một workflow.
+- `task`: thêm đúng skill đã chọn.
+- `resume`: thêm session descriptor và reference trong workspace, tối đa 4.000 token.
+- `diagnostic`: toàn inventory, chỉ khi yêu cầu rõ.
 
-## Progressive disclosure
+Ngưỡng cảnh báo: 60%; handoff: 75%; critical: 85%.
+Trước `/pl`, `/ho`, `/goal` hoặc task lớn, WSR ước lượng usage dự kiến để cảnh báo sớm.
 
-- `startup`: policy, manifest, context và adapter.
-- `command`: startup cộng đúng workflow đang chạy.
-- `task`: command cộng skill có `capabilityId` được chọn và references của nó.
-- `diagnostic`: toàn bộ inventory.
+## Kiểm định và đồng bộ
 
-Doctor kiểm 32 gate, bao gồm identity, adapter v2, marker, router, token budget,
-transaction evidence và cross-IDE conformance.
+`wsr_audit.py` là audit read-only sáu nhóm: integrity, structure, minimality,
+dependency, resource và IDE. Quick audit chỉ đọc thay đổi; deep audit đọc toàn tree.
+JSON report dùng schema `schemas/wsr-audit-report-v1.schema.json`.
+
+```text
+python scripts/wsr_audit.py --mode quick
+python scripts/wsr_audit.py --mode deep --json
+python tests/audit/run_fixtures.py
+```
+
+```text
+python scripts/wsr_doctor.py --source-mode --strict
+python scripts/wsr_audit.py --mode deep
+python scripts/sync_config.py --adapter codex --target-root <sandbox> --root-override skills=<sandbox-skills>
+python scripts/sync_config.py --adapter antigravity --target-root <sandbox>
+```
+
+Apply REVIEW cần `--apply`, `--allow-review` và approval token đúng build. Không có force-sync.

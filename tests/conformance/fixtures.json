@@ -1,85 +1,88 @@
 {
-  "schemaVersion": 1,
-  "gates": {
-    "D17": {
-      "positiveFixture": "context-valid",
-      "negativeFixture": "context-manifest-hash-stale",
-      "expectedExit": 1
+  "schemaVersion": 2,
+  "buildId": "WSR-CORE-1.5.0-REVIEW",
+  "contextTelemetry": {
+    "everyResponse": true,
+    "cases": [
+      {"usedTokens": 200, "windowTokens": 1000, "expectedPercent": 20, "expectedState": "NORMAL"},
+      {"usedTokens": 600, "windowTokens": 1000, "expectedPercent": 60, "expectedState": "WARNING"},
+      {"usedTokens": 750, "windowTokens": 1000, "expectedPercent": 75, "expectedState": "HANDOFF_REQUIRED"},
+      {"usedTokens": 850, "windowTokens": 1000, "expectedPercent": 85, "expectedState": "CRITICAL"}
+    ]
+  },
+  "profiles": {
+    "startup": {
+      "roles": [
+        "kernel",
+        "command_index"
+      ],
+      "maxTokens": 1000
     },
-    "D18": {
-      "positiveFixture": "load-plan-contained",
-      "negativeFixture": "required-entry-missing",
-      "expectedExit": 1
+    "command": {
+      "requires": [
+        "command-name"
+      ]
     },
-    "D19": {
-      "positiveFixture": "command-registry-equal",
-      "negativeFixture": "command-registry-drift",
-      "expectedExit": 1
+    "task": {
+      "requires": [
+        "command-name"
+      ],
+      "skillMode": "selected-only"
     },
-    "D20": {
-      "positiveFixture": "adapter-v2",
-      "negativeFixture": "adapter-v1",
-      "expectedExit": 1
+    "resume": {
+      "requires": [
+        "session-file",
+        "workspace-root"
+      ],
+      "maxTokens": 4000,
+      "authorityPersistence": false
     },
-    "D21": {
-      "positiveFixture": "logical-roots-contained",
-      "negativeFixture": "logical-root-escape",
-      "expectedExit": 4
-    },
-    "D22": {
-      "positiveFixture": "runtime-marker-present",
-      "negativeFixture": "runtime-marker-missing",
-      "expectedExit": 1
-    },
-    "D23": {
-      "positiveFixture": "runtime-marker-bound",
-      "negativeFixture": "runtime-marker-hash-drift",
-      "expectedExit": 1
-    },
-    "D24": {
-      "positiveFixture": "identity-unique",
-      "negativeFixture": "build-id-reused",
-      "expectedExit": 1
-    },
-    "D25": {
-      "positiveFixture": "capability-hashes-valid",
-      "negativeFixture": "capability-hash-stale",
-      "expectedExit": 1
-    },
-    "D26": {
-      "positiveFixture": "capability-paths-unique",
-      "negativeFixture": "capability-path-collision",
-      "expectedExit": 1
-    },
-    "D27": {
-      "positiveFixture": "startup-memory-excluded",
-      "negativeFixture": "startup-memory-leak",
-      "expectedExit": 1
-    },
-    "D28": {
-      "positiveFixture": "startup-budget-valid",
-      "negativeFixture": "startup-budget-exceeded",
-      "expectedExit": 1
-    },
-    "D29": {
-      "positiveFixture": "router-identity-bound",
-      "negativeFixture": "router-placeholder-unresolved",
-      "expectedExit": 1
-    },
-    "D30": {
-      "positiveFixture": "quick-audit-covered",
-      "negativeFixture": "quick-audit-zero-coverage",
-      "expectedExit": 1
-    },
-    "D31": {
-      "positiveFixture": "transaction-rollback-proof",
-      "negativeFixture": "transaction-proof-missing",
-      "expectedExit": 1
-    },
-    "D32": {
-      "positiveFixture": "adapter-matrix-complete",
-      "negativeFixture": "adapter-evidence-missing",
-      "expectedExit": 1
+    "diagnostic": {
+      "explicitOnly": true
     }
-  }
+  },
+  "adapters": {
+    "codex": {
+      "router": "AGENTS.md",
+      "skillRoot": "~/.agents/skills",
+      "nativeSlashWorkflows": false
+    },
+    "antigravity": {
+      "router": "GEMINI.md",
+      "workflowRoot": "config/global_workflows",
+      "skillRoot": "antigravity/skills",
+      "maxChars": 12000
+    }
+  },
+  "goal": {
+    "authorized": [
+      {"prompt": "/goal sửa audit", "source": "/goal", "objective": "sửa audit"},
+      {"prompt": "  Goal chạy conformance  ", "source": "Goal", "objective": "chạy conformance"},
+      {"prompt": "Goal: chạy conformance", "source": "Goal:", "objective": "chạy conformance"}
+    ],
+    "discussion": [
+      "Goal nghĩa là gì?",
+      "The Goal parser is documented here",
+      "Goal"
+    ],
+    "scopeEscape": {"allowedPaths": ["scripts"], "path": "../RELEASE/WSR_MANIFEST.json"},
+    "fallbackAdapter": "generic",
+    "receiptContract": "goal-task-v1"
+  },
+  "approval": {
+    "approved": ["ok", "làm đi", "DUYỆT", "ok duyệt", "Được rồi làm đi"],
+    "discussion": ["được rồi", "ừ", "tiếp tục", "ok chưa?", "không, ok", "có nên làm đi"]
+  },
+  "negative": [
+    "duplicate-rule-id",
+    "manifest-command-registry",
+    "resume-approval-field",
+    "resume-path-escape",
+    "router-bulk-load",
+    "adapter-root-collision",
+    "version-drift",
+    "goal-path-escape",
+    "goal-missing-receipt",
+    "goal-definition-question"
+  ]
 }
