@@ -1,6 +1,6 @@
 # WSR Core 1.5.0 — Kernel
 
-Identity: `WSR-CORE-1.5.0-REVIEW`. Canonical policy for every adapter.
+Identity: `WSR-CORE-1.5.0-RELEASE`. Canonical policy for every adapter.
 Compatibility: preserve WSR-Core 1.0.8 UX and approval behavior.
 
 ## UX and approval

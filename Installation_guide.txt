@@ -1,10 +1,10 @@
-WSR Core 1.5.0 REVIEW
+WSR Core 1.5.0 RELEASE
 
 1. Chạy Doctor strict và Deep Audit trong thư mục package.
 2. Dry-run adapter vào sandbox.
 3. Codex: config root ~/.codex; skill root ~/.agents/skills.
 4. Antigravity: config root ~/.gemini; workflow config/global_workflows; skill antigravity/skills.
-5. Apply REVIEW chỉ khi có quyền hiện tại, --allow-review và approval token đúng build.
+5. Apply RELEASE chỉ khi có quyền hiện tại và approval token đúng build.
 6. Khởi động phiên IDE mới nếu router đổi.
 7. Mọi phản hồi phải có dòng `[Context: ~X% | Trạng thái: ...]`.
 8. Preflight task lớn; chia nhỏ hoặc handoff khi usage dự kiến từ 60%.

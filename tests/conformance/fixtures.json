@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "buildId": "WSR-CORE-1.5.0-REVIEW",
+  "buildId": "WSR-CORE-1.5.0-RELEASE",
   "contextTelemetry": {
     "everyResponse": true,
     "cases": [

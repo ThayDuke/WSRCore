@@ -1,6 +1,7 @@
 # WSR Core Changelog
 
-## [1.5.0-review] - 2026-08-28
+## [1.5.0] - 2026-08-28
+- Released WSR-Core 1.5.0 with mandatory context telemetry and preflight guidance.
 - Added mandatory context percentage reporting after every response.
 - Added projected task preflight and early handoff guidance.
 - Preserved 60% warning, 75% handoff, and 85% critical thresholds.

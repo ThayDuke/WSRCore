@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "activeRun": "evidence/cross-ide-conformance/20260828_WSR-CORE-1.5.0-REVIEW/result.json",
+  "activeRun": "evidence/cross-ide-conformance/20260828_WSR-CORE-1.5.0-RELEASE/result.json",
   "primaryAdapters": [
     "codex",
     "antigravity"

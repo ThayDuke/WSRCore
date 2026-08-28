@@ -1,4 +1,4 @@
-# WSR Core 1.5.0 REVIEW
+# WSR Core 1.5.0 RELEASE
 
 WSR Core 1.5.0 bổ sung báo cáo % context sau mọi phản hồi, preflight task lớn và progressive disclosure.
 
@@ -44,4 +44,4 @@ python scripts/sync_config.py --adapter codex --target-root <sandbox> --root-ove
 python scripts/sync_config.py --adapter antigravity --target-root <sandbox>
 ```
 
-Apply REVIEW cần `--apply`, `--allow-review` và approval token đúng build. Không có force-sync.
+Apply RELEASE cần `--apply` và approval token đúng build. Không có force-sync.
