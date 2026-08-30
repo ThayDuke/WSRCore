@@ -22,7 +22,9 @@ Trao đổi và làm rõ mục tiêu. Mọi prompt chat thông thường mặc �
 - Dùng tiếng Việt, phong cách Caveman, tối đa 20 từ mỗi dòng.
 - Không in code block. Kết quả trước; nêu lựa chọn ngắn và tác động.
 - `[HIỂU_YÊU_CẦU]` dùng `> [!TIP]`; `[PHƯƠNG_PHÁP]` dùng `> [!NOTE]`.
-- `[CẢNH_BÁO]` dùng `> [!WARNING]`; đề xuất tối ưu và neo hồi quy dùng văn bản thường.
-- Dòng context `[Context: ~X% | Trạng thái: ...]` nằm ở trên dòng chốt.
-- Dòng chốt tách riêng bên dưới: DISCUSSION chốt `XIN VUI LÒNG PHÊ DUYỆT`.
-- Báo cáo hoàn thành tác vụ đã duyệt chốt `ĐÃ HOÀN THÀNH NHIỆM VỤ`.
+- `[CẢNH_BÁO]` dùng `> [!WARNING]`; `[DÒNG_CHỐT]` dùng `> [!IMPORTANT]`.
+- Đề xuất tối ưu và neo hồi quy dùng văn bản thường.
+- DISCUSSION chốt `> [!IMPORTANT]\n> XIN VUI LÒNG PHÊ DUYỆT`.
+- Báo cáo hoàn thành tác vụ đã duyệt chốt `> [!IMPORTANT]\n> ĐÃ HOÀN THÀNH NHIỆM VỤ`.
+- Dòng context: `[Context: ~X% | Trạng thái: ...]` bắt buộc nằm ở dòng cuối cùng (dưới khối IMPORTANT).
+- Báo cáo hoàn thành thêm artifact, bằng chứng kiểm tra và tối đa ba bước QA.

@@ -20,15 +20,13 @@ Mọi phản hồi bắt buộc cấu trúc Alert:
 - `> [!TIP]`: Hiểu yêu cầu, kết quả (Result first).
 - `> [!NOTE]`: Phương pháp, giải pháp, bước kế tiếp.
 - `> [!WARNING]`: Cảnh báo, rủi ro, điều kiện chặn.
+- `> [!IMPORTANT]`: Dòng chốt: DISCUSSION / PLAN chốt `XIN VUI LÒNG PHÊ DUYỆT`; APPROVED (khi hoàn thành nhiệm vụ) chốt `ĐÃ HOÀN THÀNH NHIỆM VỤ`.
 Cấm câu dẫn thừa.
-Dòng context: `[Context: ~X% | Trạng thái: ...]` ở trên dòng chốt.
-Dòng chốt tách riêng bên dưới:
-- DISCUSSION / PLAN: `XIN VUI LÒNG PHÊ DUYỆT`.
-- APPROVED (khi hoàn thành nhiệm vụ): `ĐÃ HOÀN THÀNH NHIỆM VỤ`.
+Dòng context: `[Context: ~X% | Trạng thái: ...]` bắt buộc nằm ở dòng cuối cùng (dưới khối IMPORTANT).
 No code blocks in `/br` or `/pl`.
 Use measured usage when available; otherwise use the WSR estimate.
 Context thresholds: warning 60%, handoff 75%, critical 85%; `checkpoint_then_stop`.
-Before `/pl`, `/ho`, `/goal` or large task, estimate projected usage; suggest split/handoff early.
+Before large tasks, estimate projected usage; suggest split/handoff early.
 
 ## Iron rules
 

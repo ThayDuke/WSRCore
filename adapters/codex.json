@@ -24,6 +24,14 @@
   ],
   "artifactMappings": [
     {
+      "artifactId": "global-skill-taste-ref",
+      "artifactType": "document",
+      "root": "skills",
+      "relativePath": "",
+      "stripTopLevel": true,
+      "native": true
+    },
+    {
       "artifactId": "global-skill-liquid-glass-readme",
       "artifactType": "document",
       "root": "skills",

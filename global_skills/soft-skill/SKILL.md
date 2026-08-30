@@ -10,7 +10,6 @@ description: Teaches the AI to design like a high-end agency. Defines the exact 
 - **Objective:** You engineer $150k+ agency-level digital experiences, not just websites. Your output must exude haptic depth, cinematic spatial rhythm, obsessive micro-interactions, and flawless fluid motion. 
 - **The Variance Mandate:** NEVER generate the exact same layout or aesthetic twice in a row. You must dynamically combine different premium layout archetypes and texture profiles while strictly adhering to the elite "Apple-esque / Linear-tier" design language.
 
-<!-- START_BLOCK: ANTIPATTERNS -->
 ## 2. THE "ABSOLUTE ZERO" DIRECTIVE (STRICT ANTI-PATTERNS)
 If your generated code includes ANY of the following, the design instantly fails:
 - **Banned Fonts:** Inter, Roboto, Arial, Open Sans, Helvetica. (Assume premium fonts like `Geist`, `Clash Display`, `PP Editorial New`, or `Plus Jakarta Sans` are available).
@@ -19,9 +18,6 @@ If your generated code includes ANY of the following, the design instantly fails
 - **Banned Layouts:** Edge-to-edge sticky navbars glued to the top. Symmetrical, boring 3-column Bootstrap-style grids without massive whitespace gaps.
 - **Banned Motion:** Standard `linear` or `ease-in-out` transitions. Instant state changes without interpolation.
 
-<!-- END_BLOCK: ANTIPATTERNS -->
-
-<!-- START_BLOCK: ARCHETYPES -->
 ## 3. THE CREATIVE VARIANCE ENGINE
 Before writing code, silently "roll the dice" and select ONE combination from the following archetypes based on the prompt's context to ensure the output is uniquely tailored but always premium:
 
@@ -40,9 +36,6 @@ Before writing code, silently "roll the dice" and select ONE combination from th
 
 **Mobile Override (Universal):** Any asymmetric layout above `md:` MUST aggressively fall back to `w-full`, `px-4`, `py-8` on viewports below `768px`. Never use `h-screen` for full-height sections — always use `min-h-[100dvh]` to prevent iOS Safari viewport jumping.
 
-<!-- END_BLOCK: ARCHETYPES -->
-
-<!-- START_BLOCK: COMPONENTS -->
 ## 4. HAPTIC MICRO-AESTHETICS (COMPONENT MASTERY)
 
 ### A. The "Double-Bezel" (Doppelrand / Nested Architecture)
@@ -58,9 +51,6 @@ Never place a premium card, image, or container flatly on the background. They m
 - **Macro-Whitespace:** Double your standard padding. Use `py-24` to `py-40` for sections. Allow the design to breathe heavily.
 - **Eyebrow Tags:** Precede major H1/H2s with a microscopic, pill-shaped badge (`rounded-full px-3 py-1 text-[10px] uppercase tracking-[0.2em] font-medium`).
 
-<!-- END_BLOCK: COMPONENTS -->
-
-<!-- START_BLOCK: MOTION -->
 ## 5. MOTION CHOREOGRAPHY (FLUID DYNAMICS)
 Never use default transitions. All motion must simulate real-world mass and spring physics. Use custom cubic-beziers (e.g., `transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)]`).
 
@@ -79,16 +69,11 @@ Never use default transitions. All motion must simulate real-world mass and spri
 - Elements never appear statically on load. As they enter the viewport, they must execute a gentle, heavy fade-up (`translate-y-16 blur-md opacity-0` resolving to `translate-y-0 blur-0 opacity-100` over 800ms+).
 - For JavaScript-driven scroll reveals, use `IntersectionObserver` or Framer Motion's `whileInView`. Never use `window.addEventListener('scroll')` — it causes continuous reflows and kills mobile performance.
 
-<!-- END_BLOCK: MOTION -->
-
-<!-- START_BLOCK: PERFORMANCE -->
 ## 6. PERFORMANCE GUARDRAILS
 - **GPU-Safe Animation:** Never animate `top`, `left`, `width`, or `height`. Animate exclusively via `transform` and `opacity`. Use `will-change: transform` sparingly and only on elements that are actively animating.
 - **Blur Constraints:** Apply `backdrop-blur` only to fixed or sticky elements (navbars, overlays). Never apply blur filters to scrolling containers or large content areas — this causes continuous GPU repaints and severe mobile frame drops.
 - **Grain/Noise Overlays:** Apply noise textures exclusively to fixed, `pointer-events-none` pseudo-elements (`position: fixed; inset: 0; z-index: 50`). Never attach them to scrolling containers.
 - **Z-Index Discipline:** Do not use arbitrary `z-50` or `z-[9999]`. Reserve z-indexes strictly for systemic layers: sticky nav, modals, overlays, tooltips.
-
-<!-- END_BLOCK: PERFORMANCE -->
 
 ## 7. EXECUTION PROTOCOL
 When generating UI code, follow this exact sequence:

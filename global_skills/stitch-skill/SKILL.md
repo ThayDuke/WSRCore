@@ -26,7 +26,6 @@ Generate a `DESIGN.md` file that encodes:
 
 ## Analysis & Synthesis Instructions
 
-<!-- START_BLOCK: ATMOSPHERE -->
 ### 1. Define the Atmosphere
 Evaluate the target project's intent. Use evocative adjectives from the taste spectrum:
 - **Density:** "Art Gallery Airy" (1–3) → "Daily App Balanced" (4–7) → "Cockpit Dense" (8–10)
@@ -35,9 +34,6 @@ Evaluate the target project's intent. Use evocative adjectives from the taste sp
 
 Default baseline: Variance 8, Motion 6, Density 4. Adapt dynamically based on user's vibe description.
 
-<!-- END_BLOCK: ATMOSPHERE -->
-
-<!-- START_BLOCK: COLORS -->
 ### 2. Map the Color Palette
 For each color provide: **Descriptive Name** + **Hex Code** + **Functional Role**.
 
@@ -48,9 +44,6 @@ For each color provide: **Descriptive Name** + **Hex Code** + **Functional Role*
 - Stick to one palette for the entire output — no warm/cool gray fluctuation
 - Never use pure black (`#000000`) — use Off-Black, Zinc-950, or Charcoal
 
-<!-- END_BLOCK: COLORS -->
-
-<!-- START_BLOCK: TYPOGRAPHY -->
 ### 3. Establish Typography Rules
 - **Display/Headlines:** Track-tight, controlled scale. Not screaming. Hierarchy through weight and color, not just massive size
 - **Body:** Relaxed leading, max 65 characters per line
@@ -59,9 +52,6 @@ For each color provide: **Descriptive Name** + **Hex Code** + **Functional Role*
 - **Dashboard Constraint:** Use Sans-Serif pairings exclusively (`Geist` + `Geist Mono` or `Satoshi` + `JetBrains Mono`)
 - **High-Density Override:** When density exceeds 7, all numbers must use Monospace
 
-<!-- END_BLOCK: TYPOGRAPHY -->
-
-<!-- START_BLOCK: HERO -->
 ### 4. Define the Hero Section
 The Hero is the first impression and must be creative, striking, and never generic:
 - **Inline Image Typography:** Embed small, contextual photos or visuals directly between words or letters in the headline. Images sit inline at type-height, rounded, acting as visual punctuation. This is the signature creative technique
@@ -70,9 +60,6 @@ The Hero is the first impression and must be creative, striking, and never gener
 - **Asymmetric Structure:** Centered Hero layouts BANNED when variance exceeds 4
 - **CTA Restraint:** Maximum one primary CTA. No secondary "Learn more" links
 
-<!-- END_BLOCK: HERO -->
-
-<!-- START_BLOCK: COMPONENTS -->
 ### 5. Describe Component Stylings
 For each component type, describe shape, color, shadow depth, and interaction behavior:
 - **Buttons:** Tactile push feedback on active state. No neon outer glows. No custom mouse cursors
@@ -82,9 +69,6 @@ For each component type, describe shape, color, shadow depth, and interaction be
 - **Empty States:** Composed compositions indicating how to populate data
 - **Error States:** Clear, inline error reporting
 
-<!-- END_BLOCK: COMPONENTS -->
-
-<!-- START_BLOCK: LAYOUT -->
 ### 6. Define Layout Principles
 - No overlapping elements — every element occupies its own clear spatial zone. No absolute-positioned content stacking
 - Centered Hero sections are BANNED when variance exceeds 4 — force Split Screen, Left-Aligned, or Asymmetric Whitespace
@@ -93,9 +77,6 @@ For each component type, describe shape, color, shadow depth, and interaction be
 - Contain layouts using max-width constraints (e.g., 1400px centered)
 - Full-height sections must use `min-h-[100dvh]` — never `h-screen` (iOS Safari catastrophic jump)
 
-<!-- END_BLOCK: LAYOUT -->
-
-<!-- START_BLOCK: RESPONSIVE -->
 ### 7. Define Responsive Rules
 Every design must work across all viewports:
 - **Mobile-First Collapse (< 768px):** All multi-column layouts collapse to single column. No exceptions
@@ -106,18 +87,12 @@ Every design must work across all viewports:
 - **Navigation:** Desktop horizontal nav collapses to clean mobile menu
 - **Spacing:** Vertical section gaps reduce proportionally (`clamp(3rem, 8vw, 6rem)`)
 
-<!-- END_BLOCK: RESPONSIVE -->
-
-<!-- START_BLOCK: MOTION -->
 ### 8. Encode Motion Philosophy
 - **Spring Physics default:** `stiffness: 100, damping: 20` — premium, weighty feel. No linear easing
 - **Perpetual Micro-Interactions:** Every active component should have an infinite loop state (Pulse, Typewriter, Float, Shimmer)
 - **Staggered Orchestration:** Never mount lists instantly — use cascade delays for waterfall reveals
 - **Performance:** Animate exclusively via `transform` and `opacity`. Never animate `top`, `left`, `width`, `height`. Grain/noise filters on fixed pseudo-elements only
 
-<!-- END_BLOCK: MOTION -->
-
-<!-- START_BLOCK: ANTIPATTERNS -->
 ### 9. List Anti-Patterns (AI Tells)
 Encode these as explicit "NEVER DO" rules in the DESIGN.md:
 - No emojis anywhere
@@ -137,9 +112,6 @@ Encode these as explicit "NEVER DO" rules in the DESIGN.md:
 - No broken Unsplash links — use `picsum.photos` or SVG avatars
 - No centered Hero sections (for high-variance projects)
 
-<!-- END_BLOCK: ANTIPATTERNS -->
-
-<!-- START_BLOCK: TEMPLATE -->
 ## Output Format (DESIGN.md Structure)
 
 ```markdown
@@ -188,8 +160,6 @@ transforms only. Isolated Client Components for CPU-heavy animations.)
 no neon glows, no 3-column equal grids, no AI copywriting clichés,
 no generic placeholder names, no broken image links.)
 ```
-
-<!-- END_BLOCK: TEMPLATE -->
 
 ## Best Practices
 - **Be Descriptive:** "Deep Charcoal Ink (#18181B)" — not just "dark text"

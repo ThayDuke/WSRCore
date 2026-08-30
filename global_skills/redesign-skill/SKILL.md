@@ -13,7 +13,6 @@ When applied to an existing project, follow this sequence:
 2. **Diagnose** — Run through the audit below. List every generic pattern, weak point, and missing state you find.
 3. **Fix** — Apply targeted upgrades working with the existing stack. Do not rewrite from scratch. Improve what's there.
 
-<!-- START_BLOCK: AUDIT -->
 ## Design Audit
 
 ### Typography
@@ -130,9 +129,6 @@ Check for these problems and fix them:
 - **No "skip to content" link.** Essential for keyboard users. Add a hidden skip-link.
 - **No cookie consent.** If required by jurisdiction, add a compliant consent banner.
 
-<!-- END_BLOCK: AUDIT -->
-
-<!-- START_BLOCK: UPGRADES -->
 ## Upgrade Techniques
 
 When upgrading a project, pull from these high-impact techniques to replace generic patterns:
@@ -159,8 +155,6 @@ When upgrading a project, pull from these high-impact techniques to replace gene
 - **Spotlight borders.** Card borders that illuminate dynamically under the cursor.
 - **Grain and noise overlays.** A fixed, pointer-events-none overlay with subtle noise to break digital flatness.
 - **Colored, tinted shadows.** Shadows that carry the hue of the background rather than using generic black.
-
-<!-- END_BLOCK: UPGRADES -->
 
 ## Fix Priority
 

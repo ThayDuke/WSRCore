@@ -104,6 +104,11 @@ def scan_file(filepath, project_root):
                     # Skip inline code spans by stripping backticks
                     line = re.sub(r'`[^`]+`', ' ', line)
                     
+                is_html = filepath.endswith(('.html', '.htm'))
+                if is_html:
+                    line = re.sub(r'<code[^>]*>.*?</code>', ' ', line, flags=re.IGNORECASE)
+                    line = re.sub(r'<pre[^>]*>.*?</pre>', ' ', line, flags=re.IGNORECASE)
+                    
                 # Skip schema examples or definitions to avoid false positives
                 if 'wsr-debt: [mô tả' in line or 'dec-debt: [lý do' in line or 'KEYWORDS' in line:
                     continue

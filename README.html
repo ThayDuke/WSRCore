@@ -1,7 +1,1190 @@
-<!doctype html>
-<html lang="vi"><head><meta charset="utf-8"><title>WSR Core 1.5.0 RELEASE</title></head>
-<body><main><h1>WSR Core 1.5.0 RELEASE</h1><p>Kernel nhỏ, báo cáo % context sau mọi phản hồi, preflight task lớn, workflow và Goal nạp đúng lúc.</p>
-<table><thead><tr><th>IDE</th><th>Router</th><th>Workflow</th><th>Skill</th></tr></thead><tbody>
-<tr><td>Codex</td><td>~/.codex/AGENTS.md</td><td>command index + JIT</td><td>~/.agents/skills</td></tr>
-<tr><td>Antigravity</td><td>~/.gemini/GEMINI.md</td><td>~/.gemini/config/global_workflows</td><td>~/.gemini/antigravity/skills</td></tr>
-</tbody></table><p>Mọi phản hồi có dòng Context. Ngưỡng: 60% cảnh báo, 75% handoff, 85% critical. RELEASE triển khai với approval token đúng build.</p></main></body></html>
+<!DOCTYPE html>
+<html lang="vi" data-theme="dark" data-lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WSR Core 1.5.0 — Hướng Dẫn Vận Hành & Danh Mục Kỹ Năng Tinh Gọn</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      /* Theme Sáng - Frosty Apple Glass */
+      --bg-color: #f6f8fc;
+      --bg-gradient: radial-gradient(circle at 10% 15%, rgba(0, 113, 227, 0.12) 0%, transparent 45%),
+                     radial-gradient(circle at 90% 85%, rgba(135, 91, 235, 0.12) 0%, transparent 45%),
+                     radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.05) 0%, transparent 60%);
+      --text-color: #1a1f2c;
+      --text-muted: #5a6578;
+      --accent-color: #0066cc;
+      --accent-hover: #0077ed;
+      --accent-glow: rgba(0, 102, 204, 0.25);
+      --lg-bg: rgba(255, 255, 255, 0.65);
+      --lg-bg-active: rgba(255, 255, 255, 0.85);
+      --lg-border: rgba(255, 255, 255, 0.8);
+      --lg-blur: 20px;
+      --lg-shadow: 0 10px 30px rgba(0, 40, 100, 0.06), 
+                   inset 0 1px 1px rgba(255, 255, 255, 0.8);
+      --sidebar-width: 290px;
+      --code-bg: rgba(240, 244, 250, 0.85);
+      --code-color: #0d1e3a;
+      --code-border: rgba(0, 70, 150, 0.12);
+      --table-border: rgba(0, 0, 0, 0.07);
+      --th-bg: rgba(0, 102, 204, 0.05);
+      --tag-bg: rgba(0, 102, 204, 0.08);
+      --tag-border: rgba(0, 102, 204, 0.2);
+    }
+
+    html[data-theme="dark"] {
+      /* Theme Tối - Obsidian Liquid Glass */
+      --bg-color: #07090e;
+      --bg-gradient: radial-gradient(circle at 15% 15%, rgba(59, 130, 246, 0.15) 0%, transparent 40%),
+                     radial-gradient(circle at 85% 80%, rgba(168, 85, 247, 0.12) 0%, transparent 40%),
+                     radial-gradient(circle at 50% 40%, rgba(16, 185, 129, 0.06) 0%, transparent 50%);
+      --text-color: #f1f5f9;
+      --text-muted: #94a3b8;
+      --accent-color: #38bdf8;
+      --accent-hover: #60a5fa;
+      --accent-glow: rgba(56, 189, 248, 0.25);
+      --lg-bg: rgba(15, 23, 42, 0.6);
+      --lg-bg-active: rgba(30, 41, 59, 0.75);
+      --lg-border: rgba(255, 255, 255, 0.1);
+      --lg-blur: 24px;
+      --lg-shadow: 0 16px 40px rgba(0, 0, 0, 0.5), 
+                   inset 0 1px 0px rgba(255, 255, 255, 0.12);
+      --code-bg: rgba(2, 6, 23, 0.75);
+      --code-color: #e2e8f0;
+      --code-border: rgba(255, 255, 255, 0.08);
+      --table-border: rgba(255, 255, 255, 0.08);
+      --th-bg: rgba(56, 189, 248, 0.07);
+      --tag-bg: rgba(56, 189, 248, 0.1);
+      --tag-border: rgba(56, 189, 248, 0.25);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "Be Vietnam Pro", -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg-color);
+      background-image: var(--bg-gradient);
+      background-attachment: fixed;
+      color: var(--text-color);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      transition: background 0.3s, color 0.3s;
+      overflow-x: hidden;
+    }
+
+    html[data-lang="vi"] .lang-en { display: none !important; }
+    html[data-lang="en"] .lang-vi { display: none !important; }
+
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(140, 160, 190, 0.25); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(140, 160, 190, 0.45); }
+
+    /* Header */
+    header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 64px;
+      background: var(--lg-bg);
+      backdrop-filter: blur(var(--lg-blur));
+      -webkit-backdrop-filter: blur(var(--lg-blur));
+      border-bottom: 1px solid var(--lg-border);
+      box-shadow: var(--lg-shadow);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      z-index: 1000;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+      font-size: 1.15rem;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-logo {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #0ea5e9, #8b5cf6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 900;
+      font-size: 1rem;
+      box-shadow: 0 4px 12px var(--accent-glow);
+    }
+
+    .controls { display: flex; align-items: center; gap: 12px; }
+
+    .btn-pill {
+      background: var(--lg-bg);
+      border: 1px solid var(--lg-border);
+      color: var(--text-color);
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .btn-pill:hover { background: var(--lg-bg-active); transform: translateY(-1px); }
+
+    .btn-icon {
+      background: var(--lg-bg);
+      border: 1px solid var(--lg-border);
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--text-color);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .btn-icon:hover { background: var(--lg-bg-active); transform: scale(1.05); }
+    .btn-icon svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+    /* Layout Wrapper */
+    .wrapper { display: flex; margin-top: 64px; min-height: calc(100vh - 64px); }
+
+    /* Sidebar Navigation */
+    aside {
+      position: fixed;
+      top: 64px; left: 0; bottom: 0;
+      width: var(--sidebar-width);
+      background: var(--lg-bg);
+      backdrop-filter: blur(var(--lg-blur));
+      -webkit-backdrop-filter: blur(var(--lg-blur));
+      border-right: 1px solid var(--lg-border);
+      box-shadow: var(--lg-shadow);
+      padding: 24px 16px;
+      overflow-y: auto;
+      z-index: 900;
+    }
+
+    .nav-group { margin-bottom: 24px; }
+    .nav-title {
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      padding-left: 12px;
+    }
+
+    .nav-list { list-style: none; }
+    .nav-item a {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 12px;
+      color: var(--text-color);
+      text-decoration: none;
+      font-size: 0.88rem;
+      font-weight: 500;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+      margin-bottom: 3px;
+    }
+
+    .nav-item a:hover, .nav-item.active a {
+      background: var(--lg-bg-active);
+      color: var(--accent-color);
+      transform: translateX(4px);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+
+    /* Main Content Area */
+    main {
+      margin-left: var(--sidebar-width);
+      flex: 1;
+      padding: 36px 44px;
+      max-width: 1200px;
+      width: calc(100% - var(--sidebar-width));
+    }
+
+    /* Glass Cards */
+    .card {
+      background: var(--lg-bg);
+      backdrop-filter: blur(var(--lg-blur));
+      -webkit-backdrop-filter: blur(var(--lg-blur));
+      border: 1px solid var(--lg-border);
+      box-shadow: var(--lg-shadow);
+      border-radius: 18px;
+      padding: 32px;
+      margin-bottom: 32px;
+      position: relative;
+    }
+
+    .hero-banner {
+      background: linear-gradient(135deg, rgba(14, 165, 233, 0.12), rgba(139, 92, 246, 0.12));
+      border: 1px solid var(--lg-border);
+      padding: 36px;
+      border-radius: 20px;
+      margin-bottom: 32px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      background: var(--tag-bg);
+      border: 1px solid var(--tag-border);
+      color: var(--accent-color);
+      margin-bottom: 16px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* Typography */
+    h1 {
+      font-size: 2.3rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 16px;
+      line-height: 1.2;
+      background: linear-gradient(135deg, var(--text-color) 40%, var(--accent-color));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    h2 {
+      font-size: 1.55rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+      border-bottom: 1px solid var(--lg-border);
+      padding-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    h3 { font-size: 1.15rem; font-weight: 600; margin: 18px 0 10px 0; }
+    p { font-size: 0.94rem; line-height: 1.65; color: var(--text-color); margin-bottom: 16px; opacity: 0.92; }
+
+    /* Bento Grid */
+    .bento-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 18px;
+      margin: 24px 0;
+    }
+
+    .bento-col-4 { grid-column: span 4; }
+    .bento-col-6 { grid-column: span 6; }
+    .bento-col-8 { grid-column: span 8; }
+    .bento-col-12 { grid-column: span 12; }
+
+    .bento-card {
+      background: var(--lg-bg);
+      border: 1px solid var(--lg-border);
+      border-radius: 14px;
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.25s ease;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+    }
+
+    .bento-card:hover {
+      background: var(--lg-bg-active);
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px var(--accent-glow);
+    }
+
+    .bento-icon {
+      font-size: 1.8rem;
+      margin-bottom: 12px;
+      display: inline-block;
+    }
+
+    .bento-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--text-color);
+    }
+
+    .bento-desc {
+      font-size: 0.86rem;
+      line-height: 1.55;
+      color: var(--text-muted);
+      margin-bottom: 14px;
+      flex-grow: 1;
+    }
+
+    /* Interactive Filter Bar */
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 20px;
+      padding: 14px;
+      background: var(--lg-bg);
+      border: 1px solid var(--lg-border);
+      border-radius: 12px;
+    }
+
+    .search-input {
+      flex: 1;
+      min-width: 220px;
+      background: var(--code-bg);
+      border: 1px solid var(--code-border);
+      color: var(--text-color);
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .search-input:focus {
+      border-color: var(--accent-color);
+      box-shadow: 0 0 0 2px var(--accent-glow);
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-muted);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .tab-btn:hover {
+      color: var(--text-color);
+      background: var(--lg-bg-active);
+    }
+
+    .tab-btn.active {
+      background: var(--accent-color);
+      color: #ffffff;
+      box-shadow: 0 2px 8px var(--accent-glow);
+    }
+
+    /* Badges & Tags */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .badge-blue { background: rgba(14, 165, 233, 0.15); color: #0284c7; border: 1px solid rgba(14, 165, 233, 0.3); }
+    .badge-purple { background: rgba(168, 85, 247, 0.15); color: #a855f7; border: 1px solid rgba(168, 85, 247, 0.3); }
+    .badge-green { background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .badge-amber { background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3); }
+    .badge-rose { background: rgba(244, 63, 94, 0.15); color: #f43f5e; border: 1px solid rgba(244, 63, 94, 0.3); }
+
+    html[data-theme="dark"] .badge-blue { color: #38bdf8; }
+    html[data-theme="dark"] .badge-purple { color: #c084fc; }
+    html[data-theme="dark"] .badge-green { color: #34d399; }
+    html[data-theme="dark"] .badge-amber { color: #fbbf24; }
+    html[data-theme="dark"] .badge-rose { color: #fb7185; }
+
+    /* Tables */
+    .table-container {
+      overflow-x: auto;
+      margin: 18px 0 28px 0;
+      border-radius: 12px;
+      border: 1px solid var(--table-border);
+      background: var(--lg-bg);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+      text-align: left;
+    }
+
+    th, td {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--table-border);
+      vertical-align: middle;
+    }
+
+    th {
+      background-color: var(--th-bg);
+      font-weight: 700;
+      color: var(--text-color);
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background-color: var(--lg-bg-active); }
+
+    /* Code Blocks */
+    pre {
+      background-color: var(--code-bg);
+      border: 1px solid var(--code-border);
+      border-radius: 10px;
+      padding: 16px;
+      overflow-x: auto;
+      margin: 14px 0 20px 0;
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 0.84rem;
+      line-height: 1.5;
+    }
+
+    code {
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 0.84rem;
+      color: var(--code-color);
+    }
+
+    p code, li code, td code {
+      background-color: var(--code-bg);
+      border: 1px solid var(--code-border);
+      border-radius: 4px;
+      padding: 2px 6px;
+      font-size: 0.82rem;
+      font-weight: 500;
+    }
+
+    /* Alerts */
+    .alert-box {
+      border-left: 4px solid var(--accent-color);
+      background: rgba(14, 165, 233, 0.08);
+      padding: 16px 20px;
+      border-radius: 0 12px 12px 0;
+      margin: 20px 0;
+    }
+
+    .alert-box p { margin-bottom: 0; }
+
+    @media (max-width: 960px) {
+      aside { transform: translateX(-100%); }
+      main { margin-left: 0; width: 100%; padding: 20px; }
+      .bento-col-4, .bento-col-6, .bento-col-8 { grid-column: span 12; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="brand">
+      <div class="brand-logo">W</div>
+      <span>WSR Core 1.5.0</span>
+      <span class="badge badge-green">RELEASE</span>
+    </div>
+    <div class="controls">
+      <button class="btn-pill" id="lang-toggle" onclick="toggleLang()">
+        <span class="lang-vi">EN</span>
+        <span class="lang-en">VI</span>
+      </button>
+      <button class="btn-icon" id="theme-toggle" onclick="toggleTheme()" aria-label="Toggle Theme">
+        <svg id="sun-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        <svg id="moon-icon" style="display: none;" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Layout Wrapper -->
+  <div class="wrapper">
+    <!-- Sidebar Navigation -->
+    <aside>
+      <div class="nav-group">
+        <div class="nav-title"><span class="lang-vi">Tổng quan</span><span class="lang-en">Overview</span></div>
+        <ul class="nav-list">
+          <li class="nav-item active"><a href="#gioi-thieu"><span>🚀</span> <span class="lang-vi">Giới thiệu WSR Core</span><span class="lang-en">Introduction</span></a></li>
+          <li class="nav-item"><a href="#ung-dung"><span>⚖️</span> <span class="lang-vi">Triết lý & Luật Sắt</span><span class="lang-en">Rules & Philosophy</span></a></li>
+        </ul>
+      </div>
+
+      <div class="nav-group">
+        <div class="nav-title"><span class="lang-vi">Danh mục Kỹ năng</span><span class="lang-en">Skills Catalog</span></div>
+        <ul class="nav-list">
+          <li class="nav-item"><a href="#global-skills"><span>✨</span> <span class="lang-vi">Tra cứu Skills (10 Global + 3 Core)</span><span class="lang-en">Skills Directory (13 Skills)</span></a></li>
+          <li class="nav-item"><a href="#taste-skill-spotlight"><span>🎨</span> <span class="lang-vi">Taste Skill v2 Tiêu điểm</span><span class="lang-en">Taste Skill v2 Spotlight</span></a></li>
+        </ul>
+      </div>
+
+      <div class="nav-group">
+        <div class="nav-title"><span class="lang-vi">Vận hành & Kỹ thuật</span><span class="lang-en">Operations & Architecture</span></div>
+        <ul class="nav-list">
+          <li class="nav-item"><a href="#cai-dat"><span>⚡</span> <span class="lang-vi">Cài đặt & Đồng bộ</span><span class="lang-en">Installation & Sync</span></a></li>
+          <li class="nav-item"><a href="#su-dung"><span>📜</span> <span class="lang-vi">11 Slash Workflows</span><span class="lang-en">11 Slash Workflows</span></a></li>
+          <li class="nav-item"><a href="#ky-thuat"><span>🛡️</span> <span class="lang-vi">L0-L4 & 32 Doctor Gates</span><span class="lang-en">L0-L4 & 32 Doctor Gates</span></a></li>
+          <li class="nav-item"><a href="#so-sanh"><span>📊</span> <span class="lang-vi">So sánh & Lịch sử</span><span class="lang-en">Comparison & History</span></a></li>
+        </ul>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main>
+      
+      <!-- Hero Banner -->
+      <div class="hero-banner">
+        <div class="hero-badge">
+          <span class="lang-vi">Chuẩn Quản Trị Tác Tử AI Cao Cấp</span>
+          <span class="lang-en">Premium AI Agent Governance Platform</span>
+        </div>
+        <h1 class="lang-vi">WSR Core 1.5.0 — Hệ Điều Hành Agent & Thư Viện Kỹ Năng Tinh Gọn</h1>
+        <h1 class="lang-en">WSR Core 1.5.0 — Agent Operating System & Streamlined Skills Suite</h1>
+        <p class="lang-vi">
+          Nền tảng kiểm soát tác tử toàn diện thiết kế theo chuẩn <strong>Anti-Waste</strong> và <strong>Minimal Coding Protocol</strong>. Tích hợp trọn bộ <strong>10 Global Skills</strong> (với Taste Skill v2, Liquid Glass, Stitch Design), 11 Slash Workflows và 32 cổng kiểm định Doctor đạt tuyệt đối 100/100.
+        </p>
+        <p class="lang-en">
+          Comprehensive agent governance built on <strong>Anti-Waste</strong> and <strong>Minimal Coding Protocol</strong>. Fully integrated with <strong>10 Global Skills</strong> (powered by Taste Skill v2, Liquid Glass, Stitch Design), 11 Slash Workflows, and 32-gate WSR Doctor 100/100 validation.
+        </p>
+      </div>
+
+      <!-- Section: Giới thiệu -->
+      <section id="gioi-thieu" class="card">
+        <h2>
+          <span>🚀</span>
+          <span class="lang-vi">Giới Thiệu WSR Core 1.5.0</span>
+          <span class="lang-en">Introduction to WSR Core 1.5.0</span>
+        </h2>
+        <p class="lang-vi">
+          <strong>WSR Core 1.5.0 (WSR-CORE-1.5.0-RELEASE)</strong> là nền tảng quản trị tác tử AI độc lập, thiết kế theo tôn chỉ <strong>Anti-Waste</strong> và <strong>Minimal Coding Protocol</strong>. Phiên bản 1.5.0 tối ưu hóa toàn diện: Kernel siêu gọn (~585 tokens), phân tầng nạp cấp tiến L0-L4, tích hợp 11 slash command workflows tiêu chuẩn, hệ thống kiểm định Doctor 32-gate và giám sát telemetry context chủ động.
+        </p>
+        <p class="lang-en">
+          <strong>WSR Core 1.5.0 (WSR-CORE-1.5.0-RELEASE)</strong> is an independent AI Agent governance platform built upon <strong>Anti-Waste</strong> and <strong>Minimal Coding Protocol</strong>. Version 1.5.0 delivers comprehensive optimizations: Ultra-compact kernel (~585 tokens), progressive L0-L4 loading hierarchy, 11 standardized slash command workflows, 32-gate Doctor integrity verification, and proactive context telemetry.
+        </p>
+
+        <div class="alert-box">
+          <p class="lang-vi">
+            <strong>Triết lý Core Governance:</strong> Loại bỏ toàn bộ phần giải thích dài dòng và suy nghĩ lộ liễu. Áp dụng phong cách Vietnamese Caveman, kết quả trước tiên (Result-first), tối đa 20 từ mỗi dòng và bắt buộc phân bổ thông tin vào các khối Alert chuẩn: <code>TIP</code>, <code>NOTE</code>, <code>WARNING</code>, <code>IMPORTANT</code>. Dòng context <code>[Context: ~X% | Trạng thái: ...]</code> bắt buộc nằm ở dòng cuối cùng của phản hồi.
+          </p>
+          <p class="lang-en">
+            <strong>Core Governance Philosophy:</strong> Eliminates excessive conversational filler and reasoning disclosure. Enforces Vietnamese Caveman style, Result-first output, maximum 20 words per line, and mandatory categorization into standard Alert blocks: <code>TIP</code>, <code>NOTE</code>, <code>WARNING</code>, <code>IMPORTANT</code>. Context telemetry line is strictly placed at the bottom.
+          </p>
+        </div>
+      </section>
+
+      <!-- Section: Skills Catalog -->
+      <section id="global-skills" class="card">
+        <h2>
+          <span>✨</span>
+          <span class="lang-vi">Bảng Tra Cứu Toàn Diện Kỹ Năng (10 Global + 3 Core)</span>
+          <span class="lang-en">Comprehensive Skills Directory (10 Global + 3 Core)</span>
+        </h2>
+        <p class="lang-vi">
+          Tất cả các kỹ năng bên dưới được quản lý tại <code>global_skills/</code> và <code>skills/</code>, sẵn sàng tự động kích hoạt cấp tiến (Progressive Loading L2) trên mọi IDE (Antigravity, Codex, Gemini).
+        </p>
+        <p class="lang-en">
+          All skills below are managed in <code>global_skills/</code> and <code>skills/</code>, loaded progressively on demand (L2 Progressive Loading) across all IDE adapters (Antigravity, Codex, Gemini).
+        </p>
+
+        <!-- Filter Bar -->
+        <div class="filter-bar">
+          <input type="text" id="skill-search" class="search-input" placeholder="Tìm kỹ năng, từ khóa trigger, mã ID... / Search skills, keywords..." onkeyup="filterSkills()">
+          <button class="tab-btn active" onclick="setSkillCategory('all', this)"><span class="lang-vi">Tất cả (13)</span><span class="lang-en">All (13)</span></button>
+          <button class="tab-btn" onclick="setSkillCategory('anti-slop', this)"><span>🎨</span> Anti-Slop & UI</button>
+          <button class="tab-btn" onclick="setSkillCategory('design-system', this)"><span>📐</span> Design Systems</button>
+          <button class="tab-btn" onclick="setSkillCategory('ops', this)"><span>⚙️</span> Core Ops & Lifecycle</button>
+        </div>
+
+        <!-- Skills Data Table -->
+        <div class="table-container">
+          <table id="skills-table">
+            <thead>
+              <tr>
+                <th><span class="lang-vi">Kỹ năng & Phiên bản</span><span class="lang-en">Skill & Version</span></th>
+                <th><span class="lang-vi">Mã Capability / ID</span><span class="lang-en">Capability ID</span></th>
+                <th><span class="lang-vi">Phân nhóm</span><span class="lang-en">Category</span></th>
+                <th><span class="lang-vi">Từ khóa Trigger</span><span class="lang-en">Trigger Keywords</span></th>
+                <th><span class="lang-vi">Mục tiêu & Năng lực cốt lõi</span><span class="lang-en">Core Capabilities</span></th>
+                <th><span class="lang-vi">Đường dẫn nguồn</span><span class="lang-en">Source Path</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- 1. taste-skill -->
+              <tr data-category="anti-slop">
+                <td><strong>Taste Skill (v2)</strong> <span class="badge badge-rose">FLAGSHIP ENGINE</span></td>
+                <td><code>taste-skill</code><br><small>design-taste-frontend</small></td>
+                <td><span class="badge badge-purple">Anti-Slop & UI</span></td>
+                <td><code>taste</code>, <code>frontend</code>, <code>ui</code>, <code>anti-slop</code>, <code>gsap</code>, <code>layout</code></td>
+                <td>
+                  <span class="lang-vi">Framework chống slop toàn diện: Đọc brief, chỉnh 3 núm xoay (VARIANCE/MOTION/DENSITY), cấm em-dash, GSAP motion chuẩn, tách tài liệu tham chiếu sâu tại <code>references/</code>.</span>
+                  <span class="lang-en">Comprehensive anti-slop frontend framework: Brief inference, 3 dials (VARIANCE/MOTION/DENSITY), em-dash ban, canonical GSAP motion skeletons in <code>references/</code>.</span>
+                </td>
+                <td><code>global_skills/taste-skill/SKILL.md</code></td>
+              </tr>
+              <!-- 2. taste-skill-v1 -->
+              <tr data-category="anti-slop">
+                <td><strong>Taste Skill (v1)</strong></td>
+                <td><code>taste-skill-v1</code><br><small>design-taste-frontend-v1</small></td>
+                <td><span class="badge badge-purple">Anti-Slop & UI</span></td>
+                <td><code>taste-v1</code>, <code>legacy taste</code>, <code>frontend v1</code></td>
+                <td>
+                  <span class="lang-vi">Phiên bản v1 ban đầu của taste-skill, bảo lưu cho các dự án yêu cầu tính tương thích ngược tuyệt đối.</span>
+                  <span class="lang-en">Original v1 of taste-skill preserved for strict backward compatibility.</span>
+                </td>
+                <td><code>global_skills/taste-skill-v1/SKILL.md</code></td>
+              </tr>
+              <!-- 3. gpt-tasteskill -->
+              <tr data-category="anti-slop">
+                <td><strong>GPT Taste Skill</strong> <span class="badge badge-blue">AI SPECIALIZED</span></td>
+                <td><code>gpt-taste</code><br><small>gpt-tasteskill</small></td>
+                <td><span class="badge badge-purple">Anti-Slop & UI</span></td>
+                <td><code>gpt-taste</code>, <code>codex ui</code>, <code>gsap motion</code>, <code>awwwards</code>, <code>variance</code></td>
+                <td>
+                  <span class="lang-vi">Kỹ sư UX/UI chuẩn Awwwards cho GPT/Codex: Biến thiên bố cục ngẫu nhiên thực thụ, cấu trúc AIDA, typography dàn rộng, cuộn GSAP ScrollTrigger nâng cao.</span>
+                  <span class="lang-en">Awwwards-level UI & GSAP motion engineer for GPT/Codex: True randomization layout variance, AIDA structure, wide typography, pinned ScrollTriggers.</span>
+                </td>
+                <td><code>global_skills/gpt-tasteskill/SKILL.md</code></td>
+              </tr>
+              <!-- 4. LiquidGlass -->
+              <tr data-category="design-system">
+                <td><strong>Liquid Glass UI System</strong> <span class="badge badge-blue">APPLE GLASS</span></td>
+                <td><code>liquid-glass-web-win</code></td>
+                <td><span class="badge badge-blue">Design System</span></td>
+                <td><code>liquid glass</code>, <code>glassmorphism</code>, <code>frosted glass</code></td>
+                <td>
+                  <span class="lang-vi">Hệ thống thiết kế kính mờ Apple Glassmorphism: Tích hợp viền phản quang specular highlight, blur động cho Web và Windows (Tauri/Electron).</span>
+                  <span class="lang-en">Apple Glassmorphism UI framework: Specular highlights, layered borders, backdrop blur tokens for Web and Windows apps.</span>
+                </td>
+                <td><code>global_skills/LiquidGlass/skills/...</code></td>
+              </tr>
+              <!-- 5. stitch-skill -->
+              <tr data-category="design-system">
+                <td><strong>Stitch Semantic Design</strong></td>
+                <td><code>stitch-skill</code><br><small>stitch-design-taste</small></td>
+                <td><span class="badge badge-blue">Design System</span></td>
+                <td><code>stitch</code>, <code>design taste</code>, <code>semantic design</code></td>
+                <td>
+                  <span class="lang-vi">Quy chuẩn thiết kế ngữ nghĩa tương thích Google Stitch: Sinh file DESIGN.md chuẩn, layout bất đối xứng, chuyển động mượt tăng tốc phần cứng.</span>
+                  <span class="lang-en">Google Stitch semantic design rules: Generates agent-friendly DESIGN.md files, strict typography, perpetual micro-motion.</span>
+                </td>
+                <td><code>global_skills/stitch-skill/SKILL.md</code></td>
+              </tr>
+              <!-- 6. effective-html -->
+              <tr data-category="design-system">
+                <td><strong>Effective HTML Architecture</strong></td>
+                <td><code>effective-html</code></td>
+                <td><span class="badge badge-blue">Design System</span></td>
+                <td><code>html</code>, <code>layout</code>, <code>semantic html</code></td>
+                <td>
+                  <span class="lang-vi">Chuẩn cấu trúc HTML5 ngữ nghĩa, tối ưu hóa kích thước DOM, hiệu năng render vượt trội và khả năng tương thích tiếp cận (a11y).</span>
+                  <span class="lang-en">Semantic HTML5 architecture, lightweight DOM structure, optimal rendering performance and accessibility standards.</span>
+                </td>
+                <td><code>global_skills/effective-html/SKILL.md</code></td>
+              </tr>
+              <!-- 7. soft-skill -->
+              <tr data-category="anti-slop">
+                <td><strong>High-End Visual Design Taste</strong></td>
+                <td><code>soft-skill</code><br><small>high-end-visual-design</small></td>
+                <td><span class="badge badge-purple">Anti-Slop & UI</span></td>
+                <td><code>soft-skill</code>, <code>visual design</code>, <code>high-end ui</code></td>
+                <td>
+                  <span class="lang-vi">Định hình tư duy thiết kế agency cao cấp: Font chữ tinh tuyển, khoảng thở thoáng đãng, chiều sâu bóng mờ tinh tế, loại bỏ triệt để giao diện mẫu AI giá rẻ.</span>
+                  <span class="lang-en">Agency-grade visual design taste: Curated font pairings, generous spacing, luxury depth, blocking cheap AI default patterns.</span>
+                </td>
+                <td><code>global_skills/soft-skill/SKILL.md</code></td>
+              </tr>
+              <!-- 8. redesign-skill -->
+              <tr data-category="anti-slop">
+                <td><strong>Redesign Existing Projects</strong></td>
+                <td><code>redesign-skill</code><br><small>redesign-existing-projects</small></td>
+                <td><span class="badge badge-purple">Anti-Slop & UI</span></td>
+                <td><code>redesign</code>, <code>visual update</code>, <code>ui audit</code></td>
+                <td>
+                  <span class="lang-vi">Nâng cấp website/ứng dụng hiện có: Audit lỗi giao diện trước tiên, sửa chữa phân cấp, layout và spacing mà không phá vỡ logic nghiệp vụ.</span>
+                  <span class="lang-en">UI overhaul for existing codebases: Audit-first protocol, repairing spacing, hierarchy, and styling safely without regressions.</span>
+                </td>
+                <td><code>global_skills/redesign-skill/SKILL.md</code></td>
+              </tr>
+              <!-- 9. output-skill -->
+              <tr data-category="ops">
+                <td><strong>Full Output Enforcement</strong> <span class="badge badge-green">CORE GUARD</span></td>
+                <td><code>output-skill</code><br><small>full-output-enforcement</small></td>
+                <td><span class="badge badge-green">Core Ops</span></td>
+                <td><code>output</code>, <code>format</code>, <code>full output</code>, <code>anti-lazy</code></td>
+                <td>
+                  <span class="lang-vi">Chống LLM lười biếng: Bắt buộc sinh mã đầy đủ, cấm hoàn toàn placeholder <code>// TODO...</code> và ngắt block mã token an toàn.</span>
+                  <span class="lang-en">Bans AI laziness, placeholder comments, and enforces complete, unabridged code generation across large contexts.</span>
+                </td>
+                <td><code>global_skills/output-skill/SKILL.md</code></td>
+              </tr>
+              <!-- 10. dec-dev-operator -->
+              <tr data-category="ops">
+                <td><strong>DEC Dev Operator</strong></td>
+                <td><code>dec-dev-operator</code></td>
+                <td><span class="badge badge-green">Core Ops</span></td>
+                <td><code>dec</code>, <code>dev operator</code>, <code>dec system</code></td>
+                <td>
+                  <span class="lang-vi">Kỹ năng vận hành hệ thống DEC, tích hợp các agent và tài liệu tham chiếu UI độc quyền.</span>
+                  <span class="lang-en">DEC system developer operator skill with native OpenAI agent bindings and UI references.</span>
+                </td>
+                <td><code>global_skills/dec-dev-operator/SKILL.md</code></td>
+              </tr>
+              <!-- Core Skills -->
+              <tr data-category="ops">
+                <td><strong>WSR Audit Core</strong> <span class="badge badge-green">INTERNAL CORE</span></td>
+                <td><code>wsr-audit</code></td>
+                <td><span class="badge badge-green">Core Ops</span></td>
+                <td><code>audit</code>, <code>static check</code>, <code>wsr-audit</code></td>
+                <td>
+                  <span class="lang-vi">Kiểm định 6 danh mục chất lượng: Tính toàn vẹn, cấu trúc, tối giản, phụ thuộc, tài nguyên và IDE bindings.</span>
+                  <span class="lang-en">Deterministic 6-category audit: Integrity, structure, minimality, dependency, resource, and IDE bindings.</span>
+                </td>
+                <td><code>skills/wsr-audit/SKILL.md</code></td>
+              </tr>
+              <tr data-category="ops">
+                <td><strong>WSR Debt Scanner</strong> <span class="badge badge-green">INTERNAL CORE</span></td>
+                <td><code>wsr-debt</code></td>
+                <td><span class="badge badge-green">Core Ops</span></td>
+                <td><code>debt</code>, <code>debt scan</code>, <code>wsr-debt</code></td>
+                <td>
+                  <span class="lang-vi">Quét và kiểm soát trần nợ kỹ thuật <code># wsr-debt:</code>, ngăn chặn nợ kỹ thuật tồn đọng vô thời hạn.</span>
+                  <span class="lang-en">Scans and enforces ceilings on technical debt annotations, preventing infinite procrastination.</span>
+                </td>
+                <td><code>skills/wsr-debt/SKILL.md</code></td>
+              </tr>
+              <tr data-category="ops">
+                <td><strong>WSR Review Engine</strong> <span class="badge badge-green">INTERNAL CORE</span></td>
+                <td><code>wsr-review</code></td>
+                <td><span class="badge badge-green">Core Ops</span></td>
+                <td><code>review</code>, <code>code review</code>, <code>wsr-review</code></td>
+                <td>
+                  <span class="lang-vi">Review diff mã nguồn tập trung phát hiện over-engineering, loại bỏ mã thừa theo chuẩn YAGNI.</span>
+                  <span class="lang-en">Reviews code diffs targeting over-engineering and unneeded dependencies based on YAGNI principles.</span>
+                </td>
+                <td><code>skills/wsr-review/SKILL.md</code></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Section: Bento Showcase -->
+      <section id="taste-skill-spotlight" class="card">
+        <h2>
+          <span>🎨</span>
+          <span class="lang-vi">Tiêu Điểm: Taste Skill v2 Tinh Gọn</span>
+          <span class="lang-en">Spotlight: Streamlined Taste Skill v2</span>
+        </h2>
+        <div class="bento-grid">
+          <div class="bento-card bento-col-4">
+            <div>
+              <div class="bento-icon">🎯</div>
+              <div class="bento-title">Brief Inference</div>
+              <div class="bento-desc">
+                <span class="lang-vi">Đọc vị ngữ cảnh người dùng trước khi code: Xác định loại trang, đối tượng mục tiêu, rung cảm thiết kế (calm, linear, awwwards) thay vì áp đặt mẫu mặc định.</span>
+                <span class="lang-en">Reads the room before coding: Infers page kind, audience, and design language instead of jumping to generic AI defaults.</span>
+              </div>
+            </div>
+            <span class="badge badge-blue">Section 0 Protocol</span>
+          </div>
+
+          <div class="bento-card bento-col-4">
+            <div>
+              <div class="bento-icon">🎛️</div>
+              <div class="bento-title">3 Dials Configuration</div>
+              <div class="bento-desc">
+                <span class="lang-vi">Kiểm soát 3 núm xoay cốt lõi: <strong>VARIANCE</strong> (1-10 đối xứng/bất đối xứng), <strong>MOTION</strong> (1-10 tĩnh/vật lý), <strong>DENSITY</strong> (1-10 thoáng/dày đặc).</span>
+                <span class="lang-en">Controls three dials: <strong>VARIANCE</strong> (symmetry to chaos), <strong>MOTION</strong> (static to physics), <strong>DENSITY</strong> (airy to cockpit).</span>
+              </div>
+            </div>
+            <span class="badge badge-purple">Baseline: 8 / 6 / 4</span>
+          </div>
+
+          <div class="bento-card bento-col-4">
+            <div>
+              <div class="bento-icon">🚫</div>
+              <div class="bento-title">Hard Pre-Flight Rules</div>
+              <div class="bento-desc">
+                <span class="lang-vi">Cấm triệt để: Dấu gạch ngang dài (em-dash), gradient tím AI mặc định, 3 card bằng chằn chặn, hoạt ảnh lặp vô tận, font Inter + slate-900 nhàm chán.</span>
+                <span class="lang-en">Strictly bans: Em-dashes, default purple gradients, 3 equal cards, infinite micro-animations, Inter + slate-900 AI defaults.</span>
+              </div>
+            </div>
+            <span class="badge badge-rose">Zero Tolerance</span>
+          </div>
+
+          <div class="bento-card bento-col-6">
+            <div>
+              <div class="bento-icon">📐</div>
+              <div class="bento-title">Apple Liquid Glass Engine</div>
+              <div class="bento-desc">
+                <span class="lang-vi">Kiến trúc kính mờ chuẩn xác: Sử dụng <code>backdrop-filter</code> đa tầng, viền phản xạ ánh sáng (specular highlight), shadow đa lớp tạo cảm giác vật liệu thật.</span>
+                <span class="lang-en">True glassmorphism architecture: Multi-layered backdrop blurs, specular edge highlights, and calibrated shadows for tactile depth.</span>
+              </div>
+            </div>
+            <span class="badge badge-blue">global_skills/LiquidGlass</span>
+          </div>
+
+          <div class="bento-card bento-col-6">
+            <div>
+              <div class="bento-icon">🔬</div>
+              <div class="bento-title">32 Gates WSR Doctor Verification</div>
+              <div class="bento-desc">
+                <span class="lang-vi">Bảo đảm tính toàn vẹn tuyệt đối: Kiểm tra SHA-256 từng file, chống mojibake/UTF-8 lỗi, bảo vệ danh mục lệnh, cam kết điểm số 100/100 tuyệt đối.</span>
+                <span class="lang-en">100% deterministic verification: Validates SHA-256 bindings, prevents mojibake, secures command maps with 100/100 gates.</span>
+              </div>
+            </div>
+            <span class="badge badge-green">100/100 Score</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section: Triết lý & Luật Sắt UX -->
+      <section id="ung-dung" class="card">
+        <h2>
+          <span>⚖️</span>
+          <span class="lang-vi">Triết Lý Vận Hành & 7 Luật Sắt (Iron Rules)</span>
+          <span class="lang-en">Operational Philosophy & 7 Iron Rules</span>
+        </h2>
+        <p class="lang-vi">
+          WSR Core 1.5.0 khôi phục trải nghiệm UX 1.0.8 và thiết lập 7 điều luật sắt (Iron Rules) bất khả xâm phạm:
+        </p>
+        <p class="lang-en">
+          WSR Core 1.5.0 preserves the UX 1.0.8 experience and enforces 7 inviolable Iron Rules:
+        </p>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th><span class="lang-vi">Mã luật</span><span class="lang-en">Rule ID</span></th>
+                <th><span class="lang-vi">Tên quy tắc</span><span class="lang-en">Rule Name</span></th>
+                <th><span class="lang-vi">Mô tả chi tiết</span><span class="lang-en">Description</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>AUTH-01</code></td>
+                <td><strong>Read-Only Default</strong></td>
+                <td>
+                  <span class="lang-vi">Mặc định chỉ đọc (Chế độ Thảo luận <code>/br</code>) trừ khi người dùng cấp quyền rõ ràng qua allowlist phê duyệt.</span>
+                  <span class="lang-en">Read-only default (Discussion Mode <code>/br</code>) unless explicitly authorized by user allowlist approval.</span>
+                </td>
+              </tr>
+              <tr>
+                <td><code>AUTH-02</code></td>
+                <td><strong>No Persisted Authority</strong></td>
+                <td>
+                  <span class="lang-vi">Tuyệt đối không lưu vết hoặc tự động khôi phục quyền phê duyệt từ lịch sử chat, plan hay checkpoint.</span>
+                  <span class="lang-en">Never persist or restore granted authority across chat turns, plans, or checkpoints.</span>
+                </td>
+              </tr>
+              <tr>
+                <td><code>SAFE-01</code></td>
+                <td><strong>Destructive Containment</strong></td>
+                <td>
+                  <span class="lang-vi">Xác minh ranh giới tác động; dừng ngay lập tức nếu mục tiêu xóa/sửa không rõ ràng.</span>
+                  <span class="lang-en">Verify destructive targets and containment; halt immediately if impact is ambiguous.</span>
+                </td>
+              </tr>
+              <tr>
+                <td><code>SCOPE-01</code></td>
+                <td><strong>Scope Preservation</strong></td>
+                <td>
+                  <span class="lang-vi">Chỉ chỉnh sửa chính xác phạm vi yêu cầu; bảo tồn tuyệt đối các thay đổi không liên quan của người dùng.</span>
+                  <span class="lang-en">Change only requested scope; strictly preserve unrelated user modifications.</span>
+                </td>
+              </tr>
+              <tr>
+                <td><code>LOAD-01</code></td>
+                <td><strong>Progressive Loading</strong></td>
+                <td>
+                  <span class="lang-vi">Khởi tạo chỉ nạp Kernel L0 và Command Index; nạp workflow/skill theo nhu cầu thực tế (L1-L4).</span>
+                  <span class="lang-en">Startup loads kernel and command index only; loads workflows/skills on demand (L1-L4).</span>
+                </td>
+              </tr>
+              <tr>
+                <td><code>STATE-01</code></td>
+                <td><strong>Session Descriptors</strong></td>
+                <td>
+                  <span class="lang-vi">Tác vụ kéo dài phải sử dụng con trỏ session ngắn gọn, an toàn và lưu trữ nội bộ trong workspace.</span>
+                  <span class="lang-en">Long tasks must use compact workspace-contained session descriptors.</span>
+                </td>
+              </tr>
+              <tr>
+                <td><code>VERIFY-01</code></td>
+                <td><strong>Evidence Grounding</strong></td>
+                <td>
+                  <span class="lang-vi">Chỉ tuyên bố đã tải, đã sửa hoặc hoàn thành khi có bằng chứng thực tế khớp 100%.</span>
+                  <span class="lang-en">Claim loaded, changed, or completed only with matching empirical evidence.</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Section: 11 Slash Workflows -->
+      <section id="su-dung" class="card">
+        <h2>
+          <span>📜</span>
+          <span class="lang-vi">Danh Mục 11 Slash Command Workflows Chuẩn</span>
+          <span class="lang-en">Directory of 11 Standard Slash Command Workflows</span>
+        </h2>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th><span class="lang-vi">Lệnh</span><span class="lang-en">Command</span></th>
+                <th><span class="lang-vi">Tệp Quy trình</span><span class="lang-en">Workflow File</span></th>
+                <th><span class="lang-vi">Yêu cầu Duyệt?</span><span class="lang-en">Approval?</span></th>
+                <th><span class="lang-vi">Mô tả chức năng</span><span class="lang-en">Functionality</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>/audit</code></td>
+                <td><code>global_workflows/audit.md</code></td>
+                <td><span class="badge badge-green">Không (Read-only)</span></td>
+                <td><span class="lang-vi">Kiểm định 6 danh mục chất lượng WSR tự động</span><span class="lang-en">Run deterministic 6-category WSR quality audit</span></td>
+              </tr>
+              <tr>
+                <td><code>/backup</code></td>
+                <td><code>global_workflows/backup.md</code></td>
+                <td><span class="badge badge-rose">Cần duyệt</span></td>
+                <td><span class="lang-vi">Tạo bản sao lưu nén ZIP an toàn cho workspace</span><span class="lang-en">Create safe ZIP backup archive of workspace</span></td>
+              </tr>
+              <tr>
+                <td><code>/br</code></td>
+                <td><code>global_workflows/br.md</code></td>
+                <td><span class="badge badge-green">Không (Read-only)</span></td>
+                <td><span class="lang-vi">Chế độ Brainstorm trao đổi, phân tích và đề xuất giải pháp</span><span class="lang-en">Trigger brainstorm mode for discussions & analysis</span></td>
+              </tr>
+              <tr>
+                <td><code>/clean</code></td>
+                <td><code>global_workflows/clean.md</code></td>
+                <td><span class="badge badge-rose">Cần duyệt</span></td>
+                <td><span class="lang-vi">Quét và dọn dẹp các tệp tin tạm/rác theo whitelist</span><span class="lang-en">Scan and remove temporary/unwanted files</span></td>
+              </tr>
+              <tr>
+                <td><code>/commit</code></td>
+                <td><code>global_workflows/commit.md</code></td>
+                <td><span class="badge badge-rose">Cần duyệt</span></td>
+                <td><span class="lang-vi">Commit toàn bộ thay đổi và push lên GitHub (nhánh hiện tại hoặc chỉ định)</span><span class="lang-en">Commit all repository changes and push to GitHub (current or specified branch)</span></td>
+              </tr>
+              <tr>
+                <td><code>/goal</code></td>
+                <td><code>global_workflows/goal.md</code></td>
+                <td><span class="badge badge-rose">Cần duyệt</span></td>
+                <td><span class="lang-vi">Cấp quyền thực thi một Goal tự động có biên giới</span><span class="lang-en">Authorize bounded autonomous Goal execution</span></td>
+              </tr>
+              <tr>
+                <td><code>/ho</code></td>
+                <td><code>global_workflows/ho.md</code></td>
+                <td><span class="badge badge-green">Không (Read-only)</span></td>
+                <td><span class="lang-vi">Alias của /pl ở chế độ bàn giao ngữ cảnh (Handoff)</span><span class="lang-en">Alias of /pl in context handoff mode</span></td>
+              </tr>
+              <tr>
+                <td><code>/pl</code></td>
+                <td><code>global_workflows/pl.md</code></td>
+                <td><span class="badge badge-green">Không (Read-only)</span></td>
+                <td><span class="lang-vi">Lập kế hoạch thực thi và tạo file planning chuyên nghiệp</span><span class="lang-en">Trigger planning workflow and create plan file</span></td>
+              </tr>
+              <tr>
+                <td><code>/reload</code></td>
+                <td><code>global_workflows/reload.md</code></td>
+                <td><span class="badge badge-green">Không (Read-only)</span></td>
+                <td><span class="lang-vi">Kiểm tra xác thực gói WSR và xuất biên lai nạp</span><span class="lang-en">Verify released WSR source & emit reload receipt</span></td>
+              </tr>
+              <tr>
+                <td><code>/sync</code></td>
+                <td><code>global_workflows/sync.md</code></td>
+                <td><span class="badge badge-rose">Cần duyệt</span></td>
+                <td><span class="lang-vi">Tự động phát hiện bản release và đồng bộ cấu hình IDE</span><span class="lang-en">Auto-detect release and sync IDE configuration</span></td>
+              </tr>
+              <tr>
+                <td><code>/wsr</code></td>
+                <td><code>global_workflows/wsr.md</code></td>
+                <td><span class="badge badge-rose">Cần duyệt</span></td>
+                <td><span class="lang-vi">Quy trình đóng gói phân phối WSR chuẩn</span><span class="lang-en">WSR official release packaging workflow</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Section: Cài đặt & Đồng bộ -->
+      <section id="cai-dat" class="card">
+        <h2>
+          <span>⚡</span>
+          <span class="lang-vi">Hướng Dẫn Cài Đặt & Đồng Bộ Runtime</span>
+          <span class="lang-en">Installation & Runtime Synchronization</span>
+        </h2>
+        <p class="lang-vi">
+          Để kiểm tra và đồng bộ WSR Core sang các IDE (Antigravity, Codex, Gemini), chạy các lệnh CLI tiêu chuẩn:
+        </p>
+        <p class="lang-en">
+          To verify and synchronize WSR Core across target IDEs (Antigravity, Codex, Gemini), run the standard CLI commands:
+        </p>
+
+        <pre><code># 1. Kiểm tra 32 gates WSR Doctor
+python scripts/wsr_doctor.py --path . --source-mode
+
+# 2. Kiểm tra kế hoạch đồng bộ (Dry-run)
+python scripts/sync_config.py --adapter antigravity
+
+# 3. Thực hiện đồng bộ chính thức sang IDE
+python scripts/sync_config.py --adapter antigravity --apply --approval-token WSR-CORE-1.5.0-RELEASE</code></pre>
+      </section>
+
+      <!-- Section: Kiến trúc L0-L4 & 32 Gates Doctor -->
+      <section id="ky-thuat" class="card">
+        <h2>
+          <span>🛡️</span>
+          <span class="lang-vi">Kiến Trúc Phân Tầng L0-L4 & 32 Cổng Kiểm Định Doctor</span>
+          <span class="lang-en">L0-L4 Layered Architecture & 32 Doctor Gates</span>
+        </h2>
+        <div class="bento-grid">
+          <div class="bento-card bento-col-6">
+            <div class="bento-title"><span class="lang-vi">Chuỗi Phân Tầng Nạp Cấp Tiến</span><span class="lang-en">Progressive Loading Hierarchy</span></div>
+            <ul style="margin-left: 20px; font-size: 0.88rem; line-height: 1.6;">
+              <li><strong>L0 (Startup):</strong> <code>GEMINI.md</code> (Kernel) + Command Index (~837 tokens).</li>
+              <li><strong>L1 (Workflow):</strong> Nạp tệp <code>global_workflows/&lt;cmd&gt;.md</code> khi lệnh được gọi.</li>
+              <li><strong>L2 (Skills):</strong> Nạp kỹ năng trong <code>global_skills/</code> khi khớp trigger.</li>
+              <li><strong>L3 (Resume):</strong> Nạp con trỏ phiên làm việc khi tiếp tục task dài.</li>
+              <li><strong>L4 (Diagnostics):</strong> Chỉ nạp thông tin chẩn đoán khi có yêu cầu rõ ràng.</li>
+            </ul>
+          </div>
+          <div class="bento-card bento-col-6">
+            <div class="bento-title"><span class="lang-vi">Ngưỡng Quản Trị Context Telemetry</span><span class="lang-en">Context Telemetry Thresholds</span></div>
+            <ul style="margin-left: 20px; font-size: 0.88rem; line-height: 1.6;">
+              <li><strong style="color: #f59e0b;">Warning (60%):</strong> Cảnh báo sớm, đề xuất chia nhỏ tác vụ.</li>
+              <li><strong style="color: #f97316;">Handoff (75%):</strong> Kích hoạt <code>/ho</code> lưu phiên sang session descriptor.</li>
+              <li><strong style="color: #ef4444;">Critical (85%):</strong> Dừng khẩn cấp và checkpoint an toàn (<code>checkpoint_then_stop</code>).</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section: So sánh phiên bản -->
+      <section id="so-sanh" class="card">
+        <h2>
+          <span>📊</span>
+          <span class="lang-vi">So Sánh Tính Năng Giữa Các Phiên Bản</span>
+          <span class="lang-en">Feature Comparison Across Versions</span>
+        </h2>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th><span class="lang-vi">Tính năng cốt lõi</span><span class="lang-en">Core Feature</span></th>
+                <th>WSR Core 1.0.8</th>
+                <th>WSR Core 1.4.1</th>
+                <th>WSR Core 1.5.0 (Hiện tại)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Dung lượng Kernel Khởi động</strong></td>
+                <td>~3,500 tokens</td>
+                <td>~1,200 tokens</td>
+                <td><strong>~837 tokens (Tối ưu 76%)</strong></td>
+              </tr>
+              <tr>
+                <td><strong>Thư viện Global Skills</strong></td>
+                <td>4 Skills</td>
+                <td>7 Skills</td>
+                <td><strong>10 Global Skills (Taste Skill v2 Suite)</strong></td>
+              </tr>
+              <tr>
+                <td><strong>Hệ thống WSR Doctor</strong></td>
+                <td>20 Gates</td>
+                <td>28 Gates</td>
+                <td><strong>32 Gates Tuyệt đối (100/100)</strong></td>
+              </tr>
+              <tr>
+                <td><strong>Giao thức Ngữ cảnh Telemetry</strong></td>
+                <td>Cơ bản</td>
+                <td>Nâng cao</td>
+                <td><strong>Giám sát 3 ngưỡng tự động (60/75/85%)</strong></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Interactive JavaScript -->
+  <script>
+    function toggleTheme() {
+      const html = document.documentElement;
+      const current = html.getAttribute('data-theme');
+      const next = current === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', next);
+      document.getElementById('sun-icon').style.display = next === 'light' ? 'block' : 'none';
+      document.getElementById('moon-icon').style.display = next === 'dark' ? 'block' : 'none';
+    }
+
+    function toggleLang() {
+      const html = document.documentElement;
+      const current = html.getAttribute('data-lang');
+      const next = current === 'vi' ? 'en' : 'vi';
+      html.setAttribute('data-lang', next);
+    }
+
+    function setSkillCategory(cat, targetBtn) {
+      document.querySelectorAll('.filter-bar .tab-btn').forEach(btn => btn.classList.remove('active'));
+      if (targetBtn) {
+        targetBtn.classList.add('active');
+      }
+      const rows = document.querySelectorAll('#skills-table tbody tr');
+      rows.forEach(row => {
+        if (cat === 'all' || row.getAttribute('data-category') === cat) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    }
+
+    function filterSkills() {
+      const query = document.getElementById('skill-search').value.toLowerCase();
+      const rows = document.querySelectorAll('#skills-table tbody tr');
+      rows.forEach(row => {
+        const text = row.innerText.toLowerCase();
+        row.style.display = text.includes(query) ? '' : 'none';
+      });
+    }
+
+    // Initialize icon state
+    document.addEventListener('DOMContentLoaded', () => {
+      const theme = document.documentElement.getAttribute('data-theme');
+      document.getElementById('sun-icon').style.display = theme === 'light' ? 'block' : 'none';
+      document.getElementById('moon-icon').style.display = theme === 'dark' ? 'block' : 'none';
+    });
+  </script>
+</body>
+</html>

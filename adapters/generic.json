@@ -14,68 +14,7 @@
   "discoveryPrecedence": [
     "<explicit-root>/AGENTS.md"
   ],
-  "artifactMappings": [
-    {
-      "artifactId": "global-skill-liquid-glass-readme",
-      "artifactType": "document",
-      "root": "config",
-      "relativePath": "skills",
-      "stripTopLevel": true,
-      "native": false
-    },
-    {
-      "artifactId": "global-skill-stitch-design",
-      "artifactType": "document",
-      "root": "config",
-      "relativePath": "skills",
-      "stripTopLevel": true,
-      "native": false
-    },
-    {
-      "artifactId": "global-skill-dec-dev-openai",
-      "artifactType": "document",
-      "root": "config",
-      "relativePath": "skills",
-      "stripTopLevel": true,
-      "native": false
-    },
-    {
-      "artifactId": "global-skill-liquid-glass-web-doc",
-      "artifactType": "document",
-      "root": "config",
-      "relativePath": "skills",
-      "stripTopLevel": true,
-      "native": false
-    },
-    {
-      "artifactType": "rule",
-      "root": "config",
-      "relativePath": "wsr/rules",
-      "stripTopLevel": true,
-      "native": false
-    },
-    {
-      "artifactType": "workflow",
-      "root": "config",
-      "relativePath": "workflows",
-      "stripTopLevel": true,
-      "native": false
-    },
-    {
-      "artifactType": "skill",
-      "root": "config",
-      "relativePath": "skills",
-      "stripTopLevel": true,
-      "native": false
-    },
-    {
-      "artifactType": "script",
-      "root": "config",
-      "relativePath": "scripts",
-      "stripTopLevel": true,
-      "native": false
-    }
-  ],
+  "artifactMappings": [],
   "router": {
     "root": "config",
     "path": "AGENTS.md",

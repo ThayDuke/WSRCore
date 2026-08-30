@@ -1,7 +1,7 @@
 ---
-description: Commit changes via task-scoped logic
+description: Commit all repository changes and push to GitHub (current or specified branch)
 ---
 
 # /commit
 
-Chỉ commit khi user yêu cầu rõ. Xem diff, chạy kiểm định liên quan và `detect_changes`; không đưa file ngoài phạm vi vào commit. Không push nếu chưa được yêu cầu riêng.
+Cho phép commit toàn bộ thay đổi trong repo và đặt thông điệp commit phù hợp, sau đó tự động push lên GitHub theo nhánh đang làm việc. Nếu được chỉ định rõ nhánh đích, gộp nhánh hiện tại vào nhánh được chỉ định và tiến hành push theo đúng quy định.

@@ -3,7 +3,7 @@
   "packageName": "WSR-Core",
   "version": "1.5.0",
   "buildId": "WSR-CORE-1.5.0-RELEASE",
-  "manifestSha256": "acff1a1e49e89aea2e66a0da4a58c3c20fa99c306e63a8755b358549355e01d7",
+  "manifestSha256": "fecb81754051b9df64f5af1e09d045439681004642fddd54e72620294bfe2ec2",
   "commandMap": {
     "goal": {
       "workflow": "global_workflows/goal.md",
@@ -66,7 +66,7 @@
     },
     "commit": {
       "workflow": "global_workflows/commit.md",
-      "description": "Commit changes via task-scoped logic",
+      "description": "Commit all changes and push to GitHub",
       "readOnly": false,
       "approvalRequired": true,
       "requiredProfile": "command"
@@ -81,7 +81,7 @@
     },
     "ho": {
       "workflow": "global_workflows/ho.md",
-      "description": "Alias /pl ở chế độ handoff",
+      "description": "Alias /pl \u1edf ch\u1ebf \u0111\u1ed9 handoff",
       "readOnly": true,
       "approvalRequired": false,
       "requiredProfile": "command",
@@ -149,7 +149,7 @@
       "description": "Liquid Glass design system guidelines",
       "trigger": "liquid glass, glassmorphism, UI design",
       "path": "global_skills/LiquidGlass/skills/liquid-glass-web-win/SKILL.md",
-      "contentHash": "488c3ce4c59dead22dab0ba072b5b5b740ec6aa46220cf72fb1d4276844cb4b3",
+      "contentHash": "bbde76768942afabb2715d3739fc2fd1a25755dd067a27472959d31295786b3b",
       "references": [
         "global_skills/LiquidGlass/skills/liquid-glass-web-win/references/liquid-glass-web.md"
       ],
@@ -172,17 +172,17 @@
       "description": "UI redesign and visual overhaul rules",
       "trigger": "redesign, visual update",
       "path": "global_skills/redesign-skill/SKILL.md",
-      "contentHash": "af275023ae872464fbddf2909aba6ba4a657f30b6b1aecd4467e0b3d67cbe380",
+      "contentHash": "98ad3e5b051bfb71b2795f7e8a6aa0d32b51ee095606c098a4b2822ac07926c9",
       "scope": "global",
       "priority": 5
     },
     {
       "capabilityId": "soft-skill",
       "name": "Soft Skill",
-      "description": "Soft skills and communication principles",
-      "trigger": "communication, soft skills",
+      "description": "High-end visual design and anti-generic UI taste",
+      "trigger": "soft-skill, visual design, high-end ui, anti-generic",
       "path": "global_skills/soft-skill/SKILL.md",
-      "contentHash": "3bd49aeeeb6ceb940a1bf2a64aa7cf6315443848bb15ed433d8ff26006175b6c",
+      "contentHash": "e1e32f5e2d420872c6c7332b53d5ff7721946766b78c4822b424c2d512c8fdbc",
       "scope": "global",
       "priority": 5
     },
@@ -192,10 +192,43 @@
       "description": "Stitch UI integration and design taste",
       "trigger": "stitch, UI design taste",
       "path": "global_skills/stitch-skill/SKILL.md",
-      "contentHash": "bbefb01af6104aed14866338bab46a98b38101c80710a610bf32679244a9a9c6",
+      "contentHash": "46bdb08fee2dded38b6ba0a051230a502d6ac6e4044afd47592cb40c256028b5",
       "references": [
         "global_skills/stitch-skill/DESIGN.md"
       ],
+      "scope": "global",
+      "priority": 5
+    },
+    {
+      "capabilityId": "taste-skill",
+      "name": "Taste Skill (v2)",
+      "description": "Anti-slop frontend framework for landing pages, portfolios, and redesigns",
+      "trigger": "taste, frontend, ui, anti-slop, gsap, layout, design system",
+      "path": "global_skills/taste-skill/SKILL.md",
+      "contentHash": "113c1753c2e9fbc27439df5dec98ae0b8b08c5884a3795889fb5b0fe6b698926",
+      "scope": "global",
+      "priority": 5,
+      "references": [
+        "global_skills/taste-skill/references/taste-skill-guide.md"
+      ]
+    },
+    {
+      "capabilityId": "taste-skill-v1",
+      "name": "Taste Skill (v1)",
+      "description": "Original v1 taste-skill preserved for backward compatibility",
+      "trigger": "taste-v1, legacy taste, frontend v1",
+      "path": "global_skills/taste-skill-v1/SKILL.md",
+      "contentHash": "033d45af1ed23832730642f95f40ab49db7fb5222848489a6c5656144bfc6dae",
+      "scope": "global",
+      "priority": 5
+    },
+    {
+      "capabilityId": "gpt-taste",
+      "name": "GPT Taste Skill",
+      "description": "Elite UX/UI and GSAP motion engineering for GPT/Codex models",
+      "trigger": "gpt-taste, codex ui, gsap motion, awwwards, variance",
+      "path": "global_skills/gpt-tasteskill/SKILL.md",
+      "contentHash": "2e64c269953f2656c21bf5a0fa6b4568e82fe0c72b36e8f84758e090349966a5",
       "scope": "global",
       "priority": 5
     }
@@ -261,7 +294,7 @@
   },
   "contextTelemetry": {
     "reportEveryResponse": true,
-    "lineFormat": "[Context: ~X% | Trạng thái: ...]",
+    "lineFormat": "[Context: ~X% | Tr\u1ea1ng th\u00e1i: ...]",
     "measurementPriority": [
       "native",
       "estimate"
