@@ -1,12 +1,12 @@
 {
   "adapters": {
     "antigravity": {
-      "operations": 41,
+      "operations": 39,
       "runtimeDoctor": "PASS",
       "status": "PASS"
     },
     "codex": {
-      "operations": 41,
+      "operations": 39,
       "runtimeDoctor": "PASS",
       "status": "PASS"
     }

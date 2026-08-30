@@ -4,6 +4,7 @@
 - Standardized version specification to two-segment `x.y` format (discontinued `x.y.z`).
 - Remastered `README.html` using the enhanced Liquid Glass optical framework (directional Fresnel borders, layered chromatic dispersion shadows, 20px squircles).
 - Integrated comprehensive interactive version changelog and multi-generation comparison table into `README.html`.
+- Streamlined Slash Command catalog from 11 to 9 workflows (pruned legacy `/wsr` and `/backup`).
 - Updated schemas (`wsr-manifest-v2`, `wsr-context-v2`, `wsr-active-v1`, `wsr-session-v1`) and Doctor `D02_SEMANTIC_IDENTITY` check for `x.y` version format.
 - Released official WSR-Core 1.6 package (`WSR-CORE-1.6-RELEASE`).
 

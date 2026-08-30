@@ -3,7 +3,7 @@
   "packageName": "WSR-Core",
   "version": "1.6",
   "buildId": "WSR-CORE-1.6-RELEASE",
-  "manifestSha256": "824b6cd417ad1ac783bc2ef991663f4eda3ea4c19319a284d6c533d3be1e13f5",
+  "manifestSha256": "c15e539b065705506330a35da6330d7a4bb136eaa47b55cb9d1466c1571828ab",
   "commandMap": {
     "goal": {
       "workflow": "global_workflows/goal.md",
@@ -49,20 +49,6 @@
       "approvalRequired": false,
       "requiredProfile": "command",
       "entrypoint": "scripts/wsr_reload.py"
-    },
-    "wsr": {
-      "workflow": "global_workflows/wsr.md",
-      "description": "WSR packaging workflow",
-      "readOnly": false,
-      "approvalRequired": true,
-      "requiredProfile": "command"
-    },
-    "backup": {
-      "workflow": "global_workflows/backup.md",
-      "description": "Create ZIP backup of workspace",
-      "readOnly": false,
-      "approvalRequired": true,
-      "requiredProfile": "command"
     },
     "commit": {
       "workflow": "global_workflows/commit.md",

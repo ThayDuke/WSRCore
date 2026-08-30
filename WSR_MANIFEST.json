@@ -183,21 +183,6 @@
       "encoding": "UTF-8"
     },
     {
-      "id": "workflow-backup",
-      "source": "global_workflows/backup.md",
-      "type": "workflow",
-      "required": true,
-      "mutable": false,
-      "deploy": true,
-      "targets": [
-        "codex",
-        "gemini",
-        "antigravity"
-      ],
-      "owner": "Workflow Engineer",
-      "encoding": "UTF-8"
-    },
-    {
       "id": "workflow-br",
       "source": "global_workflows/br.md",
       "type": "workflow",
@@ -290,21 +275,6 @@
     {
       "id": "workflow-reload",
       "source": "global_workflows/reload.md",
-      "type": "workflow",
-      "required": true,
-      "mutable": false,
-      "deploy": true,
-      "targets": [
-        "codex",
-        "gemini",
-        "antigravity"
-      ],
-      "owner": "Workflow Engineer",
-      "encoding": "UTF-8"
-    },
-    {
-      "id": "workflow-wsr",
-      "source": "global_workflows/wsr.md",
       "type": "workflow",
       "required": true,
       "mutable": false,
@@ -962,50 +932,6 @@
       "encoding": "UTF-8"
     },
     {
-      "id": "conformance-evidence-run-20260720",
-      "source": "evidence/cross-ide-conformance/20260720_WSR-CORE-1.0.5-REVIEW/result.json",
-      "type": "evidence",
-      "required": true,
-      "mutable": false,
-      "deploy": false,
-      "targets": [],
-      "owner": "QA Engineer",
-      "encoding": "UTF-8"
-    },
-    {
-      "id": "conformance-evidence-run-20260720-release",
-      "source": "evidence/cross-ide-conformance/20260720_WSR-CORE-1.0.6-RELEASE/result.json",
-      "type": "evidence",
-      "required": true,
-      "mutable": false,
-      "deploy": false,
-      "targets": [],
-      "owner": "QA Engineer",
-      "encoding": "UTF-8"
-    },
-    {
-      "id": "conformance-evidence-run-20260720-1-0-7-release",
-      "source": "evidence/cross-ide-conformance/20260720_WSR-CORE-1.0.7-RELEASE/result.json",
-      "type": "evidence",
-      "required": true,
-      "mutable": false,
-      "deploy": false,
-      "targets": [],
-      "owner": "QA Engineer",
-      "encoding": "UTF-8"
-    },
-    {
-      "id": "conformance-evidence-run-20260820-1-0-8-release",
-      "source": "evidence/cross-ide-conformance/20260820_WSR-CORE-1.0.8-RELEASE/result.json",
-      "type": "evidence",
-      "required": true,
-      "mutable": false,
-      "deploy": false,
-      "targets": [],
-      "owner": "QA Engineer",
-      "encoding": "UTF-8"
-    },
-    {
       "id": "wsr-checksums",
       "source": "WSR_CHECKSUMS.json",
       "type": "generated",
@@ -1036,66 +962,11 @@
       "encoding": "UTF-8"
     },
     {
-      "id": "conformance-evidence-run-20260827-1-1-0-review",
-      "source": "evidence/cross-ide-conformance/20260827_WSR-CORE-1.1.0-REVIEW/result.json",
-      "type": "evidence",
-      "required": true,
-      "mutable": true,
-      "deploy": false,
-      "targets": [],
-      "owner": "QA Engineer",
-      "encoding": "UTF-8"
-    },
-    {
-      "id": "conformance-evidence-run-20260827-1-2-0-review",
-      "source": "evidence/cross-ide-conformance/20260827_WSR-CORE-1.2.0-REVIEW/result.json",
-      "type": "evidence",
-      "required": true,
-      "mutable": true,
-      "deploy": false,
-      "targets": [],
-      "owner": "QA Engineer",
-      "encoding": "UTF-8"
-    },
-    {
-      "id": "conformance-evidence-run-20260827-1-3-0-review",
-      "source": "evidence/cross-ide-conformance/20260827_WSR-CORE-1.3.0-REVIEW/result.json",
-      "type": "evidence",
-      "required": true,
-      "mutable": true,
-      "deploy": false,
-      "targets": [],
-      "owner": "QA Engineer",
-      "encoding": "UTF-8"
-    },
-    {
       "id": "conformance-evidence-run-20260831-1-6-release",
       "source": "evidence/cross-ide-conformance/20260831_WSR-CORE-1.6-RELEASE/result.json",
       "type": "evidence",
       "required": true,
       "mutable": true,
-      "deploy": false,
-      "targets": [],
-      "owner": "QA Engineer",
-      "encoding": "UTF-8"
-    },
-    {
-      "id": "conformance-evidence-run-20260828-1-5-0-release",
-      "source": "evidence/cross-ide-conformance/20260828_WSR-CORE-1.5.0-RELEASE/result.json",
-      "type": "evidence",
-      "required": true,
-      "mutable": true,
-      "deploy": false,
-      "targets": [],
-      "owner": "QA Engineer",
-      "encoding": "UTF-8"
-    },
-    {
-      "id": "conformance-evidence-run-20260828-1-5-0-review",
-      "source": "evidence/cross-ide-conformance/20260828_WSR-CORE-1.5.0-REVIEW/result.json",
-      "type": "evidence",
-      "required": true,
-      "mutable": false,
       "deploy": false,
       "targets": [],
       "owner": "QA Engineer",
