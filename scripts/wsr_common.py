@@ -14,6 +14,39 @@ EXIT_INVALID_ARGS = 2
 EXIT_IO_TRANSACTION_ERROR = 3
 EXIT_SAFETY_REJECTION = 4
 
+CANONICAL_WSR_REPO = "https://github.com/ThayDuke/WSRCore"
+
+def get_git_remote_info(path):
+    """Inspect Git remote and commit info for a package root if available."""
+    try:
+        import subprocess
+        probe = subprocess.run(
+            ["git", "-C", str(path), "remote", "get-url", "origin"],
+            capture_output=True, text=True, check=False,
+        )
+        remote_url = probe.stdout.strip() if probe.returncode == 0 else None
+
+        branch_probe = subprocess.run(
+            ["git", "-C", str(path), "rev-parse", "--abbrev-ref", "HEAD"],
+            capture_output=True, text=True, check=False,
+        )
+        branch = branch_probe.stdout.strip() if branch_probe.returncode == 0 else None
+
+        commit_probe = subprocess.run(
+            ["git", "-C", str(path), "rev-parse", "HEAD"],
+            capture_output=True, text=True, check=False,
+        )
+        commit = commit_probe.stdout.strip() if commit_probe.returncode == 0 else None
+
+        return {
+            "remoteUrl": remote_url,
+            "branch": branch,
+            "commit": commit,
+            "isCanonical": bool(remote_url and CANONICAL_WSR_REPO.lower() in remote_url.lower()),
+        }
+    except Exception:
+        return {"remoteUrl": None, "branch": None, "commit": None, "isCanonical": False}
+
 def get_package_root():
     """Find package root based on this script's location."""
     current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -33,7 +66,7 @@ def find_ancestor_lock(start_dir):
     return None
 
 def resolve_source_root(explicit_source_root=None, lock_file=None):
-    """Resolve WSR package source root following Section 7.1 (explicit -> lock -> env -> ancestor lock -> package_root)."""
+    """Resolve WSR package source root (explicit -> lock -> env -> ancestor lock -> package_root)."""
     if explicit_source_root:
         return _resolve_source_candidate(explicit_source_root, "explicit_source_root")
 
@@ -41,11 +74,19 @@ def resolve_source_root(explicit_source_root=None, lock_file=None):
     if explicit_lock:
         return _resolve_source_candidate(explicit_lock, f"lock:{explicit_lock}")
 
+    env_root = os.environ.get("WSR_CORE_ROOT")
+    if env_root and os.path.isdir(env_root):
+        return _resolve_source_candidate(env_root, "env:WSR_CORE_ROOT")
+
     ancestor_lock = find_ancestor_lock(os.getcwd())
     if ancestor_lock:
         return _resolve_source_candidate(ancestor_lock, f"lock:{ancestor_lock}")
 
-    return _resolve_source_candidate(get_package_root(), "package_root")
+    pkg_root = get_package_root()
+    if os.path.isfile(os.path.join(pkg_root, "WSR_MANIFEST.json")):
+        return _resolve_source_candidate(pkg_root, "package_root")
+
+    raise ValueError(f"WSRCore source root could not be resolved. Expected valid clone of {CANONICAL_WSR_REPO}")
 
 def _resolve_source_candidate(candidate_path, origin):
     """Resolve one authoritative source candidate without fallback."""

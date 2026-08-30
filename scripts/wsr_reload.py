@@ -286,9 +286,52 @@ def build_load_plan(
     return plan
 
 
+def check_remote_sync(source_root, fetch_remote=False):
+    """Check Git tracking and sync status against canonical GitHub repo."""
+    info = wsr_common.get_git_remote_info(source_root)
+    if not info.get("remoteUrl"):
+        return "STANDALONE", info, None
+
+    if fetch_remote:
+        try:
+            subprocess.run(
+                ["git", "-C", str(source_root), "fetch", "origin", "main"],
+                capture_output=True, text=True, check=False, timeout=10,
+            )
+        except Exception:
+            pass
+
+    try:
+        probe = subprocess.run(
+            ["git", "-C", str(source_root), "rev-parse", "origin/main"],
+            capture_output=True, text=True, check=False,
+        )
+        origin_commit = probe.stdout.strip() if probe.returncode == 0 else None
+        if not origin_commit:
+            return "TRACKED", info, None
+
+        if info["commit"] == origin_commit:
+            return "UP_TO_DATE", info, None
+        else:
+            rev_list = subprocess.run(
+                ["git", "-C", str(source_root), "rev-list", "{0}..{1}".format(info["commit"], origin_commit)],
+                capture_output=True, text=True, check=False,
+            )
+            behind_count = len(rev_list.stdout.strip().splitlines()) if rev_list.returncode == 0 and rev_list.stdout.strip() else 0
+            if behind_count > 0:
+                return "BEHIND", info, "{0} commit(s) behind remote GitHub origin/main".format(behind_count)
+            return "AHEAD", info, None
+    except Exception as error:
+        return "OFFLINE", info, str(error)
+
+
 def emit_human(receipt, status_only):
     print("WSR RELOAD: {0}".format(receipt["state"]))
     print("Source: {0}".format(receipt["sourceRoot"]))
+    if receipt.get("remoteInfo", {}).get("remoteUrl"):
+        print("Remote: {0} ({1})".format(
+            receipt["remoteInfo"]["remoteUrl"], receipt.get("remoteSyncStatus", "UNKNOWN")
+        ))
     print("Build: {0}".format(receipt["buildId"]))
     print("Doctor: {0}/100 | Drift: {1}".format(receipt["doctorScore"], receipt["drift"]))
     print("Load budget: {0}/{1} tokens".format(receipt["estimatedTokens"], receipt["maxTokens"]))
@@ -320,6 +363,8 @@ def parse_args():
     parser.add_argument("--projected-task-tokens", type=int, default=0)
     parser.add_argument("--deep", action="store_true")
     parser.add_argument("--allow-review", action="store_true")
+    parser.add_argument("--check-remote", action="store_true")
+    parser.add_argument("--fetch-remote", action="store_true")
     parser.add_argument("--status", action="store_true")
     parser.add_argument("--json", action="store_true")
     return parser.parse_args()
@@ -426,12 +471,20 @@ def run_reload(args):
         projected_tokens=args.projected_task_tokens,
     )
     outcome = evaluate_reload_state(source_root, manifest, args, active, roots)
+    remote_status, remote_info, remote_msg = check_remote_sync(
+        source_root, fetch_remote=args.fetch_remote or args.check_remote
+    )
+    if remote_msg and not outcome.get("warning"):
+        outcome["warning"] = remote_msg
 
     return {
         "state": outcome["state"],
         "reason": outcome["reason"],
         "sourceRoot": source_root,
         "sourceOrigin": source_origin,
+        "canonicalRepo": wsr_common.CANONICAL_WSR_REPO,
+        "remoteInfo": remote_info,
+        "remoteSyncStatus": remote_status,
         "version": manifest.get("version"),
         "buildId": manifest.get("buildId"),
         "activeBuildId": active_build,

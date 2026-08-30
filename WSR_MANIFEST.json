@@ -35,7 +35,8 @@
     ".DS_Store",
     "Thumbs.db",
     "memory/",
-    "metadata.json"
+    "metadata.json",
+    "DOCS/"
   ],
   "adapters": [
     "adapters/codex.json",
@@ -547,7 +548,11 @@
       "required": true,
       "mutable": false,
       "deploy": true,
-      "targets": ["codex", "gemini", "antigravity"],
+      "targets": [
+        "codex",
+        "gemini",
+        "antigravity"
+      ],
       "owner": "Python Tooling Engineer B",
       "encoding": "UTF-8"
     },
@@ -896,7 +901,11 @@
       "required": true,
       "mutable": false,
       "deploy": true,
-      "targets": ["codex", "gemini", "antigravity"],
+      "targets": [
+        "codex",
+        "gemini",
+        "antigravity"
+      ],
       "owner": "QA Engineer",
       "encoding": "UTF-8"
     },

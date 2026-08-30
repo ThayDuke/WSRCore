@@ -1,3 +1,7 @@
+---
+description: Authorize one bounded Goal execution and its task receipts
+---
+
 # /goal — bounded execution
 
 Parse only a leading `/goal`, `Goal `, or `Goal:` token.

@@ -1,3 +1,7 @@
+---
+description: Alias /pl ở chế độ handoff
+---
+
 # /ho
 
 Alias `/pl` ở chế độ `handoff`; mọi semantics 1.0.8 nằm trong workflow canonical.

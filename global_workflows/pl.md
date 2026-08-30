@@ -1,3 +1,7 @@
+---
+description: Trigger planning workflow and create planning file
+---
+
 # /pl
 
 Tạo hoặc cập nhật kế hoạch tại `DOCS/Planning/planning_<task>.md`.
@@ -21,7 +25,9 @@ Tạo hoặc cập nhật kế hoạch tại `DOCS/Planning/planning_<task>.md`.
 - Dùng tiếng Việt Caveman, không in code block; dùng đúng mapping alert của `GEMINI.md`.
 - Trước khi lập plan, ước lượng context hiện tại và usage dự kiến của plan.
 - Nếu dự kiến từ 60%, cảnh báo sớm và gợi ý chia nhỏ, `/ho` hoặc `/reload`.
-- Kết thúc bản plan bằng yêu cầu phê duyệt và dòng `[Context: ~X% | Trạng thái: ...]`.
+- Dòng context `[Context: ~X% | Trạng thái: ...]` nằm ở trên dòng chốt.
+- Dòng chốt tách riêng bên dưới: PLAN chốt `XIN VUI LÒNG PHÊ DUYỆT`.
+- Báo cáo hoàn thành tác vụ đã duyệt chốt `ĐÃ HOÀN THÀNH NHIỆM VỤ`.
 
 Mode `handoff`: thêm session descriptor tại `.agents/memory/wsr-session.json`.
 Chỉ lưu con trỏ workspace-relative, workflow/capability và timestamp.

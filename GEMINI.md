@@ -16,11 +16,19 @@ Compatibility: preserve WSR-Core 1.0.8 UX and approval behavior.
 ## Output and context
 
 Vietnamese Caveman style. Result first. Maximum 20 words per line. No reasoning disclosure.
-No code blocks in `/br` or `/pl`. Alerts: hiểu yêu cầu=`TIP`, phương pháp=`NOTE`, cảnh báo=`WARNING`.
-Every response ends with `[Context: ~X% | Trạng thái: ...]`.
+Mọi phản hồi bắt buộc cấu trúc Alert:
+- `> [!TIP]`: Hiểu yêu cầu, kết quả (Result first).
+- `> [!NOTE]`: Phương pháp, giải pháp, bước kế tiếp.
+- `> [!WARNING]`: Cảnh báo, rủi ro, điều kiện chặn.
+Cấm câu dẫn thừa.
+Dòng context: `[Context: ~X% | Trạng thái: ...]` ở trên dòng chốt.
+Dòng chốt tách riêng bên dưới:
+- DISCUSSION / PLAN: `XIN VUI LÒNG PHÊ DUYỆT`.
+- APPROVED (khi hoàn thành nhiệm vụ): `ĐÃ HOÀN THÀNH NHIỆM VỤ`.
+No code blocks in `/br` or `/pl`.
 Use measured usage when available; otherwise use the WSR estimate.
-Context thresholds remain warning 60%, handoff 75%, critical 85%; action `checkpoint_then_stop`.
-Before `/pl`, `/ho`, `/goal` or a large task, estimate projected usage and suggest splitting or handoff early.
+Context thresholds: warning 60%, handoff 75%, critical 85%; `checkpoint_then_stop`.
+Before `/pl`, `/ho`, `/goal` or large task, estimate projected usage; suggest split/handoff early.
 
 ## Iron rules
 

@@ -1,6 +1,10 @@
 # WSR Core 1.5.0 — Release Package Rules
 
-- Đọc và tuân thủ `GEMINI.md`; đây là nguồn luật chung duy nhất.
+- Đọc và tuân thủ `GEMINI.md`; đây là nguồn luật chung duy nhất cho mọi IDE (Codex, Antigravity).
+- Áp dụng triệt để luật sắt Vietnamese Caveman: tối đa 20 từ mỗi dòng, cấm câu dẫn thừa.
+- Mọi phản hồi bắt buộc phân bổ vào đúng khối alert: TIP (Kết quả), NOTE (Phương pháp), WARNING (Cảnh báo).
+- Dòng context `[Context: ~X% | Trạng thái: ...]` nằm ở trên dòng chốt.
+- Dòng chốt tách riêng bên dưới: DISCUSSION/PLAN chốt `XIN VUI LÒNG PHÊ DUYỆT`; sau khi duyệt và hoàn thành nhiệm vụ chốt `ĐÃ HOÀN THÀNH NHIỆM VỤ`.
 - Tra lệnh trong `WSR_CONTEXT.json`, rồi chỉ đọc workflow tương ứng trong `global_workflows/`.
 - Chỉ đọc toàn bộ `SKILL.md` khi mô tả skill khớp tác vụ.
 - Không sửa bản RELEASE khác; gói này là WSR-Core 1.5.0 RELEASE.

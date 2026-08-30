@@ -1,3 +1,7 @@
+---
+description: Trigger brainstorm mode for discussions
+---
+
 # /br
 
 Trao đổi và làm rõ mục tiêu. Mọi prompt chat thông thường mặc định chạy workflow này.
@@ -19,5 +23,6 @@ Trao đổi và làm rõ mục tiêu. Mọi prompt chat thông thường mặc �
 - Không in code block. Kết quả trước; nêu lựa chọn ngắn và tác động.
 - `[HIỂU_YÊU_CẦU]` dùng `> [!TIP]`; `[PHƯƠNG_PHÁP]` dùng `> [!NOTE]`.
 - `[CẢNH_BÁO]` dùng `> [!WARNING]`; đề xuất tối ưu và neo hồi quy dùng văn bản thường.
-- Mọi phản hồi kết thúc bằng dòng context: `[Context: ~X% | Trạng thái: ...]`.
-- Báo cáo hoàn thành thêm artifact, bằng chứng kiểm tra và tối đa ba bước QA.
+- Dòng context `[Context: ~X% | Trạng thái: ...]` nằm ở trên dòng chốt.
+- Dòng chốt tách riêng bên dưới: DISCUSSION chốt `XIN VUI LÒNG PHÊ DUYỆT`.
+- Báo cáo hoàn thành tác vụ đã duyệt chốt `ĐÃ HOÀN THÀNH NHIỆM VỤ`.
