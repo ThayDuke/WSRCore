@@ -442,7 +442,7 @@ def _check_manifest_contracts(package_root, manifest, gate):
     }
     identity_ok = bool(
         manifest.get("schemaVersion") == 2
-        and re.fullmatch(r"\d+\.\d+\.\d+", version)
+        and re.fullmatch(r"\d+\.\d+(?:\.\d+)?", version)
         and build_id == "WSR-CORE-{0}-{1}".format(
             version, status_suffixes.get(manifest.get("status"), "INVALID")
         )

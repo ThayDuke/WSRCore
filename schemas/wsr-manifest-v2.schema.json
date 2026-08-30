@@ -15,11 +15,11 @@
     },
     "version": {
       "type": "string",
-      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+      "pattern": "^\\d+\\.\\d+(?:\\.\\d+)?$"
     },
     "buildId": {
       "type": "string",
-      "pattern": "^WSR-CORE-\\d+\\.\\d+\\.\\d+-(REVIEW|RELEASE-CANDIDATE|RELEASE)$"
+      "pattern": "^WSR-CORE-\\d+\\.\\d+(?:\\.\\d+)?-(REVIEW|RELEASE-CANDIDATE|RELEASE)$"
     },
     "status": {
       "type": "string",

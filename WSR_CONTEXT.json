@@ -1,9 +1,9 @@
 {
   "schemaVersion": 2,
   "packageName": "WSR-Core",
-  "version": "1.5.0",
-  "buildId": "WSR-CORE-1.5.0-RELEASE",
-  "manifestSha256": "fecb81754051b9df64f5af1e09d045439681004642fddd54e72620294bfe2ec2",
+  "version": "1.6",
+  "buildId": "WSR-CORE-1.6-RELEASE",
+  "manifestSha256": "824b6cd417ad1ac783bc2ef991663f4eda3ea4c19319a284d6c533d3be1e13f5",
   "commandMap": {
     "goal": {
       "workflow": "global_workflows/goal.md",

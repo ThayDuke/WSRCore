@@ -1,4 +1,4 @@
-WSR Core 1.5.0 RELEASE
+WSR Core 1.6 RELEASE
 
 1. Chạy Doctor strict và Deep Audit trong thư mục package.
 2. Dry-run adapter vào sandbox.

@@ -91,6 +91,12 @@
       "buildId": "WSR-CORE-1.5.0-RELEASE",
       "status": "Released",
       "contentHash": "8e2221f1e4d0c518e5159fb5028fa3397b3e1b028c8351dc707d85ce1f28e77c"
+    },
+    {
+      "version": "1.6",
+      "buildId": "WSR-CORE-1.6-RELEASE",
+      "status": "Released",
+      "contentHash": "0ea02ca15d8d8df125428a0a55228d9103e5709dd7efd2edbb8803895c8dc9e9"
     }
   ]
 }

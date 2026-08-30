@@ -14,7 +14,7 @@
     },
     "buildId": {
       "type": "string",
-      "pattern": "^WSR-CORE-\\d+\\.\\d+\\.\\d+-(REVIEW|RELEASE-CANDIDATE|RELEASE)$"
+      "pattern": "^WSR-CORE-\\d+\\.\\d+(?:\\.\\d+)?-(REVIEW|RELEASE-CANDIDATE|RELEASE)$"
     },
     "updatedAt": {
       "type": "string",

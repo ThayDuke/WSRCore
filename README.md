@@ -1,6 +1,6 @@
-# WSR Core 1.5.0 RELEASE
+# WSR Core 1.6 RELEASE
 
-WSR Core 1.5.0 bổ sung báo cáo % context sau mọi phản hồi, preflight task lớn và progressive disclosure.
+WSR Core 1.6 chuẩn hóa định dạng phiên bản x.y, nâng cấp giao diện Liquid Glass quang học cho README.html, tích hợp changelog đầy đủ giữa các phiên bản và duy trì 100% 32 Doctor gates.
 
 Mọi phản hồi kết thúc bằng `[Context: ~X% | Trạng thái: ...]`; WSR ưu tiên usage native,
 fallback estimator vẫn phải hiển thị tỷ lệ.

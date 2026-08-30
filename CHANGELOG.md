@@ -1,5 +1,12 @@
 # WSR Core Changelog
 
+## [1.6] - 2026-08-31
+- Standardized version specification to two-segment `x.y` format (discontinued `x.y.z`).
+- Remastered `README.html` using the enhanced Liquid Glass optical framework (directional Fresnel borders, layered chromatic dispersion shadows, 20px squircles).
+- Integrated comprehensive interactive version changelog and multi-generation comparison table into `README.html`.
+- Updated schemas (`wsr-manifest-v2`, `wsr-context-v2`, `wsr-active-v1`, `wsr-session-v1`) and Doctor `D02_SEMANTIC_IDENTITY` check for `x.y` version format.
+- Released official WSR-Core 1.6 package (`WSR-CORE-1.6-RELEASE`).
+
 ## [1.5.0] - 2026-08-28
 - Released WSR-Core 1.5.0 with mandatory context telemetry and preflight guidance.
 - Added mandatory context percentage reporting after every response.

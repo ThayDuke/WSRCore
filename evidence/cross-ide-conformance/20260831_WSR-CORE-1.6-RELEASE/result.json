@@ -1,0 +1,38 @@
+{
+  "adapters": {
+    "antigravity": {
+      "operations": 41,
+      "runtimeDoctor": "PASS",
+      "status": "PASS"
+    },
+    "codex": {
+      "operations": 41,
+      "runtimeDoctor": "PASS",
+      "status": "PASS"
+    }
+  },
+  "audit": {
+    "blockers": 0,
+    "high": 0,
+    "low": 0,
+    "medium": 6,
+    "score": 76,
+    "status": "WARN"
+  },
+  "buildId": "WSR-CORE-1.6-RELEASE",
+  "doctor": {
+    "gates": 32,
+    "score": 100,
+    "status": "PASS"
+  },
+  "fixtures": {
+    "cases": 45,
+    "status": "PASS"
+  },
+  "schemaVersion": 2,
+  "status": "PASS",
+  "syntax": {
+    "files": 9,
+    "status": "PASS"
+  }
+}

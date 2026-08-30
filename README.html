@@ -3,68 +3,105 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>WSR Core 1.5.0 — Hướng Dẫn Vận Hành & Danh Mục Kỹ Năng Tinh Gọn</title>
+  <title>WSR Core 1.6 — Hướng Dẫn Vận Hành & Danh Mục Kỹ Năng Tinh Gọn</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
+    /* Liquid Glass Optical Design System (v1.1.0 Benchmark Enhanced) */
     :root {
-      /* Theme Sáng - Frosty Apple Glass */
-      --bg-color: #f6f8fc;
-      --bg-gradient: radial-gradient(circle at 10% 15%, rgba(0, 113, 227, 0.12) 0%, transparent 45%),
-                     radial-gradient(circle at 90% 85%, rgba(135, 91, 235, 0.12) 0%, transparent 45%),
-                     radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.05) 0%, transparent 60%);
-      --text-color: #1a1f2c;
-      --text-muted: #5a6578;
-      --accent-color: #0066cc;
-      --accent-hover: #0077ed;
-      --accent-glow: rgba(0, 102, 204, 0.25);
-      --lg-bg: rgba(255, 255, 255, 0.65);
-      --lg-bg-active: rgba(255, 255, 255, 0.85);
-      --lg-border: rgba(255, 255, 255, 0.8);
+      /* Light Mode - Frosty Apple Glass (Kính mờ quang học clear) */
+      --bg-color: #f1f5f9;
+      --bg-gradient: radial-gradient(circle at 10% 15%, rgba(0, 113, 227, 0.08) 0%, transparent 45%),
+                     radial-gradient(circle at 90% 85%, rgba(135, 91, 235, 0.08) 0%, transparent 45%),
+                     radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.04) 0%, transparent 60%);
+      
+      --lg-bg: rgba(255, 255, 255, 0.55);
+      --lg-bg-prominent: rgba(255, 255, 255, 0.78);
+      --lg-bg-active: rgba(255, 255, 255, 0.90);
       --lg-blur: 20px;
-      --lg-shadow: 0 10px 30px rgba(0, 40, 100, 0.06), 
-                   inset 0 1px 1px rgba(255, 255, 255, 0.8);
-      --sidebar-width: 290px;
-      --code-bg: rgba(240, 244, 250, 0.85);
-      --code-color: #0d1e3a;
-      --code-border: rgba(0, 70, 150, 0.12);
-      --table-border: rgba(0, 0, 0, 0.07);
-      --th-bg: rgba(0, 102, 204, 0.05);
-      --tag-bg: rgba(0, 102, 204, 0.08);
-      --tag-border: rgba(0, 102, 204, 0.2);
+      
+      /* Directional Fresnel Border (135deg incident light) */
+      --lg-border-color: rgba(255, 255, 255, 0.65);
+      --lg-border-fresnel: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.85) 0%,
+        rgba(255, 255, 255, 0.35) 45%,
+        rgba(255, 255, 255, 0.10) 100%
+      );
+
+      /* Layered Optical Shadows (Contact + Ambient + Chromatic Dispersion + Inner Specular) */
+      --lg-shadow-contact: 0 2px 4px rgba(15, 23, 42, 0.04);
+      --lg-shadow-ambient: 0 12px 32px -4px rgba(31, 38, 135, 0.08);
+      --lg-shadow-chromatic: 0 0 20px rgba(59, 130, 246, 0.04), 0 0 40px rgba(236, 72, 153, 0.02);
+      --lg-shadow-inner: inset 0 1px 1px 0 rgba(255, 255, 255, 0.8), inset 0 -1px 1px 0 rgba(0, 0, 0, 0.02);
+      --lg-shadow-combined: var(--lg-shadow-contact), var(--lg-shadow-ambient), var(--lg-shadow-chromatic), var(--lg-shadow-inner);
+
+      --text-color: #0f172a;
+      --text-muted: #475569;
+      --accent-color: #0284c7;
+      --accent-hover: #0369a1;
+      --accent-glow: rgba(2, 132, 199, 0.20);
+      
+      --sidebar-width: 300px;
+      --code-bg: rgba(241, 245, 249, 0.90);
+      --code-color: #0f172a;
+      --code-border: rgba(148, 163, 184, 0.3);
+      --table-border: rgba(203, 213, 225, 0.6);
+      --th-bg: rgba(2, 132, 199, 0.06);
+      --tag-bg: rgba(2, 132, 199, 0.08);
+      --tag-border: rgba(2, 132, 199, 0.25);
+      --lg-radius-squircle: 20px;
     }
 
     html[data-theme="dark"] {
-      /* Theme Tối - Obsidian Liquid Glass */
-      --bg-color: #07090e;
-      --bg-gradient: radial-gradient(circle at 15% 15%, rgba(59, 130, 246, 0.15) 0%, transparent 40%),
-                     radial-gradient(circle at 85% 80%, rgba(168, 85, 247, 0.12) 0%, transparent 40%),
-                     radial-gradient(circle at 50% 40%, rgba(16, 185, 129, 0.06) 0%, transparent 50%);
-      --text-color: #f1f5f9;
+      /* Dark Mode - Obsidian Liquid Glass (Không dùng màu đen tuyệt đối #000000) */
+      --bg-color: #0b0f19;
+      --bg-gradient: radial-gradient(circle at 15% 15%, rgba(56, 189, 248, 0.12) 0%, transparent 40%),
+                     radial-gradient(circle at 85% 80%, rgba(168, 85, 247, 0.10) 0%, transparent 40%),
+                     radial-gradient(circle at 50% 40%, rgba(16, 185, 129, 0.05) 0%, transparent 50%);
+      
+      --lg-bg: rgba(15, 23, 42, 0.55);
+      --lg-bg-prominent: rgba(30, 41, 59, 0.70);
+      --lg-bg-active: rgba(45, 59, 80, 0.85);
+      --lg-blur: 24px;
+      
+      /* Directional Fresnel Border for Dark Mode */
+      --lg-border-color: rgba(255, 255, 255, 0.12);
+      --lg-border-fresnel: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.25) 0%,
+        rgba(255, 255, 255, 0.08) 50%,
+        rgba(255, 255, 255, 0.02) 100%
+      );
+
+      /* Layered Optical Shadows for Dark Mode */
+      --lg-shadow-contact: 0 2px 6px rgba(0, 0, 0, 0.25);
+      --lg-shadow-ambient: 0 16px 48px -8px rgba(2, 6, 23, 0.65);
+      --lg-shadow-chromatic: 0 0 24px rgba(99, 102, 241, 0.06), 0 0 48px rgba(168, 85, 247, 0.03);
+      --lg-shadow-inner: inset 0 1px 0px 0 rgba(255, 255, 255, 0.16), inset 0 -1px 0px 0 rgba(0, 0, 0, 0.3);
+      --lg-shadow-combined: var(--lg-shadow-contact), var(--lg-shadow-ambient), var(--lg-shadow-chromatic), var(--lg-shadow-inner);
+
+      --text-color: #f8fafc;
       --text-muted: #94a3b8;
       --accent-color: #38bdf8;
-      --accent-hover: #60a5fa;
+      --accent-hover: #7dd3fc;
       --accent-glow: rgba(56, 189, 248, 0.25);
-      --lg-bg: rgba(15, 23, 42, 0.6);
-      --lg-bg-active: rgba(30, 41, 59, 0.75);
-      --lg-border: rgba(255, 255, 255, 0.1);
-      --lg-blur: 24px;
-      --lg-shadow: 0 16px 40px rgba(0, 0, 0, 0.5), 
-                   inset 0 1px 0px rgba(255, 255, 255, 0.12);
-      --code-bg: rgba(2, 6, 23, 0.75);
-      --code-color: #e2e8f0;
-      --code-border: rgba(255, 255, 255, 0.08);
-      --table-border: rgba(255, 255, 255, 0.08);
-      --th-bg: rgba(56, 189, 248, 0.07);
-      --tag-bg: rgba(56, 189, 248, 0.1);
-      --tag-border: rgba(56, 189, 248, 0.25);
+      
+      --code-bg: rgba(2, 6, 23, 0.80);
+      --code-color: #f1f5f9;
+      --code-border: rgba(255, 255, 255, 0.10);
+      --table-border: rgba(255, 255, 255, 0.10);
+      --th-bg: rgba(56, 189, 248, 0.08);
+      --tag-bg: rgba(56, 189, 248, 0.12);
+      --tag-border: rgba(56, 189, 248, 0.28);
+      --lg-radius-squircle: 20px;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: "Be Vietnam Pro", -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif;
       background-color: var(--bg-color);
       background-image: var(--bg-gradient);
       background-attachment: fixed;
@@ -72,19 +109,20 @@
       min-height: 100vh;
       display: flex;
       flex-direction: column;
-      transition: background 0.3s, color 0.3s;
+      transition: background 0.35s cubic-bezier(0.25, 0.8, 0.25, 1), color 0.35s ease;
       overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
     }
 
     html[data-lang="vi"] .lang-en { display: none !important; }
     html[data-lang="en"] .lang-vi { display: none !important; }
 
-    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar { width: 7px; height: 7px; }
     ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: rgba(140, 160, 190, 0.25); border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: rgba(140, 160, 190, 0.45); }
+    ::-webkit-scrollbar-thumb { background: rgba(140, 160, 190, 0.28); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(140, 160, 190, 0.48); }
 
-    /* Header */
+    /* Header with Liquid Glass material */
     header {
       position: fixed;
       top: 0; left: 0; right: 0;
@@ -92,410 +130,534 @@
       background: var(--lg-bg);
       backdrop-filter: blur(var(--lg-blur));
       -webkit-backdrop-filter: blur(var(--lg-blur));
-      border-bottom: 1px solid var(--lg-border);
-      box-shadow: var(--lg-shadow);
+      border-bottom: 1px solid var(--lg-border-color);
+      box-shadow: var(--lg-shadow-combined);
       display: flex;
       align-items: center;
       justify-content: space-between;
       padding: 0 28px;
       z-index: 1000;
+      transition: background 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
     }
 
     .brand {
       display: flex;
       align-items: center;
       gap: 12px;
-      font-weight: 800;
+      font-weight: 700;
       font-size: 1.15rem;
       letter-spacing: -0.02em;
     }
 
     .brand-logo {
-      width: 32px;
-      height: 32px;
-      border-radius: 8px;
-      background: linear-gradient(135deg, #0ea5e9, #8b5cf6);
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--accent-color), #8b5cf6);
       display: flex;
       align-items: center;
       justify-content: center;
-      color: white;
-      font-weight: 900;
+      color: #ffffff;
+      font-weight: 800;
       font-size: 1rem;
       box-shadow: 0 4px 12px var(--accent-glow);
     }
 
-    .controls { display: flex; align-items: center; gap: 12px; }
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
 
     .btn-pill {
-      background: var(--lg-bg);
-      border: 1px solid var(--lg-border);
+      background: var(--lg-bg-prominent);
+      border: 1px solid var(--lg-border-color);
       color: var(--text-color);
       padding: 6px 14px;
-      border-radius: 999px;
-      font-size: 0.85rem;
+      border-radius: 20px;
+      font-size: 0.84rem;
       font-weight: 600;
       cursor: pointer;
       backdrop-filter: blur(8px);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: all 0.25s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
-    .btn-pill:hover { background: var(--lg-bg-active); transform: translateY(-1px); }
+    .btn-pill:hover {
+      background: var(--lg-bg-active);
+      border-color: var(--accent-color);
+      transform: translateY(-1px);
+    }
 
     .btn-icon {
-      background: var(--lg-bg);
-      border: 1px solid var(--lg-border);
       width: 36px;
       height: 36px;
       border-radius: 50%;
+      background: var(--lg-bg-prominent);
+      border: 1px solid var(--lg-border-color);
+      color: var(--text-color);
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      color: var(--text-color);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: all 0.25s ease;
     }
 
-    .btn-icon:hover { background: var(--lg-bg-active); transform: scale(1.05); }
+    .btn-icon:hover {
+      background: var(--lg-bg-active);
+      border-color: var(--accent-color);
+      transform: rotate(15deg);
+    }
+
     .btn-icon svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
     /* Layout Wrapper */
-    .wrapper { display: flex; margin-top: 64px; min-height: calc(100vh - 64px); }
+    .wrapper {
+      display: flex;
+      margin-top: 64px;
+      min-height: calc(100vh - 64px);
+    }
 
     /* Sidebar Navigation */
     aside {
-      position: fixed;
-      top: 64px; left: 0; bottom: 0;
       width: var(--sidebar-width);
+      position: fixed;
+      top: 64px;
+      bottom: 0;
+      left: 0;
       background: var(--lg-bg);
       backdrop-filter: blur(var(--lg-blur));
       -webkit-backdrop-filter: blur(var(--lg-blur));
-      border-right: 1px solid var(--lg-border);
-      box-shadow: var(--lg-shadow);
-      padding: 24px 16px;
+      border-right: 1px solid var(--lg-border-color);
+      padding: 24px 18px;
       overflow-y: auto;
       z-index: 900;
+      transition: background 0.35s ease, border-color 0.35s ease;
     }
 
     .nav-group { margin-bottom: 24px; }
     .nav-title {
       font-size: 0.72rem;
-      font-weight: 800;
       text-transform: uppercase;
-      letter-spacing: 0.12em;
+      letter-spacing: 0.08em;
       color: var(--text-muted);
-      margin-bottom: 8px;
-      padding-left: 12px;
+      font-weight: 700;
+      padding: 0 12px 8px;
     }
 
     .nav-list { list-style: none; }
     .nav-item a {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
       padding: 9px 12px;
-      color: var(--text-color);
+      border-radius: 12px;
+      color: var(--text-muted);
       text-decoration: none;
       font-size: 0.88rem;
       font-weight: 500;
-      border-radius: 8px;
       transition: all 0.2s ease;
-      margin-bottom: 3px;
     }
 
-    .nav-item a:hover, .nav-item.active a {
+    .nav-item a:hover {
+      background: var(--lg-bg-prominent);
+      color: var(--text-color);
+      transform: translateX(3px);
+    }
+
+    .nav-item.active a {
       background: var(--lg-bg-active);
       color: var(--accent-color);
-      transform: translateX(4px);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      font-weight: 700;
+      border: 1px solid var(--accent-glow);
     }
 
     /* Main Content Area */
     main {
-      margin-left: var(--sidebar-width);
       flex: 1;
-      padding: 36px 44px;
-      max-width: 1200px;
-      width: calc(100% - var(--sidebar-width));
+      margin-left: var(--sidebar-width);
+      padding: 36px 48px 80px;
+      max-width: 1280px;
     }
 
-    /* Glass Cards */
-    .card {
+    /* Hero Banner */
+    .hero-banner {
+      position: relative;
       background: var(--lg-bg);
       backdrop-filter: blur(var(--lg-blur));
       -webkit-backdrop-filter: blur(var(--lg-blur));
-      border: 1px solid var(--lg-border);
-      box-shadow: var(--lg-shadow);
-      border-radius: 18px;
-      padding: 32px;
+      border: 1px solid var(--lg-border-color);
+      box-shadow: var(--lg-shadow-combined);
+      border-radius: var(--lg-radius-squircle);
+      padding: 40px;
       margin-bottom: 32px;
-      position: relative;
+      overflow: hidden;
+      transition: all 0.35s ease;
     }
 
-    .hero-banner {
-      background: linear-gradient(135deg, rgba(14, 165, 233, 0.12), rgba(139, 92, 246, 0.12));
-      border: 1px solid var(--lg-border);
-      padding: 36px;
-      border-radius: 20px;
-      margin-bottom: 32px;
-      position: relative;
-      overflow: hidden;
+    .hero-banner::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 1px;
+      background: var(--lg-border-fresnel);
     }
 
     .hero-badge {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      padding: 4px 12px;
-      border-radius: 999px;
-      font-size: 0.78rem;
-      font-weight: 700;
+      gap: 8px;
       background: var(--tag-bg);
       border: 1px solid var(--tag-border);
       color: var(--accent-color);
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
       margin-bottom: 16px;
+    }
+
+    .hero-banner h1 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.25;
+      margin-bottom: 14px;
+      background: linear-gradient(135deg, var(--text-color) 30%, var(--accent-color) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-banner p {
+      font-size: 1.02rem;
+      line-height: 1.65;
+      color: var(--text-muted);
+      max-width: 900px;
+    }
+
+    /* Content Cards (Squircle & Fresnel Borders) */
+    .card {
+      position: relative;
+      background: var(--lg-bg);
+      backdrop-filter: blur(var(--lg-blur));
+      -webkit-backdrop-filter: blur(var(--lg-blur));
+      border: 1px solid var(--lg-border-color);
+      box-shadow: var(--lg-shadow-combined);
+      border-radius: var(--lg-radius-squircle);
+      padding: 32px;
+      margin-bottom: 32px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 1px;
+      background: var(--lg-border-fresnel);
+      border-radius: var(--lg-radius-squircle) var(--lg-radius-squircle) 0 0;
+    }
+
+    .card h2 {
+      font-size: 1.45rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--text-color);
+    }
+
+    .card p {
+      font-size: 0.95rem;
+      line-height: 1.65;
+      color: var(--text-muted);
+      margin-bottom: 18px;
+    }
+
+    /* Badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+
+    .badge-green { background: rgba(16, 185, 129, 0.12); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.25); }
+    .badge-blue { background: rgba(56, 189, 248, 0.12); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.25); }
+    .badge-purple { background: rgba(168, 85, 247, 0.12); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.25); }
+    .badge-rose { background: rgba(244, 63, 94, 0.12); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.25); }
+    .badge-amber { background: rgba(245, 158, 11, 0.12); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.25); }
+
+    /* Tables */
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+      margin-top: 16px;
+      border-radius: 14px;
+      border: 1px solid var(--table-border);
+      background: var(--lg-bg-prominent);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.9rem;
+    }
+
+    th, td {
+      padding: 13px 16px;
+      border-bottom: 1px solid var(--table-border);
+      vertical-align: top;
+    }
+
+    th {
+      background: var(--th-bg);
+      color: var(--text-color);
+      font-weight: 700;
+      font-size: 0.8rem;
       text-transform: uppercase;
       letter-spacing: 0.05em;
     }
 
-    /* Typography */
-    h1 {
-      font-size: 2.3rem;
-      font-weight: 800;
-      letter-spacing: -0.03em;
-      margin-bottom: 16px;
-      line-height: 1.2;
-      background: linear-gradient(135deg, var(--text-color) 40%, var(--accent-color));
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--lg-bg-active); }
+
+    code {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.84em;
+      background: var(--code-bg);
+      color: var(--accent-color);
+      padding: 2px 6px;
+      border-radius: 5px;
+      border: 1px solid var(--code-border);
     }
 
-    h2 {
-      font-size: 1.55rem;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      margin-bottom: 16px;
-      border-bottom: 1px solid var(--lg-border);
-      padding-bottom: 10px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
+    pre {
+      background: var(--code-bg);
+      border: 1px solid var(--code-border);
+      border-radius: 12px;
+      padding: 16px;
+      overflow-x: auto;
+      margin: 14px 0;
     }
 
-    h3 { font-size: 1.15rem; font-weight: 600; margin: 18px 0 10px 0; }
-    p { font-size: 0.94rem; line-height: 1.65; color: var(--text-color); margin-bottom: 16px; opacity: 0.92; }
+    pre code {
+      background: transparent;
+      border: none;
+      padding: 0;
+      color: var(--code-color);
+      font-size: 0.88rem;
+      line-height: 1.5;
+    }
 
     /* Bento Grid */
     .bento-grid {
       display: grid;
       grid-template-columns: repeat(12, 1fr);
       gap: 18px;
-      margin: 24px 0;
+      margin-top: 18px;
     }
 
-    .bento-col-4 { grid-column: span 4; }
-    .bento-col-6 { grid-column: span 6; }
-    .bento-col-8 { grid-column: span 8; }
-    .bento-col-12 { grid-column: span 12; }
-
     .bento-card {
-      background: var(--lg-bg);
-      border: 1px solid var(--lg-border);
-      border-radius: 14px;
+      background: var(--lg-bg-prominent);
+      border: 1px solid var(--lg-border-color);
+      border-radius: 16px;
       padding: 22px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       transition: all 0.25s ease;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+      position: relative;
+    }
+
+    .bento-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 1px;
+      background: var(--lg-border-fresnel);
+      border-radius: 16px 16px 0 0;
     }
 
     .bento-card:hover {
-      background: var(--lg-bg-active);
-      transform: translateY(-3px);
-      box-shadow: 0 10px 25px var(--accent-glow);
+      transform: translateY(-2px);
+      border-color: var(--accent-color);
+      box-shadow: 0 8px 24px -4px var(--accent-glow);
     }
 
-    .bento-icon {
-      font-size: 1.8rem;
-      margin-bottom: 12px;
-      display: inline-block;
+    .bento-col-4 { grid-column: span 4; }
+    .bento-col-6 { grid-column: span 6; }
+    .bento-col-12 { grid-column: span 12; }
+
+    .bento-icon { font-size: 1.6rem; margin-bottom: 12px; }
+    .bento-title { font-weight: 700; font-size: 1.05rem; margin-bottom: 8px; color: var(--text-color); }
+    .bento-desc { font-size: 0.88rem; color: var(--text-muted); line-height: 1.55; }
+
+    /* Timeline & Changelog UI */
+    .timeline {
+      position: relative;
+      margin-top: 24px;
+      padding-left: 28px;
     }
 
-    .bento-title {
-      font-size: 1.05rem;
-      font-weight: 700;
-      margin-bottom: 8px;
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 8px;
+      top: 6px;
+      bottom: 6px;
+      width: 2px;
+      background: var(--lg-border-color);
+    }
+
+    .timeline-item {
+      position: relative;
+      margin-bottom: 28px;
+    }
+
+    .timeline-item:last-child { margin-bottom: 0; }
+
+    .timeline-dot {
+      position: absolute;
+      left: -28px;
+      top: 4px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--accent-color);
+      border: 3px solid var(--bg-color);
+      box-shadow: 0 0 10px var(--accent-glow);
+    }
+
+    .timeline-dot.active {
+      background: #10b981;
+      box-shadow: 0 0 12px rgba(16, 185, 129, 0.4);
+    }
+
+    .timeline-content {
+      background: var(--lg-bg-prominent);
+      border: 1px solid var(--lg-border-color);
+      border-radius: 14px;
+      padding: 18px 22px;
+      transition: all 0.25s ease;
+    }
+
+    .timeline-content:hover {
+      border-color: var(--accent-color);
+    }
+
+    .timeline-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .timeline-version {
+      font-size: 1.1rem;
+      font-weight: 800;
       color: var(--text-color);
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
 
-    .bento-desc {
-      font-size: 0.86rem;
-      line-height: 1.55;
+    .timeline-date {
+      font-size: 0.82rem;
       color: var(--text-muted);
-      margin-bottom: 14px;
-      flex-grow: 1;
+      font-weight: 600;
     }
 
-    /* Interactive Filter Bar */
+    .timeline-list {
+      margin-left: 20px;
+      font-size: 0.9rem;
+      line-height: 1.6;
+      color: var(--text-muted);
+    }
+
+    .timeline-list li { margin-bottom: 6px; }
+
+    /* Alert Boxes */
+    .alert-box {
+      border-radius: 14px;
+      padding: 16px 20px;
+      margin: 18px 0;
+      border-left: 4px solid var(--accent-color);
+      background: var(--tag-bg);
+      font-size: 0.92rem;
+      line-height: 1.6;
+    }
+
+    /* Filter / Search Bar */
     .filter-bar {
       display: flex;
-      flex-wrap: wrap;
       gap: 10px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
       align-items: center;
-      margin-bottom: 20px;
-      padding: 14px;
-      background: var(--lg-bg);
-      border: 1px solid var(--lg-border);
-      border-radius: 12px;
     }
 
     .search-input {
       flex: 1;
-      min-width: 220px;
-      background: var(--code-bg);
-      border: 1px solid var(--code-border);
+      min-width: 240px;
+      padding: 10px 16px;
+      border-radius: 12px;
+      background: var(--lg-bg-prominent);
+      border: 1px solid var(--lg-border-color);
       color: var(--text-color);
-      padding: 8px 14px;
-      border-radius: 8px;
-      font-size: 0.88rem;
       font-family: inherit;
+      font-size: 0.88rem;
       outline: none;
-      transition: border-color 0.2s;
+      transition: all 0.25s ease;
     }
 
     .search-input:focus {
       border-color: var(--accent-color);
-      box-shadow: 0 0 0 2px var(--accent-glow);
+      box-shadow: 0 0 12px var(--accent-glow);
     }
 
     .tab-btn {
-      background: transparent;
-      border: 1px solid transparent;
+      padding: 8px 16px;
+      border-radius: 12px;
+      background: var(--lg-bg-prominent);
+      border: 1px solid var(--lg-border-color);
       color: var(--text-muted);
-      padding: 6px 12px;
-      border-radius: 6px;
-      font-size: 0.82rem;
+      font-family: inherit;
+      font-size: 0.84rem;
       font-weight: 600;
       cursor: pointer;
       transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
     .tab-btn:hover {
-      color: var(--text-color);
       background: var(--lg-bg-active);
+      color: var(--text-color);
     }
 
     .tab-btn.active {
       background: var(--accent-color);
       color: #ffffff;
-      box-shadow: 0 2px 8px var(--accent-glow);
+      border-color: var(--accent-color);
+      box-shadow: 0 4px 12px var(--accent-glow);
     }
 
-    /* Badges & Tags */
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      padding: 3px 8px;
-      border-radius: 6px;
-      font-size: 0.72rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-    }
-
-    .badge-blue { background: rgba(14, 165, 233, 0.15); color: #0284c7; border: 1px solid rgba(14, 165, 233, 0.3); }
-    .badge-purple { background: rgba(168, 85, 247, 0.15); color: #a855f7; border: 1px solid rgba(168, 85, 247, 0.3); }
-    .badge-green { background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); }
-    .badge-amber { background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3); }
-    .badge-rose { background: rgba(244, 63, 94, 0.15); color: #f43f5e; border: 1px solid rgba(244, 63, 94, 0.3); }
-
-    html[data-theme="dark"] .badge-blue { color: #38bdf8; }
-    html[data-theme="dark"] .badge-purple { color: #c084fc; }
-    html[data-theme="dark"] .badge-green { color: #34d399; }
-    html[data-theme="dark"] .badge-amber { color: #fbbf24; }
-    html[data-theme="dark"] .badge-rose { color: #fb7185; }
-
-    /* Tables */
-    .table-container {
-      overflow-x: auto;
-      margin: 18px 0 28px 0;
-      border-radius: 12px;
-      border: 1px solid var(--table-border);
-      background: var(--lg-bg);
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.88rem;
-      text-align: left;
-    }
-
-    th, td {
-      padding: 12px 16px;
-      border-bottom: 1px solid var(--table-border);
-      vertical-align: middle;
-    }
-
-    th {
-      background-color: var(--th-bg);
-      font-weight: 700;
-      color: var(--text-color);
-      font-size: 0.82rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-
-    tr:last-child td { border-bottom: none; }
-    tr:hover td { background-color: var(--lg-bg-active); }
-
-    /* Code Blocks */
-    pre {
-      background-color: var(--code-bg);
-      border: 1px solid var(--code-border);
-      border-radius: 10px;
-      padding: 16px;
-      overflow-x: auto;
-      margin: 14px 0 20px 0;
-      font-family: "JetBrains Mono", Consolas, monospace;
-      font-size: 0.84rem;
-      line-height: 1.5;
-    }
-
-    code {
-      font-family: "JetBrains Mono", Consolas, monospace;
-      font-size: 0.84rem;
-      color: var(--code-color);
-    }
-
-    p code, li code, td code {
-      background-color: var(--code-bg);
-      border: 1px solid var(--code-border);
-      border-radius: 4px;
-      padding: 2px 6px;
-      font-size: 0.82rem;
-      font-weight: 500;
-    }
-
-    /* Alerts */
-    .alert-box {
-      border-left: 4px solid var(--accent-color);
-      background: rgba(14, 165, 233, 0.08);
-      padding: 16px 20px;
-      border-radius: 0 12px 12px 0;
-      margin: 20px 0;
-    }
-
-    .alert-box p { margin-bottom: 0; }
-
-    @media (max-width: 960px) {
-      aside { transform: translateX(-100%); }
-      main { margin-left: 0; width: 100%; padding: 20px; }
-      .bento-col-4, .bento-col-6, .bento-col-8 { grid-column: span 12; }
+    @media (max-width: 1024px) {
+      aside { display: none; }
+      main { margin-left: 0; padding: 24px 20px 60px; }
+      .bento-col-4, .bento-col-6 { grid-column: span 12; }
     }
   </style>
 </head>
@@ -505,7 +667,7 @@
   <header>
     <div class="brand">
       <div class="brand-logo">W</div>
-      <span>WSR Core 1.5.0</span>
+      <span>WSR Core 1.6</span>
       <span class="badge badge-green">RELEASE</span>
     </div>
     <div class="controls">
@@ -527,26 +689,27 @@
       <div class="nav-group">
         <div class="nav-title"><span class="lang-vi">Tổng quan</span><span class="lang-en">Overview</span></div>
         <ul class="nav-list">
-          <li class="nav-item active"><a href="#gioi-thieu"><span>🚀</span> <span class="lang-vi">Giới thiệu WSR Core</span><span class="lang-en">Introduction</span></a></li>
-          <li class="nav-item"><a href="#ung-dung"><span>⚖️</span> <span class="lang-vi">Triết lý & Luật Sắt</span><span class="lang-en">Rules & Philosophy</span></a></li>
+          <li class="nav-item active"><a href="#gioi-thieu"><span>🚀</span> <span class="lang-vi">Giới thiệu WSR Core 1.6</span><span class="lang-en">Introduction 1.6</span></a></li>
+          <li class="nav-item"><a href="#ung-dung"><span>⚖️</span> <span class="lang-vi">Triết lý & 7 Luật Sắt</span><span class="lang-en">Philosophy & 7 Rules</span></a></li>
         </ul>
       </div>
 
       <div class="nav-group">
         <div class="nav-title"><span class="lang-vi">Danh mục Kỹ năng</span><span class="lang-en">Skills Catalog</span></div>
         <ul class="nav-list">
-          <li class="nav-item"><a href="#global-skills"><span>✨</span> <span class="lang-vi">Tra cứu Skills (10 Global + 3 Core)</span><span class="lang-en">Skills Directory (13 Skills)</span></a></li>
-          <li class="nav-item"><a href="#taste-skill-spotlight"><span>🎨</span> <span class="lang-vi">Taste Skill v2 Tiêu điểm</span><span class="lang-en">Taste Skill v2 Spotlight</span></a></li>
+          <li class="nav-item"><a href="#global-skills"><span>✨</span> <span class="lang-vi">Tra cứu Skills (13 Skills)</span><span class="lang-en">Skills Directory (13 Skills)</span></a></li>
+          <li class="nav-item"><a href="#taste-skill-spotlight"><span>🎨</span> <span class="lang-vi">Taste Skill & Liquid Glass</span><span class="lang-en">Taste Skill & Liquid Glass</span></a></li>
         </ul>
       </div>
 
       <div class="nav-group">
-        <div class="nav-title"><span class="lang-vi">Vận hành & Kỹ thuật</span><span class="lang-en">Operations & Architecture</span></div>
+        <div class="nav-title"><span class="lang-vi">Vận hành & Lịch sử</span><span class="lang-en">Operations & History</span></div>
         <ul class="nav-list">
           <li class="nav-item"><a href="#cai-dat"><span>⚡</span> <span class="lang-vi">Cài đặt & Đồng bộ</span><span class="lang-en">Installation & Sync</span></a></li>
           <li class="nav-item"><a href="#su-dung"><span>📜</span> <span class="lang-vi">11 Slash Workflows</span><span class="lang-en">11 Slash Workflows</span></a></li>
           <li class="nav-item"><a href="#ky-thuat"><span>🛡️</span> <span class="lang-vi">L0-L4 & 32 Doctor Gates</span><span class="lang-en">L0-L4 & 32 Doctor Gates</span></a></li>
-          <li class="nav-item"><a href="#so-sanh"><span>📊</span> <span class="lang-vi">So sánh & Lịch sử</span><span class="lang-en">Comparison & History</span></a></li>
+          <li class="nav-item"><a href="#changelog"><span>📝</span> <span class="lang-vi">Lịch sử Phiên bản (Changelog)</span><span class="lang-en">Version Changelog</span></a></li>
+          <li class="nav-item"><a href="#so-sanh"><span>📊</span> <span class="lang-vi">So sánh Đa Thế Hệ</span><span class="lang-en">Multi-Gen Comparison</span></a></li>
         </ul>
       </div>
     </aside>
@@ -560,13 +723,13 @@
           <span class="lang-vi">Chuẩn Quản Trị Tác Tử AI Cao Cấp</span>
           <span class="lang-en">Premium AI Agent Governance Platform</span>
         </div>
-        <h1 class="lang-vi">WSR Core 1.5.0 — Hệ Điều Hành Agent & Thư Viện Kỹ Năng Tinh Gọn</h1>
-        <h1 class="lang-en">WSR Core 1.5.0 — Agent Operating System & Streamlined Skills Suite</h1>
+        <h1 class="lang-vi">WSR Core 1.6 — Hệ Điều Hành Agent & Thư Viện Kỹ Năng Tinh Gọn</h1>
+        <h1 class="lang-en">WSR Core 1.6 — Agent Operating System & Streamlined Skills Suite</h1>
         <p class="lang-vi">
-          Nền tảng kiểm soát tác tử toàn diện thiết kế theo chuẩn <strong>Anti-Waste</strong> và <strong>Minimal Coding Protocol</strong>. Tích hợp trọn bộ <strong>10 Global Skills</strong> (với Taste Skill v2, Liquid Glass, Stitch Design), 11 Slash Workflows và 32 cổng kiểm định Doctor đạt tuyệt đối 100/100.
+          Nền tảng kiểm soát tác tử AI độc lập thiết kế theo tôn chỉ <strong>Anti-Waste</strong> và <strong>Minimal Coding Protocol</strong>. Chuẩn hóa phiên bản dạng <code>x.y</code>, tích hợp toàn diện <strong>10 Global Skills + 3 Core Skills</strong>, 11 Slash Workflows, giao diện Liquid Glass chuẩn quang học và 32 cổng kiểm định Doctor 100/100 tuyệt đối.
         </p>
         <p class="lang-en">
-          Comprehensive agent governance built on <strong>Anti-Waste</strong> and <strong>Minimal Coding Protocol</strong>. Fully integrated with <strong>10 Global Skills</strong> (powered by Taste Skill v2, Liquid Glass, Stitch Design), 11 Slash Workflows, and 32-gate WSR Doctor 100/100 validation.
+          Independent AI Agent governance built on <strong>Anti-Waste</strong> and <strong>Minimal Coding Protocol</strong>. Standardized to <code>x.y</code> versioning, fully loaded with <strong>10 Global Skills + 3 Core Skills</strong>, 11 Slash Workflows, optical Liquid Glass UI, and 32-gate Doctor 100/100 validation.
         </p>
       </div>
 
@@ -574,14 +737,14 @@
       <section id="gioi-thieu" class="card">
         <h2>
           <span>🚀</span>
-          <span class="lang-vi">Giới Thiệu WSR Core 1.5.0</span>
-          <span class="lang-en">Introduction to WSR Core 1.5.0</span>
+          <span class="lang-vi">Giới Thiệu WSR Core 1.6</span>
+          <span class="lang-en">Introduction to WSR Core 1.6</span>
         </h2>
         <p class="lang-vi">
-          <strong>WSR Core 1.5.0 (WSR-CORE-1.5.0-RELEASE)</strong> là nền tảng quản trị tác tử AI độc lập, thiết kế theo tôn chỉ <strong>Anti-Waste</strong> và <strong>Minimal Coding Protocol</strong>. Phiên bản 1.5.0 tối ưu hóa toàn diện: Kernel siêu gọn (~585 tokens), phân tầng nạp cấp tiến L0-L4, tích hợp 11 slash command workflows tiêu chuẩn, hệ thống kiểm định Doctor 32-gate và giám sát telemetry context chủ động.
+          <strong>WSR Core 1.6 (WSR-CORE-1.6-RELEASE)</strong> là bản phát hành chính thức chuẩn hóa quy cách định danh phiên bản sang dạng hai phân đoạn <code>x.y</code> (loại bỏ hoàn toàn quy cách ba phân đoạn cũ). Bản phát hành này mang đến giao diện quang học Liquid Glass Apple thế hệ mới cho tài liệu, nâng cấp danh mục kỹ năng cao cấp, hệ thống giám sát context telemetry chủ động và bảo toàn 100% các cổng kiểm định chất lượng.
         </p>
         <p class="lang-en">
-          <strong>WSR Core 1.5.0 (WSR-CORE-1.5.0-RELEASE)</strong> is an independent AI Agent governance platform built upon <strong>Anti-Waste</strong> and <strong>Minimal Coding Protocol</strong>. Version 1.5.0 delivers comprehensive optimizations: Ultra-compact kernel (~585 tokens), progressive L0-L4 loading hierarchy, 11 standardized slash command workflows, 32-gate Doctor integrity verification, and proactive context telemetry.
+          <strong>WSR Core 1.6 (WSR-CORE-1.6-RELEASE)</strong> is the official release standardizing version specification to two-segment <code>x.y</code> format. This edition delivers a remastered optical Apple Liquid Glass documentation interface, upgraded high-end skills directory, proactive context telemetry governance, and strict 100% Doctor quality gates.
         </p>
 
         <div class="alert-box">
@@ -674,8 +837,8 @@
                 <td><span class="badge badge-blue">Design System</span></td>
                 <td><code>liquid glass</code>, <code>glassmorphism</code>, <code>frosted glass</code></td>
                 <td>
-                  <span class="lang-vi">Hệ thống thiết kế kính mờ Apple Glassmorphism: Tích hợp viền phản quang specular highlight, blur động cho Web và Windows (Tauri/Electron).</span>
-                  <span class="lang-en">Apple Glassmorphism UI framework: Specular highlights, layered borders, backdrop blur tokens for Web and Windows apps.</span>
+                  <span class="lang-vi">Hệ thống thiết kế kính mờ Apple Glassmorphism chuẩn quang học: Fresnel gradient 135°, layered shadows với chromatic dispersion, squircle 20px cho Web và Windows.</span>
+                  <span class="lang-en">Optical benchmark Apple Glassmorphism: 135deg Fresnel borders, layered chromatic shadows, 20px squircles for Web & Windows apps.</span>
                 </td>
                 <td><code>global_skills/LiquidGlass/skills/...</code></td>
               </tr>
@@ -794,8 +957,8 @@
       <section id="taste-skill-spotlight" class="card">
         <h2>
           <span>🎨</span>
-          <span class="lang-vi">Tiêu Điểm: Taste Skill v2 Tinh Gọn</span>
-          <span class="lang-en">Spotlight: Streamlined Taste Skill v2</span>
+          <span class="lang-vi">Tiêu Điểm Thiết Kế: Taste Skill v2 & Liquid Glass</span>
+          <span class="lang-en">Design Spotlight: Taste Skill v2 & Liquid Glass</span>
         </h2>
         <div class="bento-grid">
           <div class="bento-card bento-col-4">
@@ -837,10 +1000,10 @@
           <div class="bento-card bento-col-6">
             <div>
               <div class="bento-icon">📐</div>
-              <div class="bento-title">Apple Liquid Glass Engine</div>
+              <div class="bento-title">Apple Liquid Glass Optics</div>
               <div class="bento-desc">
-                <span class="lang-vi">Kiến trúc kính mờ chuẩn xác: Sử dụng <code>backdrop-filter</code> đa tầng, viền phản xạ ánh sáng (specular highlight), shadow đa lớp tạo cảm giác vật liệu thật.</span>
-                <span class="lang-en">True glassmorphism architecture: Multi-layered backdrop blurs, specular edge highlights, and calibrated shadows for tactile depth.</span>
+                <span class="lang-vi">Vật liệu kính chuẩn vật lý: <code>backdrop-filter</code> đa tầng, viền phản xạ Fresnel gradient 135°, đổ bóng tán sắc quang học (chromatic dispersion), bo góc squircle 20px.</span>
+                <span class="lang-en">Physically grounded glass: Layered backdrop blurs, 135deg Fresnel specular borders, chromatic dispersion shadows, 20px squircle curvature.</span>
               </div>
             </div>
             <span class="badge badge-blue">global_skills/LiquidGlass</span>
@@ -868,10 +1031,10 @@
           <span class="lang-en">Operational Philosophy & 7 Iron Rules</span>
         </h2>
         <p class="lang-vi">
-          WSR Core 1.5.0 khôi phục trải nghiệm UX 1.0.8 và thiết lập 7 điều luật sắt (Iron Rules) bất khả xâm phạm:
+          WSR Core 1.6 duy trì trải nghiệm UX 1.0.8 và thiết lập 7 điều luật sắt (Iron Rules) bất khả xâm phạm:
         </p>
         <p class="lang-en">
-          WSR Core 1.5.0 preserves the UX 1.0.8 experience and enforces 7 inviolable Iron Rules:
+          WSR Core 1.6 preserves the UX 1.0.8 experience and enforces 7 inviolable Iron Rules:
         </p>
 
         <div class="table-container">
@@ -1042,10 +1205,10 @@
           <span class="lang-en">Installation & Runtime Synchronization</span>
         </h2>
         <p class="lang-vi">
-          Để kiểm tra và đồng bộ WSR Core sang các IDE (Antigravity, Codex, Gemini), chạy các lệnh CLI tiêu chuẩn:
+          Để kiểm tra và đồng bộ WSR Core 1.6 sang các IDE (Antigravity, Codex, Gemini), chạy các lệnh CLI tiêu chuẩn:
         </p>
         <p class="lang-en">
-          To verify and synchronize WSR Core across target IDEs (Antigravity, Codex, Gemini), run the standard CLI commands:
+          To verify and synchronize WSR Core 1.6 across target IDEs (Antigravity, Codex, Gemini), run the standard CLI commands:
         </p>
 
         <pre><code># 1. Kiểm tra 32 gates WSR Doctor
@@ -1054,8 +1217,8 @@ python scripts/wsr_doctor.py --path . --source-mode
 # 2. Kiểm tra kế hoạch đồng bộ (Dry-run)
 python scripts/sync_config.py --adapter antigravity
 
-# 3. Thực hiện đồng bộ chính thức sang IDE
-python scripts/sync_config.py --adapter antigravity --apply --approval-token WSR-CORE-1.5.0-RELEASE</code></pre>
+# 3. Thực hiện đồng bộ chính thức sang IDE với Approval Token
+python scripts/sync_config.py --adapter antigravity --apply --approval-token WSR-CORE-1.6-RELEASE</code></pre>
       </section>
 
       <!-- Section: Kiến trúc L0-L4 & 32 Gates Doctor -->
@@ -1087,12 +1250,179 @@ python scripts/sync_config.py --adapter antigravity --apply --approval-token WSR
         </div>
       </section>
 
-      <!-- Section: So sánh phiên bản -->
+      <!-- Section: Lịch Sử Phiên Bản (Changelog) -->
+      <section id="changelog" class="card">
+        <h2>
+          <span>📝</span>
+          <span class="lang-vi">Lịch Sử Phiên Bản Toàn Diện (Changelog Timeline)</span>
+          <span class="lang-en">Comprehensive Version History (Changelog Timeline)</span>
+        </h2>
+        <p class="lang-vi">
+          Quá trình tiến hóa kiến trúc và các cột mốc tính năng của hệ điều hành tác tử WSR Core qua các thời kỳ:
+        </p>
+        <p class="lang-en">
+          Architectural evolution and key feature milestones of the WSR Core agent operating system across releases:
+        </p>
+
+        <div class="timeline">
+          <!-- 1.6 -->
+          <div class="timeline-item">
+            <div class="timeline-dot active"></div>
+            <div class="timeline-content">
+              <div class="timeline-header">
+                <div class="timeline-version">
+                  <span>WSR Core 1.6</span>
+                  <span class="badge badge-green">LATEST RELEASE</span>
+                  <span class="badge badge-blue">VERSION X.Y</span>
+                </div>
+                <div class="timeline-date">2026-08-31</div>
+              </div>
+              <ul class="timeline-list">
+                <li><strong>Chuẩn hóa định dạng phiên bản:</strong> Chuyển sang quy cách hai phân đoạn <code>x.y</code> (chính thức bỏ chuẩn ba phân đoạn <code>x.y.z</code>).</li>
+                <li><strong>Nâng cấp Liquid Glass quang học:</strong> Thiết kế lại toàn bộ <code>README.html</code> theo chuẩn Apple Glassmorphism (Fresnel border 135°, chromatic dispersion shadow, squircle 20px).</li>
+                <li><strong>Tích hợp Changelog Timeline tương tác:</strong> Hiển thị toàn bộ lịch sử tiến hóa và thay đổi tính năng trực tiếp trong tài liệu.</li>
+                <li><strong>Cập nhật Schema & Doctor:</strong> Điều chỉnh các schema v2 và cổng <code>D02_SEMANTIC_IDENTITY</code> để xác thực chuẩn <code>x.y</code>.</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- 1.5.0 -->
+          <div class="timeline-item">
+            <div class="timeline-dot"></div>
+            <div class="timeline-content">
+              <div class="timeline-header">
+                <div class="timeline-version">
+                  <span>WSR Core 1.5.0</span>
+                  <span class="badge badge-purple">CONTEXT TELEMETRY</span>
+                </div>
+                <div class="timeline-date">2026-08-28</div>
+              </div>
+              <ul class="timeline-list">
+                <li>Bắt buộc báo cáo phần trăm context usage sau mọi phản hồi (dòng cuối cùng).</li>
+                <li>Bổ sung tính toán usage dự kiến (Preflight) và gợi ý bàn giao sớm trước task lớn.</li>
+                <li>Thiết lập 3 ngưỡng quản trị context: 60% (Warning), 75% (Handoff), 85% (Critical Stop).</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- 1.4.1 -->
+          <div class="timeline-item">
+            <div class="timeline-dot"></div>
+            <div class="timeline-content">
+              <div class="timeline-header">
+                <div class="timeline-version">
+                  <span>WSR Core 1.4.1</span>
+                  <span class="badge badge-amber">REFACTORING</span>
+                </div>
+                <div class="timeline-date">2026-08-28</div>
+              </div>
+              <ul class="timeline-list">
+                <li>Tái cấu trúc các entrypoint quá khổ: Clean, Doctor, Reload.</li>
+                <li>Tăng cường hiệu năng kiểm tra SHA-256 và tối ưu bộ nhớ.</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- 1.4.0 -->
+          <div class="timeline-item">
+            <div class="timeline-dot"></div>
+            <div class="timeline-content">
+              <div class="timeline-header">
+                <div class="timeline-version">
+                  <span>WSR Core 1.4.0</span>
+                  <span class="badge badge-blue">GOAL & UX RESTORATION</span>
+                </div>
+                <div class="timeline-date">2026-08-27</div>
+              </div>
+              <ul class="timeline-list">
+                <li>Khôi phục trải nghiệm Caveman UX 1.0.8, allowlist phê duyệt chính xác, ánh xạ Alert TIP/NOTE/WARNING/IMPORTANT.</li>
+                <li>Bổ sung lệnh <code>/goal</code> có biên giới, Goal ledger, task receipts và handshake native cho Codex/Antigravity.</li>
+                <li>Tích hợp kiểm định Doctor nghiêm ngặt cho Goal contracts và evidence packaging.</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- 1.2.0 -->
+          <div class="timeline-item">
+            <div class="timeline-dot"></div>
+            <div class="timeline-content">
+              <div class="timeline-header">
+                <div class="timeline-version">
+                  <span>WSR Core 1.2.0</span>
+                  <span class="badge badge-purple">DETERMINISTIC AUDIT</span>
+                </div>
+                <div class="timeline-date">2026-08-27</div>
+              </div>
+              <ul class="timeline-list">
+                <li>Tái cấu trúc <code>wsr-audit</code> thành kiểm định 6 nhóm độc lập và chỉ đọc.</li>
+                <li>Phân loại severity scoring (Blocker, High, Medium, Low) và định dạng báo cáo JSON chuẩn schema.</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- 1.1.0 -->
+          <div class="timeline-item">
+            <div class="timeline-dot"></div>
+            <div class="timeline-content">
+              <div class="timeline-header">
+                <div class="timeline-version">
+                  <span>WSR Core 1.1.0</span>
+                  <span class="badge badge-purple">PROGRESSIVE L0-L4</span>
+                </div>
+                <div class="timeline-date">2026-08-27</div>
+              </div>
+              <ul class="timeline-list">
+                <li>Thay thế tải hàng loạt bằng 5 tầng nạp cấp tiến L0-L4 với ngân sách token riêng từng profile.</li>
+                <li>Biến <code>WSR_CONTEXT.json</code> thành nơi đăng ký lệnh duy nhất, rút gọn Kernel còn 7 Iron Rules.</li>
+                <li>Thêm Session Descriptor v1 và Adapter v3 multi-root bindings cho Codex và Antigravity.</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- 1.0.8 -->
+          <div class="timeline-item">
+            <div class="timeline-dot"></div>
+            <div class="timeline-content">
+              <div class="timeline-header">
+                <div class="timeline-version">
+                  <span>WSR Core 1.0.8</span>
+                  <span class="badge badge-blue">SUBAGENT PROTOCOL</span>
+                </div>
+                <div class="timeline-date">2026-08-20</div>
+              </div>
+              <ul class="timeline-list">
+                <li>Bổ sung Section 10: Autonomous Task Ledger & Subagent Protocol.</li>
+                <li>Chuẩn hóa mô hình Orchestrator - Subagent Worker cho các tác vụ xử lý hàng loạt lớn.</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- 1.0.0 - 1.0.7 -->
+          <div class="timeline-item">
+            <div class="timeline-dot"></div>
+            <div class="timeline-content">
+              <div class="timeline-header">
+                <div class="timeline-version">
+                  <span>WSR Core 1.0.0 — 1.0.7</span>
+                  <span class="badge badge-green">FOUNDATION</span>
+                </div>
+                <div class="timeline-date">2026-07-13 – 2026-07-20</div>
+              </div>
+              <ul class="timeline-list">
+                <li>Định hình nền tảng WSR Core độc lập: Anti-Waste, Minimal Coding Protocol.</li>
+                <li>Thiết lập hệ thống kiểm định Doctor 32 gates, Smart Reload và đóng gói ZIP tất định vào <code>DOCS/</code>.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section: So sánh đa thế hệ -->
       <section id="so-sanh" class="card">
         <h2>
           <span>📊</span>
-          <span class="lang-vi">So Sánh Tính Năng Giữa Các Phiên Bản</span>
-          <span class="lang-en">Feature Comparison Across Versions</span>
+          <span class="lang-vi">So Sánh Tính Năng Đa Thế Hệ WSR Core</span>
+          <span class="lang-en">Multi-Generation Feature Comparison</span>
         </h2>
         <div class="table-container">
           <table>
@@ -1101,33 +1431,52 @@ python scripts/sync_config.py --adapter antigravity --apply --approval-token WSR
                 <th><span class="lang-vi">Tính năng cốt lõi</span><span class="lang-en">Core Feature</span></th>
                 <th>WSR Core 1.0.8</th>
                 <th>WSR Core 1.4.1</th>
-                <th>WSR Core 1.5.0 (Hiện tại)</th>
+                <th>WSR Core 1.5.0</th>
+                <th>WSR Core 1.6 (Hiện tại)</th>
               </tr>
             </thead>
             <tbody>
               <tr>
+                <td><strong>Quy cách Phiên bản</strong></td>
+                <td><code>1.0.8</code> (x.y.z)</td>
+                <td><code>1.4.1</code> (x.y.z)</td>
+                <td><code>1.5.0</code> (x.y.z)</td>
+                <td><strong><code>1.6</code> (Chuẩn x.y tinh gọn)</strong></td>
+              </tr>
+              <tr>
                 <td><strong>Dung lượng Kernel Khởi động</strong></td>
                 <td>~3,500 tokens</td>
                 <td>~1,200 tokens</td>
-                <td><strong>~837 tokens (Tối ưu 76%)</strong></td>
+                <td>~837 tokens</td>
+                <td><strong>~585-837 tokens (Tối ưu 76%)</strong></td>
               </tr>
               <tr>
                 <td><strong>Thư viện Global Skills</strong></td>
                 <td>4 Skills</td>
                 <td>7 Skills</td>
-                <td><strong>10 Global Skills (Taste Skill v2 Suite)</strong></td>
+                <td>10 Global Skills</td>
+                <td><strong>10 Global + 3 Core Skills</strong></td>
               </tr>
               <tr>
                 <td><strong>Hệ thống WSR Doctor</strong></td>
                 <td>20 Gates</td>
                 <td>28 Gates</td>
+                <td>32 Gates</td>
                 <td><strong>32 Gates Tuyệt đối (100/100)</strong></td>
               </tr>
               <tr>
                 <td><strong>Giao thức Ngữ cảnh Telemetry</strong></td>
                 <td>Cơ bản</td>
                 <td>Nâng cao</td>
-                <td><strong>Giám sát 3 ngưỡng tự động (60/75/85%)</strong></td>
+                <td>3 Ngưỡng tự động</td>
+                <td><strong>Giám sát 3 ngưỡng & Preflight</strong></td>
+              </tr>
+              <tr>
+                <td><strong>Giao diện & Thiết kế UI</strong></td>
+                <td>HTML tĩnh cơ bản</td>
+                <td>Modern Web v1</td>
+                <td>Liquid Glass v1</td>
+                <td><strong>Liquid Glass Benchmark v1.1.0</strong></td>
               </tr>
             </tbody>
           </table>
