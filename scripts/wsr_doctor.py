@@ -612,10 +612,15 @@ def _check_adapter_contracts(package_root, manifest, artifacts, gate, blockers):
     gate("D14_PRIMARY_ADAPTERS", primary_ok, "Codex and Antigravity must be primary-native")
 
     codex = adapters.get("codex", {})
+    codex_mappings = {item.get("artifactId"): item for item in codex.get("artifactMappings", [])}
+    codex_policy = codex_mappings.get("gemini-policy", {})
     codex_ok = (
         codex.get("router", {}).get("path") == "AGENTS.md"
         and codex.get("roots", {}).get("config", {}).get("default") == "~/.codex"
         and codex.get("roots", {}).get("skills", {}).get("default") == "~/.agents/skills"
+        and codex_policy.get("root") == "config"
+        and codex_policy.get("relativePath") == ""
+        and codex_policy.get("native") is True
         and codex.get("capabilities", {}).get("nativeSlashWorkflows") is False
         and codex.get("capabilities", {}).get("nativeProgressiveSkills") is True
     )

@@ -52,6 +52,18 @@ def run_dependency_case(case: dict) -> set[str]:
         return {item.rule_id for item in findings}
 
 
+def run_duplicate_case(case: dict) -> set[str]:
+    with tempfile.TemporaryDirectory(prefix="wsr-audit-duplicate-") as temp:
+        root = Path(temp)
+        files = []
+        for relative, content in case["files"].items():
+            path = root / relative
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(content, encoding="utf-8")
+            files.append((path, content))
+        return {item.rule_id for item in checks.duplicate_blocks(files)}
+
+
 def git_run(cwd: Path, *args: str) -> None:
     result = subprocess.run(("git",) + args, cwd=cwd, capture_output=True)
     if result.returncode:
@@ -130,6 +142,11 @@ def main() -> int:
         expected = set(case["expect"])
         if actual != expected:
             failures.append({"id": case["id"], "expected": sorted(expected), "actual": sorted(actual)})
+    for case in fixtures.get("duplicateCases", []):
+        actual = run_duplicate_case(case)
+        expected = set(case["expect"])
+        if actual != expected:
+            failures.append({"id": case["id"], "expected": sorted(expected), "actual": sorted(actual)})
     failures.extend(run_git_discovery_fixture())
     failures.extend(run_gate_fixtures())
     if failures:
@@ -140,7 +157,8 @@ def main() -> int:
     if set(report) != required:
         print(json.dumps({"status": "FAIL", "reportSchemaExpected": sorted(required), "reportSchemaActual": sorted(report)}, ensure_ascii=False))
         return 1
-    total = len(fixtures["cases"]) + len(fixtures.get("dependencyCases", [])) + 11
+    total = (len(fixtures["cases"]) + len(fixtures.get("dependencyCases", []))
+             + len(fixtures.get("duplicateCases", [])) + 11)
     print(json.dumps({"status": "PASS", "cases": total, "reportSchema": "PASS"}, ensure_ascii=False))
     return 0
 

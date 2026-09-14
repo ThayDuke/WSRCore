@@ -6,7 +6,7 @@
       "status": "PASS"
     },
     "codex": {
-      "operations": 46,
+      "operations": 47,
       "runtimeDoctor": "PASS",
       "status": "PASS"
     }
@@ -15,9 +15,9 @@
     "blockers": 0,
     "high": 0,
     "low": 0,
-    "medium": 6,
-    "score": 76,
-    "status": "WARN"
+    "medium": 0,
+    "score": 100,
+    "status": "PASS"
   },
   "buildId": "WSR-CORE-1.7-RELEASE",
   "doctor": {
@@ -26,7 +26,7 @@
     "status": "PASS"
   },
   "fixtures": {
-    "cases": 48,
+    "cases": 51,
     "status": "PASS"
   },
   "schemaVersion": 2,

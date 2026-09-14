@@ -9,3 +9,6 @@ WSR Core 1.7 RELEASE
 7. Mọi phản hồi phải có dòng `[Context: ~X% | Trạng thái: ...]`.
 8. Preflight task lớn; chia nhỏ hoặc handoff khi usage dự kiến từ 60%.
 9. /gr chạy read-only; /grd chỉ ghi glossary hoặc ADR sau approval chính xác.
+10. Codex đồng bộ cả AGENTS.md và GEMINI.md từ cùng release.
+11. Nếu AGENTS.override.md che router, sync dừng; xóa file hoặc chỉ giữ loader tối thiểu được hỗ trợ.
+12. Manual UAT được miễn cho lần hardening này; sandbox conformance vẫn bắt buộc PASS.

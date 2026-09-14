@@ -230,10 +230,25 @@ def markdown_findings(path: Path, text: str) -> list[Finding]:
     return out
 
 
+def _duplicate_policy_scope(path: Path) -> bool:
+    parts = {part.lower() for part in path.parts}
+    name = path.name.lower()
+    if path.suffix.lower() != ".md" or parts & {"docs", "evidence", "references"}:
+        return False
+    if name in {"readme.md", "changelog.md"}:
+        return False
+    return (
+        name in {"agents.md", "gemini.md", "skill.md"}
+        or bool(parts & {"global_rules", "global_workflows", "skills", "global_skills"})
+    )
+
+
 def duplicate_blocks(files: list[tuple[Path, str]]) -> list[Finding]:
     seen: dict[str, tuple[Path, int]] = {}
     out: list[Finding] = []
     for path, text in files:
+        if not _duplicate_policy_scope(path):
+            continue
         for line_no, line in enumerate(text.splitlines(), 1):
             normalized = " ".join(line.strip().lower().split())
             if len(normalized) < 80 or len(normalized.split()) < 12:

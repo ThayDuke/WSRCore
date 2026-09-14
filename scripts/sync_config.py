@@ -17,6 +17,7 @@ ADAPTER_KEYS = {
     "roots", "discoveryPrecedence", "artifactMappings", "router", "state",
     "capabilities", "legacyRoots", "unsupportedFeatures",
 }
+CODEX_OVERRIDE_DELEGATION = "Read and obey `AGENTS.md` in this directory as the canonical global router."
 
 
 def run_doctor_preflight(package_root):
@@ -128,6 +129,32 @@ def render_router(package_root, manifest):
     return rendered
 
 
+def validate_router_precedence(adapter_config, roots, rendered_router):
+    if adapter_config.get("adapterId") != "codex":
+        return
+    precedence = adapter_config.get("discoveryPrecedence", [])
+    if not precedence or not precedence[0].endswith("/AGENTS.override.md"):
+        return
+    config_root = roots[adapter_config["router"]["root"]]
+    override_path = wsr_common.safe_resolve_path(config_root, "AGENTS.override.md")
+    if not os.path.isfile(override_path):
+        return
+    with open(override_path, "r", encoding="utf-8", errors="strict") as stream:
+        override = stream.read()
+    delegation = CODEX_OVERRIDE_DELEGATION
+    allowed_loaders = {
+        delegation,
+        "- " + delegation,
+        "# WSR Core Active Loader\n\n- " + delegation,
+    }
+    if override.strip() == rendered_router.strip() or override.strip() in allowed_loaders:
+        return
+    raise ValueError(
+        "Codex router is shadowed by unmanaged override: {0}. "
+        "Remove it or delegate explicitly to AGENTS.md before sync.".format(override_path)
+    )
+
+
 def compute_checksums(package_root, manifest):
     result = {}
     path = wsr_common.safe_resolve_path(
@@ -223,6 +250,7 @@ def build_deployment_plan(package_root, target_root, manifest, adapter_config, c
     if key in destinations:
         raise ValueError("Router destination collision with '{0}'".format(destinations[key]))
     rendered = render_router(package_root, manifest)
+    validate_router_precedence(adapter_config, roots, rendered)
     rendered_hash = hashlib.sha256(rendered.encode("utf-8")).hexdigest()
     plan.append(_operation(
         "active-router", None, router_destination, router["root"], router_root,

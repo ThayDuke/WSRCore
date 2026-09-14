@@ -84,5 +84,31 @@
       },
       "expect": ["DEP-003"]
     }
+  ],
+  "duplicateCases": [
+    {
+      "id": "canonical-policy-duplicate",
+      "files": {
+        "global_rules/rules.md": "This canonical policy sentence is deliberately long enough to prove duplicated governance text is still detected reliably.\n",
+        "global_workflows/audit.md": "This canonical policy sentence is deliberately long enough to prove duplicated governance text is still detected reliably.\n"
+      },
+      "expect": ["STR-002"]
+    },
+    {
+      "id": "reference-duplicate-ignored",
+      "files": {
+        "global_skills/example/SKILL.md": "This long compatibility guidance remains valid when a separate reference document repeats the same explanatory sentence.\n",
+        "global_skills/example/references/guide.md": "This long compatibility guidance remains valid when a separate reference document repeats the same explanatory sentence.\n"
+      },
+      "expect": []
+    },
+    {
+      "id": "readme-duplicate-ignored",
+      "files": {
+        "README.md": "This long documentation sentence may repeat implementation guidance without becoming a duplicated canonical policy definition.\n",
+        "global_workflows/reference.md": "This long documentation sentence may repeat implementation guidance without becoming a duplicated canonical policy definition.\n"
+      },
+      "expect": []
+    }
   ]
 }

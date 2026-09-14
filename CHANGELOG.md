@@ -1,6 +1,11 @@
 # WSR Core Changelog
 
 ## [1.7] - 2026-09-14
+- Hardened the existing 1.7 release without changing its version or build ID.
+- Scoped `STR-002` to canonical policy documents, removing HTML and reference false positives.
+- Added Codex kernel deployment and blocked unmanaged overrides that shadow the active router.
+- Corrected the stale 1.6 global-rule heading and reduced duplicated output policy text.
+- Superseded content hash `a6659a240658aeee6ec7e7d8d6a414f78192f910b62298ceeaf0925a154eef15`.
 - Added `/gr` for read-only decision-tree interviews.
 - Added `/grd` for approval-gated glossary and ADR updates.
 - Added the shared `wsr-grilling` global skill with mode-specific references.

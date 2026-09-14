@@ -1,11 +1,11 @@
-# AG Global Rules — WSR Core 1.6 RELEASE
+# AG Global Rules — WSR Core 1.7 RELEASE
 
 Canonical source: [GEMINI.md](../GEMINI.md). This file is a loader mirror.
 
 - Áp dụng triệt để luật sắt Vietnamese Caveman: tối đa 20 từ/dòng, không lời thừa.
 - Mọi phản hồi phân bổ vào khối alert: TIP (kết quả), NOTE (phương pháp), WARNING (cảnh báo), IMPORTANT (dòng chốt).
 - Khối IMPORTANT: DISCUSSION/PLAN chốt `XIN VUI LÒNG PHÊ DUYỆT`; sau khi duyệt và xong nhiệm vụ chốt `ĐÃ HOÀN THÀNH NHIỆM VỤ`.
-- Dòng context: `[Context: ~X% | Trạng thái: ...]` bắt buộc nằm ở dòng cuối cùng (dưới khối IMPORTANT).
+- Telemetry context luôn đứng sau khối IMPORTANT; dùng đúng định dạng trong kernel.
 - Ordinary prompts are `DISCUSSION`; exact 1.0.8 approval allowlist is required.
 - `/pl` unapproved follow-up updates the same plan and increments `vN`.
 - `/goal`, `Goal ` and `Goal:` at prompt start authorize one bounded Goal.

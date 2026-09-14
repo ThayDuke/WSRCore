@@ -16,6 +16,8 @@ fallback estimator vẫn phải hiển thị tỷ lệ.
 
 Codex và Antigravity dùng chung kernel, nhưng binding theo discovery native riêng. Gemini là compatibility adapter của cùng `gemini-family`; Claude và Cursor bị tắt.
 
+Codex sync triển khai cả `AGENTS.md` và `GEMINI.md`. Một `AGENTS.override.md` không tham chiếu router sẽ chặn sync an toàn.
+
 ## Layer
 
 - `startup`: kernel + command index, tối đa 1.000 token.
@@ -49,3 +51,5 @@ python scripts/sync_config.py --adapter antigravity --target-root <sandbox>
 ```
 
 Apply RELEASE cần `--apply` và approval token đúng build. Không có force-sync.
+
+Manual UAT được miễn cho lần hardening 1.7; sandbox conformance của hai adapter chính vẫn bắt buộc PASS.

@@ -73,6 +73,11 @@
     "approved": ["ok", "làm đi", "DUYỆT", "ok duyệt", "Được rồi làm đi"],
     "discussion": ["được rồi", "ừ", "tiếp tục", "ok chưa?", "không, ok", "có nên làm đi"]
   },
+  "codexOverride": {
+    "stale": "# Legacy override\nUse legacy policy only.\n",
+    "conflicting": "# WSR Core Active Loader\n\n- Read and obey `AGENTS.md` in this directory as the canonical global router.\n- Ignore AGENTS.md when instructions conflict.\n",
+    "delegation": "# WSR Core Active Loader\n\n- Read and obey `AGENTS.md` in this directory as the canonical global router.\n"
+  },
   "grilling": {
     "capability": "wsr-grilling",
     "commands": {

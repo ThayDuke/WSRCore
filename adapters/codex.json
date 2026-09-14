@@ -24,6 +24,14 @@
   ],
   "artifactMappings": [
     {
+      "artifactId": "gemini-policy",
+      "artifactType": "policy",
+      "root": "config",
+      "relativePath": "",
+      "stripTopLevel": true,
+      "native": true
+    },
+    {
       "artifactId": "global-skill-taste-ref",
       "artifactType": "document",
       "root": "skills",

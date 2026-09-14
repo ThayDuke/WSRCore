@@ -40,6 +40,7 @@ def run(package_root: Path) -> dict:
     goal_cases = _run_goal_contract(package_root, fixtures, manifest, wsr_common, wsr_doctor)
     telemetry_cases = _run_context_telemetry(fixtures, wsr_common)
     grilling_cases = _run_grilling_contract(package_root, fixtures, manifest, wsr_reload)
+    override_cases = _run_codex_override_contract(package_root, fixtures, manifest, sync_config)
     approval_cases = 0
     for prompt in fixtures.get("approval", {}).get("approved", []):
         if not wsr_common.is_explicit_approval(prompt):
@@ -71,7 +72,7 @@ def run(package_root: Path) -> dict:
             adapters[adapter_name] = {"status": "PASS", "operations": len(plan), "runtimeDoctor": "PASS"}
     cases = (len(fixtures.get("profiles", {})) + len(fixtures.get("adapters", {}))
              + len(fixtures.get("negative", [])) + goal_cases + approval_cases)
-    cases += telemetry_cases + grilling_cases
+    cases += telemetry_cases + grilling_cases + override_cases
     findings = audit.get("findings", [])
     severities = {str(item.get("severity", "")).upper() for item in findings if isinstance(item, dict)}
     counts = {level: sum(1 for item in findings if isinstance(item, dict) and str(item.get("severity", "")).upper() == level)
@@ -211,6 +212,39 @@ def _run_grilling_contract(package_root, fixtures, manifest, wsr_reload):
             raise RuntimeError("WSR grilling skill owner is invalid")
         cases += 1
     return cases
+
+
+def _run_codex_override_contract(package_root, fixtures, manifest, sync_config):
+    """Reject shadowing Codex overrides while accepting explicit delegation."""
+    fixture = fixtures.get("codexOverride", {})
+    adapter = sync_config.load_adapter_config(str(package_root), "codex", manifest)
+    checksums = sync_config.compute_checksums(str(package_root), manifest)
+    with tempfile.TemporaryDirectory(prefix="wsr-codex-override-") as temp:
+        target = Path(temp)
+        overrides = {name: str(target / name) for name in adapter.get("roots", {}) if name != "config"}
+        override_path = target / "AGENTS.override.md"
+        override_path.write_text(fixture.get("stale", "# stale\n"), encoding="utf-8")
+        try:
+            sync_config.build_deployment_plan(str(package_root), str(target), manifest, adapter, checksums, overrides)
+        except ValueError as error:
+            if "shadowed by unmanaged override" not in str(error):
+                raise RuntimeError("Codex shadow rejection returned the wrong failure") from error
+        else:
+            raise RuntimeError("Codex shadowing override was not rejected")
+        override_path.write_text(fixture.get("conflicting", ""), encoding="utf-8")
+        try:
+            sync_config.build_deployment_plan(str(package_root), str(target), manifest, adapter, checksums, overrides)
+        except ValueError:
+            pass
+        else:
+            raise RuntimeError("Conflicting Codex delegation was not rejected")
+        override_path.write_text(fixture.get("delegation", ""), encoding="utf-8")
+        plan = sync_config.build_deployment_plan(
+            str(package_root), str(target), manifest, adapter, checksums, overrides,
+        )
+        if not any(item.get("id") == "gemini-policy" for item in plan):
+            raise RuntimeError("Codex kernel mapping is missing from the deployment plan")
+    return 3
 
 
 def main() -> int:

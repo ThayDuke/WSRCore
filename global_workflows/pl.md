@@ -26,8 +26,8 @@ Tạo hoặc cập nhật kế hoạch tại `DOCS/Planning/planning_<task>.md`.
 - Trước khi lập plan, ước lượng context hiện tại và usage dự kiến của plan.
 - Nếu dự kiến từ 60%, cảnh báo sớm và gợi ý chia nhỏ, `/ho` hoặc `/reload`.
 - PLAN chốt `> [!IMPORTANT]\n> XIN VUI LÒNG PHÊ DUYỆT`.
-- Báo cáo hoàn thành tác vụ đã duyệt chốt `> [!IMPORTANT]\n> ĐÃ HOÀN THÀNH NHIỆM VỤ`.
-- Dòng context: `[Context: ~X% | Trạng thái: ...]` bắt buộc nằm ở dòng cuối cùng (dưới khối IMPORTANT).
+- Tác vụ đã duyệt hoàn tất dùng IMPORTANT theo hợp đồng kernel.
+- Luôn đặt telemetry context cuối phản hồi; định dạng lấy từ kernel.
 
 Mode `handoff`: thêm session descriptor tại `.agents/memory/wsr-session.json`.
 Chỉ lưu con trỏ workspace-relative, workflow/capability và timestamp.

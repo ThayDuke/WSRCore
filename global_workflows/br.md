@@ -26,5 +26,5 @@ Trao đổi và làm rõ mục tiêu. Mọi prompt chat thông thường mặc �
 - Đề xuất tối ưu và neo hồi quy dùng văn bản thường.
 - DISCUSSION chốt `> [!IMPORTANT]\n> XIN VUI LÒNG PHÊ DUYỆT`.
 - Báo cáo hoàn thành tác vụ đã duyệt chốt `> [!IMPORTANT]\n> ĐÃ HOÀN THÀNH NHIỆM VỤ`.
-- Dòng context: `[Context: ~X% | Trạng thái: ...]` bắt buộc nằm ở dòng cuối cùng (dưới khối IMPORTANT).
+- Đặt telemetry context sau IMPORTANT; định dạng lấy từ kernel.
 - Báo cáo hoàn thành thêm artifact, bằng chứng kiểm tra và tối đa ba bước QA.
