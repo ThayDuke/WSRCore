@@ -1,3 +1,4 @@
+import argparse
 import os
 import sys
 sys.dont_write_bytecode = True
@@ -11,6 +12,11 @@ STATUS_SUFFIXES = {
     "Released": "RELEASE",
     "Review": "REVIEW",
 }
+
+
+def parse_cli_args(argv=None):
+    parser = argparse.ArgumentParser(description="Build a verified WSR-Core release archive")
+    return parser.parse_args(argv)
 
 def _artifact_source(artifact):
     """Return one canonical, package-relative artifact source."""
@@ -74,6 +80,31 @@ def validate_identity_ledger(package_root, manifest):
     if bindings.get(manifest.get("buildId")) != package_content_hash:
         raise ValueError("Current build identity is not bound to the active package content hash")
 
+
+def validate_manual_uat(package_root, manifest):
+    """Require explicit native UAT evidence before packaging a released build."""
+    if manifest.get("status") != "Released":
+        return
+    index_path = wsr_common.safe_resolve_path(
+        package_root, "evidence/cross-ide-conformance/index.json",
+    )
+    with open(index_path, "r", encoding="utf-8") as stream:
+        index = json.load(stream)
+    active_relative = index.get("activeRun")
+    if not isinstance(active_relative, str) or not active_relative:
+        raise ValueError("Manual UAT gate requires an active evidence run")
+    evidence_path = wsr_common.safe_resolve_path(package_root, active_relative)
+    with open(evidence_path, "r", encoding="utf-8") as stream:
+        evidence = json.load(stream)
+    uat = evidence.get("manualUat", {})
+    if evidence.get("buildId") != manifest.get("buildId") or uat.get("status") != "PASS":
+        raise ValueError("Released packaging requires PASS native Manual UAT evidence")
+    for adapter in ("codex", "antigravity"):
+        result = uat.get("adapters", {}).get(adapter, {})
+        required = ("router", "overridePrecedence", "restart")
+        if result.get("status") != "PASS" or any(result.get(key) != "PASS" for key in required):
+            raise ValueError("Manual UAT evidence is incomplete for {0}".format(adapter))
+
 def verify_zip_archive(zip_filepath, manifest, checksums):
     """Open built ZIP in read-only mode and verify entries and checksums."""
     with zipfile.ZipFile(zip_filepath, 'r') as zipf:
@@ -108,7 +139,8 @@ def verify_zip_archive(zip_filepath, manifest, checksums):
             if zip_hash != expected_hash:
                 raise RuntimeError(f"ZIP Verification Error: Checksum mismatch for '{zn}'. Expected: {expected_hash}, Got: {zip_hash}")
 
-def main():
+def main(argv=None):
+    parse_cli_args(argv)
     package_root = wsr_common.get_package_root()
     
     # 1. Load manifest
@@ -129,6 +161,7 @@ def main():
 
     try:
         validate_identity_ledger(package_root, manifest)
+        validate_manual_uat(package_root, manifest)
     except Exception as e:
         print(f"[-] Identity ledger safety gate failed: {e}", file=sys.stderr)
         sys.exit(wsr_common.EXIT_SAFETY_REJECTION)

@@ -3,7 +3,7 @@
   "packageName": "WSR-Core",
   "version": "1.7",
   "buildId": "WSR-CORE-1.7-RELEASE",
-  "manifestSha256": "c0043c3562f7c8a63f768b6f4c6c38e6c61a758f112af25aae9343aadcfbcebe",
+  "manifestSha256": "a6e9524236b1d832ff2e40f31c8dc92c2c7fb63362f277fe9962c0285480b8a4",
   "commandMap": {
     "goal": {
       "workflow": "global_workflows/goal.md",
@@ -66,14 +66,15 @@
     },
     "commit": {
       "workflow": "global_workflows/commit.md",
-      "description": "Commit all changes and push to GitHub",
+      "description": "Intentional exception: commit all changes; push origin/main",
       "readOnly": false,
-      "approvalRequired": true,
-      "requiredProfile": "command"
+      "approvalRequired": false,
+      "requiredProfile": "command",
+      "mode": "intentional-exception"
     },
     "sync": {
       "workflow": "global_workflows/sync.md",
-      "description": "Auto-detect latest release and execute configuration sync without prompt re-approval",
+      "description": "Approval-gated configuration sync",
       "readOnly": false,
       "approvalRequired": true,
       "requiredProfile": "command",
@@ -182,26 +183,6 @@
       "priority": 5
     },
     {
-      "capabilityId": "redesign-skill",
-      "name": "Redesign Skill",
-      "description": "UI redesign and visual overhaul rules",
-      "trigger": "redesign, visual update",
-      "path": "global_skills/redesign-skill/SKILL.md",
-      "contentHash": "98ad3e5b051bfb71b2795f7e8a6aa0d32b51ee095606c098a4b2822ac07926c9",
-      "scope": "global",
-      "priority": 5
-    },
-    {
-      "capabilityId": "soft-skill",
-      "name": "Soft Skill",
-      "description": "High-end visual design and anti-generic UI taste",
-      "trigger": "soft-skill, visual design, high-end ui, anti-generic",
-      "path": "global_skills/soft-skill/SKILL.md",
-      "contentHash": "e1e32f5e2d420872c6c7332b53d5ff7721946766b78c4822b424c2d512c8fdbc",
-      "scope": "global",
-      "priority": 5
-    },
-    {
       "capabilityId": "stitch-skill",
       "name": "Stitch Skill",
       "description": "Stitch UI integration and design taste",
@@ -212,40 +193,19 @@
         "global_skills/stitch-skill/DESIGN.md"
       ],
       "scope": "global",
-      "priority": 5
+      "priority": 5,
+      "exclusiveGroup": "frontend-design-profile"
     },
     {
-      "capabilityId": "taste-skill",
-      "name": "Taste Skill (v2)",
-      "description": "Anti-slop frontend framework for landing pages, portfolios, and redesigns",
-      "trigger": "taste, frontend, ui, anti-slop, gsap, layout, design system",
+      "capabilityId": "frontend-design",
+      "name": "Frontend Design",
+      "description": "Minimal frontend design rules for new and existing web interfaces",
+      "trigger": "frontend, UI, redesign, visual design, anti-slop, premium UI",
       "path": "global_skills/taste-skill/SKILL.md",
-      "contentHash": "113c1753c2e9fbc27439df5dec98ae0b8b08c5884a3795889fb5b0fe6b698926",
+      "contentHash": "aa6a4fed7a65e4958f01449bdb211aac0d088587744f3a4b749dddd76cf45936",
       "scope": "global",
       "priority": 5,
-      "references": [
-        "global_skills/taste-skill/references/taste-skill-guide.md"
-      ]
-    },
-    {
-      "capabilityId": "taste-skill-v1",
-      "name": "Taste Skill (v1)",
-      "description": "Original v1 taste-skill preserved for backward compatibility",
-      "trigger": "taste-v1, legacy taste, frontend v1",
-      "path": "global_skills/taste-skill-v1/SKILL.md",
-      "contentHash": "033d45af1ed23832730642f95f40ab49db7fb5222848489a6c5656144bfc6dae",
-      "scope": "global",
-      "priority": 5
-    },
-    {
-      "capabilityId": "gpt-taste",
-      "name": "GPT Taste Skill",
-      "description": "Elite UX/UI and GSAP motion engineering for GPT/Codex models",
-      "trigger": "gpt-taste, codex ui, gsap motion, awwwards, variance",
-      "path": "global_skills/gpt-tasteskill/SKILL.md",
-      "contentHash": "2e64c269953f2656c21bf5a0fa6b4568e82fe0c72b36e8f84758e090349966a5",
-      "scope": "global",
-      "priority": 5
+      "exclusiveGroup": "frontend-design-profile"
     }
   ],
   "loadProfiles": {

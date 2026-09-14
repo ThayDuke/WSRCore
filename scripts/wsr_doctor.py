@@ -367,11 +367,13 @@ def _evidence_contract_ok(package_root, manifest):
         if active_relative not in declared:
             return False, "active evidence is not declared in manifest"
         active = load_json(wsr_common.safe_resolve_path(package_root, active_relative))
-        required = {"schemaVersion", "buildId", "status", "audit", "doctor", "fixtures", "syntax", "adapters"}
+        required = {"schemaVersion", "buildId", "status", "audit", "doctor", "fixtures", "conformanceCases", "syntax", "adapters"}
         if set(active) != required or active.get("schemaVersion") != 2:
             return False, "active evidence must use the exact v2 result contract"
         if active.get("buildId") != manifest.get("buildId") or active.get("status") != "PASS":
             return False, "active evidence identity/status mismatch"
+        if not isinstance(active.get("conformanceCases"), int) or active.get("conformanceCases") < 1:
+            return False, "evidence conformance case count is incomplete"
         doctor = active.get("doctor", {})
         if doctor.get("status") != "PASS" or doctor.get("score") != 100 or not isinstance(doctor.get("gates"), int):
             return False, "evidence Doctor result is incomplete"
@@ -421,7 +423,8 @@ def _validate_runtime(package_root, manifest, adapter_name, target_root, root_ov
         raise ValueError("Active marker manifest hash mismatch")
     checksums = sync_config.compute_checksums(package_root, manifest)
     plan = sync_config.build_deployment_plan(
-        package_root, roots["config"], manifest, adapter, checksums, root_overrides,
+        package_root, roots["config"], manifest, adapter, checksums,
+        root_overrides, workspace_root=os.getcwd(),
     )
     if any(operation["action"] != "unchanged" for operation in plan):
         raise ValueError("Runtime files drift from source")

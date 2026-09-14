@@ -52,4 +52,9 @@ python scripts/sync_config.py --adapter antigravity --target-root <sandbox>
 
 Apply RELEASE cần `--apply` và approval token đúng build. Không có force-sync.
 
-Manual UAT được miễn cho lần hardening 1.7; sandbox conformance của hai adapter chính vẫn bắt buộc PASS.
+Packaging RELEASE yêu cầu Manual UAT native PASS cho Codex và Antigravity.
+Sandbox conformance không thay thế Manual UAT.
+
+Frontend design dùng một skill lõi với profile `standard`, `existing-project`, `premium`, `motion`.
+Các skill frontend cũ vẫn là alias tương thích, không còn là policy độc lập.
+`/commit` là ngoại lệ có chủ đích: commit mọi thay đổi và push `origin/main`.

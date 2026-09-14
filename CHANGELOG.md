@@ -1,6 +1,12 @@
 # WSR Core Changelog
 
 ## [1.7] - 2026-09-14
+- Added native Manual UAT as a mandatory RELEASE packaging gate.
+- Consolidated overlapping frontend skills into one profile-based core skill.
+- Kept legacy frontend skill aliases without loading duplicate policy.
+- Corrected `/sync` wording and marked `/commit` as an intentional origin/main exception.
+- Added workspace-level Codex override detection and fail-closed CLI validation.
+- Made Deep Audit accept single-file paths without invoking repository-wide checks.
 - Hardened the existing 1.7 release without changing its version or build ID.
 - Scoped `STR-002` to canonical policy documents, removing HTML and reference false positives.
 - Added Codex kernel deployment and blocked unmanaged overrides that shadow the active router.

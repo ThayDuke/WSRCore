@@ -1176,21 +1176,6 @@
       ],
       "owner": "Workflow Engineer",
       "encoding": "UTF-8"
-    },
-    {
-      "id": "global-skill-taste-ref",
-      "source": "global_skills/taste-skill/references/taste-skill-guide.md",
-      "type": "document",
-      "required": true,
-      "mutable": false,
-      "deploy": true,
-      "targets": [
-        "codex",
-        "gemini",
-        "antigravity"
-      ],
-      "owner": "Workflow Engineer",
-      "encoding": "UTF-8"
     }
   ]
 }

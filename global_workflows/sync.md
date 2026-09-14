@@ -1,5 +1,5 @@
 ---
-description: Auto-detect latest release and execute configuration sync without prompt re-approval
+description: Auto-detect latest release and execute approval-gated configuration sync
 ---
 
 # /sync

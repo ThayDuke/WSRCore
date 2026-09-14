@@ -11,4 +11,7 @@ WSR Core 1.7 RELEASE
 9. /gr chạy read-only; /grd chỉ ghi glossary hoặc ADR sau approval chính xác.
 10. Codex đồng bộ cả AGENTS.md và GEMINI.md từ cùng release.
 11. Nếu AGENTS.override.md che router, sync dừng; xóa file hoặc chỉ giữ loader tối thiểu được hỗ trợ.
-12. Manual UAT được miễn cho lần hardening này; sandbox conformance vẫn bắt buộc PASS.
+12. Packaging RELEASE yêu cầu Manual UAT native PASS cho Codex và Antigravity.
+13. Sandbox conformance không thay thế Manual UAT native.
+14. Frontend dùng skill lõi và chọn profile phù hợp; alias cũ chỉ giữ tương thích.
+15. /commit là ngoại lệ có chủ đích, chỉ commit mọi thay đổi và push origin/main.

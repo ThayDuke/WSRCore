@@ -176,6 +176,30 @@ def _validate_session(session_file, workspace_root, expected_build_id=None):
     return data, session_file, workspace_root
 
 
+def _validate_capability_selection(requested_caps, by_id):
+    unknown = set(requested_caps) - set(by_id)
+    if unknown:
+        raise ValueError("Unknown capability requested: {0}".format(sorted(unknown)))
+    groups = {}
+    for capability in requested_caps:
+        item = by_id[capability]
+        group = item.get("exclusiveGroup")
+        if group and group in groups and groups[group] != capability:
+            raise ValueError(
+                "Mutually exclusive capabilities requested: {0}, {1} ({2})".format(
+                    groups[group], capability, group,
+                )
+            )
+        if group:
+            groups[group] = capability
+        for conflict in item.get("conflictsWith", []):
+            if conflict in requested_caps and conflict != capability:
+                raise ValueError("Conflicting capabilities requested: {0}, {1}".format(capability, conflict))
+        for required in item.get("requires", []):
+            if required not in requested_caps:
+                raise ValueError("Capability '{0}' requires '{1}'".format(capability, required))
+
+
 def build_load_plan(
     source_root, manifest, adapter_name, profile="startup", command_name=None,
     capability_ids=None, session_file=None, workspace_root=None,
@@ -254,9 +278,7 @@ def build_load_plan(
 
     if profile in ("task", "resume") and requested_caps:
         by_id = {item.get("capabilityId"): item for item in context.get("skillIndex", [])}
-        unknown = set(requested_caps) - set(by_id)
-        if unknown:
-            raise ValueError("Unknown capability requested: {0}".format(sorted(unknown)))
+        _validate_capability_selection(requested_caps, by_id)
         for capability in requested_caps:
             item = by_id[capability]
             add_file(item["path"], "skill", source_root, required=True, precedence=item.get("priority", 10), owner=capability)
@@ -325,6 +347,11 @@ def check_remote_sync(source_root, fetch_remote=False):
         return "OFFLINE", info, str(error)
 
 
+def validate_fetch_authorization(args, build_id):
+    if args.fetch_remote and args.approval_token != build_id:
+        raise ValueError("Remote fetch requires --approval-token matching the active build ID")
+
+
 def emit_human(receipt, status_only):
     print("WSR RELOAD: {0}".format(receipt["state"]))
     print("Source: {0}".format(receipt["sourceRoot"]))
@@ -365,6 +392,7 @@ def parse_args():
     parser.add_argument("--allow-review", action="store_true")
     parser.add_argument("--check-remote", action="store_true")
     parser.add_argument("--fetch-remote", action="store_true")
+    parser.add_argument("--approval-token")
     parser.add_argument("--status", action="store_true")
     parser.add_argument("--json", action="store_true")
     return parser.parse_args()
@@ -445,6 +473,7 @@ def evaluate_reload_state(source_root, manifest, args, active, roots):
 def run_reload(args):
     source_root, source_origin, lock = resolve_source(args.source_root, args.lock_file)
     manifest, manifest_sha = validate_identity(source_root, lock, args.allow_review)
+    validate_fetch_authorization(args, manifest.get("buildId"))
     root_overrides = sync_config.parse_root_overrides(args.root_override)
     adapter, roots = resolve_target(
         source_root, manifest, args.adapter, args.target_root, root_overrides,
@@ -472,7 +501,7 @@ def run_reload(args):
     )
     outcome = evaluate_reload_state(source_root, manifest, args, active, roots)
     remote_status, remote_info, remote_msg = check_remote_sync(
-        source_root, fetch_remote=args.fetch_remote or args.check_remote
+        source_root, fetch_remote=args.fetch_remote
     )
     if remote_msg and not outcome.get("warning"):
         outcome["warning"] = remote_msg

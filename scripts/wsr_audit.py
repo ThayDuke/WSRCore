@@ -164,8 +164,12 @@ def score(findings: list[dict], mode: str, coverage: dict, fail_on: str) -> tupl
 
 
 def audit(root: Path, mode: str, changed: bool, categories: set[str] | None, fail_on: str) -> dict:
+    root = root.resolve()
+    single_file = root.is_file()
     metadata = {"deleted": [], "renamed": []}
-    if changed or mode == "quick":
+    if single_file:
+        files, skipped = [root], {}
+    elif changed or mode == "quick":
         files, metadata = git_changed(root)
         skipped = {}
     else:
@@ -185,8 +189,11 @@ def audit(root: Path, mode: str, changed: bool, categories: set[str] | None, fai
         findings.extend(checks.file_findings(root, path, text))
     if mode == "deep":
         findings.extend(checks.duplicate_blocks(text_files))
-        findings.extend(checks.dependency_findings(root, text_files, EXCLUDED_DIRS))
-        doctor_findings, doctor = run_doctor(root)
+        if single_file:
+            doctor_findings, doctor = [], {"ran": False, "reason": "single-file path"}
+        else:
+            findings.extend(checks.dependency_findings(root, text_files, EXCLUDED_DIRS))
+            doctor_findings, doctor = run_doctor(root)
     else:
         doctor_findings, doctor = [], {"ran": False, "reason": "quick mode"}
     coverage = {"discoveredFiles": len(files), "auditedFiles": len(text_files), "skippedFiles": sum(skipped.values()), "coverageRatio": round(len(text_files) / len(files), 4) if files else 0.0, **metadata}

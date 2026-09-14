@@ -20,13 +20,14 @@
     "status": "PASS"
   },
   "buildId": "WSR-CORE-1.7-RELEASE",
+  "conformanceCases": 58,
   "doctor": {
     "gates": 32,
     "score": 100,
     "status": "PASS"
   },
   "fixtures": {
-    "cases": 51,
+    "cases": 58,
     "status": "PASS"
   },
   "schemaVersion": 2,

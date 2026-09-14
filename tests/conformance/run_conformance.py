@@ -3,6 +3,8 @@ from __future__ import annotations
 
 import argparse
 import ast
+import contextlib
+import io
 import json
 import os
 import sys
@@ -20,6 +22,7 @@ def run(package_root: Path) -> dict:
         raise ValueError("conformance fixture buildId does not match manifest")
     sys.path.insert(0, str(package_root / "scripts"))
     import sync_config
+    import pack_wsr
     import wsr_audit
     import wsr_common
     import wsr_doctor
@@ -41,6 +44,7 @@ def run(package_root: Path) -> dict:
     telemetry_cases = _run_context_telemetry(fixtures, wsr_common)
     grilling_cases = _run_grilling_contract(package_root, fixtures, manifest, wsr_reload)
     override_cases = _run_codex_override_contract(package_root, fixtures, manifest, sync_config)
+    cli_cases = _run_cli_contract(package_root, manifest, pack_wsr, wsr_audit, wsr_reload)
     approval_cases = 0
     for prompt in fixtures.get("approval", {}).get("approved", []):
         if not wsr_common.is_explicit_approval(prompt):
@@ -72,7 +76,7 @@ def run(package_root: Path) -> dict:
             adapters[adapter_name] = {"status": "PASS", "operations": len(plan), "runtimeDoctor": "PASS"}
     cases = (len(fixtures.get("profiles", {})) + len(fixtures.get("adapters", {}))
              + len(fixtures.get("negative", [])) + goal_cases + approval_cases)
-    cases += telemetry_cases + grilling_cases + override_cases
+    cases += telemetry_cases + grilling_cases + override_cases + cli_cases
     findings = audit.get("findings", [])
     severities = {str(item.get("severity", "")).upper() for item in findings if isinstance(item, dict)}
     counts = {level: sum(1 for item in findings if isinstance(item, dict) and str(item.get("severity", "")).upper() == level)
@@ -83,7 +87,8 @@ def run(package_root: Path) -> dict:
                       "medium": counts["MEDIUM"], "low": counts["LOW"]},
             "doctor": {"status": doctor["status"], "score": doctor["score"], "gates": len(doctor.get("checks", []))},
             "syntax": {"status": "PASS", "files": syntax_count},
-            "fixtures": {"status": "PASS", "cases": cases}, "adapters": adapters}
+            "fixtures": {"status": "PASS", "cases": cases}, "conformanceCases": cases,
+            "adapters": adapters}
 
 
 def _run_goal_contract(package_root, fixtures, manifest, wsr_common, wsr_doctor):
@@ -211,6 +216,18 @@ def _run_grilling_contract(package_root, fixtures, manifest, wsr_reload):
         if plan[-1].get("capabilityOwner") != capability:
             raise RuntimeError("WSR grilling skill owner is invalid")
         cases += 1
+    try:
+        wsr_reload.build_load_plan(
+            str(package_root), manifest, "codex", "task",
+            command_name="gr",
+            capability_ids=["frontend-design", "stitch-skill"],
+        )
+    except ValueError as error:
+        if "Mutually exclusive" not in str(error):
+            raise RuntimeError("Frontend capability conflict returned the wrong failure") from error
+    else:
+        raise RuntimeError("Mutually exclusive frontend capabilities were loaded together")
+    cases += 1
     return cases
 
 
@@ -244,7 +261,60 @@ def _run_codex_override_contract(package_root, fixtures, manifest, sync_config):
         )
         if not any(item.get("id") == "gemini-policy" for item in plan):
             raise RuntimeError("Codex kernel mapping is missing from the deployment plan")
+        workspace = target / "workspace"
+        workspace.mkdir()
+        workspace_override = workspace / "AGENTS.override.md"
+        workspace_override.write_text(fixture.get("stale", "# stale\n"), encoding="utf-8")
+        try:
+            sync_config.build_deployment_plan(
+                str(package_root), str(target), manifest, adapter, checksums,
+                overrides, workspace_root=str(workspace),
+            )
+        except ValueError as error:
+            if "workspace router is shadowed" not in str(error):
+                raise RuntimeError("Workspace shadow rejection returned the wrong failure") from error
+        else:
+            raise RuntimeError("Workspace shadowing override was not rejected")
     return 3
+
+
+def _run_cli_contract(package_root, manifest, pack_wsr, wsr_audit, wsr_reload):
+    """Ensure CLI validation happens before any build or audit side effect."""
+    try:
+        pack_wsr.parse_cli_args(["--unknown"])
+    except SystemExit as error:
+        if error.code != 2:
+            raise RuntimeError("Packaging CLI rejected unknown arguments incorrectly") from error
+    else:
+        raise RuntimeError("Packaging CLI accepted an unknown argument")
+    output = io.StringIO()
+    try:
+        with contextlib.redirect_stdout(output):
+            pack_wsr.parse_cli_args(["--help"])
+    except SystemExit as error:
+        if error.code != 0 or "usage:" not in output.getvalue().lower():
+            raise RuntimeError("Packaging CLI help contract failed") from error
+    single = package_root / "scripts" / "sync_config.py"
+    report = wsr_audit.audit(single, "deep", False, None, "high")
+    if report["coverage"]["auditedFiles"] != 1 or report["doctor"]["ran"]:
+        raise RuntimeError("Single-file audit contract failed")
+    try:
+        pack_wsr.validate_manual_uat(str(package_root), manifest)
+    except ValueError as error:
+        if "Manual UAT" not in str(error):
+            raise RuntimeError("Manual UAT rejection returned the wrong failure") from error
+    else:
+        raise RuntimeError("Released packaging accepted missing Manual UAT evidence")
+    args = argparse.Namespace(fetch_remote=True, approval_token=None)
+    try:
+        wsr_reload.validate_fetch_authorization(args, manifest.get("buildId"))
+    except ValueError:
+        pass
+    else:
+        raise RuntimeError("Remote fetch accepted without build approval token")
+    args.approval_token = manifest.get("buildId")
+    wsr_reload.validate_fetch_authorization(args, manifest.get("buildId"))
+    return 6
 
 
 def main() -> int:

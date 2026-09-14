@@ -1,14 +1,18 @@
 ---
-description: Commit all repository changes and push to GitHub (current or specified branch)
+description: Commit all repository changes and push origin/main
 ---
 
 # /commit
 
-Cho phép commit toàn bộ thay đổi trong repo và đặt thông điệp commit phù hợp, sau đó tự động push lên GitHub theo nhánh đang làm việc. Nếu được chỉ định rõ nhánh đích, gộp nhánh hiện tại vào nhánh được chỉ định và tiến hành push theo đúng quy định.
+Cho phép commit toàn bộ thay đổi trong repo và tự động push lên `origin/main`.
 
 - Không yêu cầu phê duyệt trước.
+- Đây là ngoại lệ có chủ đích theo yêu cầu người dùng.
+- Ngoại lệ này không được suy rộng sang workflow khác.
 - Không tự động tạo issue.
-- Nếu branch đích chưa tồn tại, tạo nhánh mới và push lần đầu.
+- Chỉ chấp nhận branch hiện tại là `main`.
+- Không tự tạo branch, merge, rebase, pull, hoặc force-push.
+- Dừng nếu remote không phải `origin` hoặc push thất bại.
 - Sử dụng thông điệp commit tổng quát:
     - Nếu không có prompt, dùng "Repository update".
     - Có thể tùy chỉnh prompt ngắn gọn.

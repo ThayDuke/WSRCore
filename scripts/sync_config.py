@@ -129,30 +129,34 @@ def render_router(package_root, manifest):
     return rendered
 
 
-def validate_router_precedence(adapter_config, roots, rendered_router):
+def validate_router_precedence(adapter_config, roots, rendered_router, workspace_root=None):
     if adapter_config.get("adapterId") != "codex":
         return
     precedence = adapter_config.get("discoveryPrecedence", [])
     if not precedence or not precedence[0].endswith("/AGENTS.override.md"):
         return
-    config_root = roots[adapter_config["router"]["root"]]
-    override_path = wsr_common.safe_resolve_path(config_root, "AGENTS.override.md")
-    if not os.path.isfile(override_path):
-        return
-    with open(override_path, "r", encoding="utf-8", errors="strict") as stream:
-        override = stream.read()
     delegation = CODEX_OVERRIDE_DELEGATION
     allowed_loaders = {
         delegation,
         "- " + delegation,
         "# WSR Core Active Loader\n\n- " + delegation,
     }
-    if override.strip() == rendered_router.strip() or override.strip() in allowed_loaders:
-        return
-    raise ValueError(
-        "Codex router is shadowed by unmanaged override: {0}. "
-        "Remove it or delegate explicitly to AGENTS.md before sync.".format(override_path)
-    )
+    config_root = roots[adapter_config["router"]["root"]]
+    candidates = [(config_root, "global")]
+    if workspace_root:
+        candidates.append((workspace_root, "workspace"))
+    for base, scope in candidates:
+        override_path = wsr_common.safe_resolve_path(base, "AGENTS.override.md")
+        if not os.path.isfile(override_path):
+            continue
+        with open(override_path, "r", encoding="utf-8", errors="strict") as stream:
+            override = stream.read()
+        if override.strip() == rendered_router.strip() or override.strip() in allowed_loaders:
+            continue
+        raise ValueError(
+            "Codex {0} router is shadowed by unmanaged override: {1}. "
+            "Remove it or delegate explicitly to AGENTS.md before sync.".format(scope, override_path)
+        )
 
 
 def compute_checksums(package_root, manifest):
@@ -209,7 +213,10 @@ def _operation(artifact_id, source_path, destination, root_name, root_path, sour
     return item
 
 
-def build_deployment_plan(package_root, target_root, manifest, adapter_config, checksums, root_overrides=None):
+def build_deployment_plan(
+    package_root, target_root, manifest, adapter_config, checksums,
+    root_overrides=None, workspace_root=None,
+):
     package_root = os.path.realpath(os.path.abspath(package_root))
     roots = resolve_roots(adapter_config, config_override=target_root, root_overrides=root_overrides)
     mappings = adapter_config.get("artifactMappings", [])
@@ -250,7 +257,7 @@ def build_deployment_plan(package_root, target_root, manifest, adapter_config, c
     if key in destinations:
         raise ValueError("Router destination collision with '{0}'".format(destinations[key]))
     rendered = render_router(package_root, manifest)
-    validate_router_precedence(adapter_config, roots, rendered)
+    validate_router_precedence(adapter_config, roots, rendered, workspace_root)
     rendered_hash = hashlib.sha256(rendered.encode("utf-8")).hexdigest()
     plan.append(_operation(
         "active-router", None, router_destination, router["root"], router_root,
@@ -506,7 +513,10 @@ def main():
             raise RuntimeError("Doctor preflight failed: {0}".format(detail.strip()))
 
         checksums = compute_checksums(package_root, manifest)
-        plan = build_deployment_plan(package_root, roots["config"], manifest, adapter, checksums, root_overrides)
+        plan = build_deployment_plan(
+            package_root, roots["config"], manifest, adapter, checksums,
+            root_overrides, workspace_root=os.getcwd(),
+        )
         changes = [op for op in plan if op["action"] != "unchanged"]
         router_changed = any(op["id"] == "active-router" and op["action"] != "unchanged" for op in plan)
         report = {
