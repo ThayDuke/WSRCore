@@ -1,6 +1,8 @@
-# WSR Core 1.6 RELEASE
+# WSR Core 1.7 RELEASE
 
-WSR Core 1.6 chuẩn hóa định dạng phiên bản x.y, nâng cấp giao diện Liquid Glass quang học cho README.html, tích hợp changelog đầy đủ giữa các phiên bản và duy trì 100% 32 Doctor gates.
+WSR Core 1.7 bổ sung `/gr`, `/grd` và global skill `wsr-grilling`.
+
+Hai workflow dùng chung engine, giữ JIT L2 và approval semantics của WSR.
 
 Mọi phản hồi kết thúc bằng `[Context: ~X% | Trạng thái: ...]`; WSR ưu tiên usage native,
 fallback estimator vẫn phải hiển thị tỷ lệ.
@@ -24,6 +26,8 @@ Codex và Antigravity dùng chung kernel, nhưng binding theo discovery native r
 
 Ngưỡng cảnh báo: 60%; handoff: 75%; critical: 85%.
 Trước `/pl`, `/ho`, `/goal` hoặc task lớn, WSR ước lượng usage dự kiến để cảnh báo sớm.
+
+`/gr` làm rõ quyết định read-only. `/grd` chuẩn bị glossary hoặc ADR và chờ duyệt trước khi ghi.
 
 ## Kiểm định và đồng bộ
 

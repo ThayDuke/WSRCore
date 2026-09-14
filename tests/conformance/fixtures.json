@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "buildId": "WSR-CORE-1.6-RELEASE",
+  "buildId": "WSR-CORE-1.7-RELEASE",
   "contextTelemetry": {
     "everyResponse": true,
     "cases": [
@@ -72,6 +72,26 @@
   "approval": {
     "approved": ["ok", "làm đi", "DUYỆT", "ok duyệt", "Được rồi làm đi"],
     "discussion": ["được rồi", "ừ", "tiếp tục", "ok chưa?", "không, ok", "có nên làm đi"]
+  },
+  "grilling": {
+    "capability": "wsr-grilling",
+    "commands": {
+      "gr": {
+        "readOnly": true,
+        "approvalRequired": false,
+        "requiredProfile": "task"
+      },
+      "grd": {
+        "readOnly": false,
+        "approvalRequired": true,
+        "requiredProfile": "task"
+      }
+    },
+    "references": [
+      "global_skills/wsr-grilling/references/domain-modeling.md",
+      "global_skills/wsr-grilling/references/context-format.md",
+      "global_skills/wsr-grilling/references/adr-format.md"
+    ]
   },
   "negative": [
     "duplicate-rule-id",

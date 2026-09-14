@@ -1,9 +1,9 @@
 {
   "schemaVersion": 2,
   "packageName": "WSR-Core",
-  "version": "1.6",
-  "buildId": "WSR-CORE-1.6-RELEASE",
-  "manifestSha256": "c15e539b065705506330a35da6330d7a4bb136eaa47b55cb9d1466c1571828ab",
+  "version": "1.7",
+  "buildId": "WSR-CORE-1.7-RELEASE",
+  "manifestSha256": "c0043c3562f7c8a63f768b6f4c6c38e6c61a758f112af25aae9343aadcfbcebe",
   "commandMap": {
     "goal": {
       "workflow": "global_workflows/goal.md",
@@ -26,6 +26,20 @@
       "readOnly": true,
       "approvalRequired": false,
       "requiredProfile": "command"
+    },
+    "gr": {
+      "workflow": "global_workflows/gr.md",
+      "description": "Grill decisions read-only",
+      "readOnly": true,
+      "approvalRequired": false,
+      "requiredProfile": "task"
+    },
+    "grd": {
+      "workflow": "global_workflows/grd.md",
+      "description": "Grill decisions with approval-gated docs",
+      "readOnly": false,
+      "approvalRequired": true,
+      "requiredProfile": "task"
     },
     "pl": {
       "workflow": "global_workflows/pl.md",
@@ -103,6 +117,21 @@
       "trigger": "review, code review, wsr-review",
       "path": "skills/wsr-review/SKILL.md",
       "contentHash": "ed5ed1169db58d062914f2f3be6d5e1395921bc06107de00bd0d371158600376",
+      "scope": "global",
+      "priority": 10
+    },
+    {
+      "capabilityId": "wsr-grilling",
+      "name": "WSR Grilling",
+      "description": "Decision-tree interview engine for /gr and /grd",
+      "trigger": "/gr, /grd, grill me, stress-test decision",
+      "path": "global_skills/wsr-grilling/SKILL.md",
+      "contentHash": "498d10a2de0b2f80b210b984c50a5a43e469afa79ce0615968eca3a4069bb487",
+      "references": [
+        "global_skills/wsr-grilling/references/domain-modeling.md",
+        "global_skills/wsr-grilling/references/context-format.md",
+        "global_skills/wsr-grilling/references/adr-format.md"
+      ],
       "scope": "global",
       "priority": 10
     },

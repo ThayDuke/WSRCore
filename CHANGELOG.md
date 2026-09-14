@@ -1,5 +1,13 @@
 # WSR Core Changelog
 
+## [1.7] - 2026-09-14
+- Added `/gr` for read-only decision-tree interviews.
+- Added `/grd` for approval-gated glossary and ADR updates.
+- Added the shared `wsr-grilling` global skill with mode-specific references.
+- Pinned attribution to Matt Pocock Skills commit `3cca18b368ae95cdbdebbff572ccafa662551015`.
+- Preserved WSR approval, JIT loading, context telemetry, and adapter boundaries.
+- Released official WSR-Core 1.7 package (`WSR-CORE-1.7-RELEASE`).
+
 ## [1.6] - 2026-08-31
 - Standardized version specification to two-segment `x.y` format (discontinued `x.y.z`).
 - Remastered `README.html` using the enhanced Liquid Glass optical framework (directional Fresnel borders, layered chromatic dispersion shadows, 20px squircles).

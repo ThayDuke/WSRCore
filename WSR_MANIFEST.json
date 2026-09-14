@@ -1,10 +1,10 @@
 {
   "schemaVersion": 2,
   "packageName": "WSR-Core",
-  "version": "1.6",
-  "buildId": "WSR-CORE-1.6-RELEASE",
+  "version": "1.7",
+  "buildId": "WSR-CORE-1.7-RELEASE",
   "status": "Released",
-  "createdAt": "2026-08-31T00:00:00+07:00",
+  "createdAt": "2026-09-14T00:00:00+07:00",
   "canonicalLayout": ".agents",
   "compatibilityLayouts": [
     ".agents",
@@ -185,6 +185,36 @@
     {
       "id": "workflow-br",
       "source": "global_workflows/br.md",
+      "type": "workflow",
+      "required": true,
+      "mutable": false,
+      "deploy": true,
+      "targets": [
+        "codex",
+        "gemini",
+        "antigravity"
+      ],
+      "owner": "Workflow Engineer",
+      "encoding": "UTF-8"
+    },
+    {
+      "id": "workflow-gr",
+      "source": "global_workflows/gr.md",
+      "type": "workflow",
+      "required": true,
+      "mutable": false,
+      "deploy": true,
+      "targets": [
+        "codex",
+        "gemini",
+        "antigravity"
+      ],
+      "owner": "Workflow Engineer",
+      "encoding": "UTF-8"
+    },
+    {
+      "id": "workflow-grd",
+      "source": "global_workflows/grd.md",
       "type": "workflow",
       "required": true,
       "mutable": false,
@@ -425,6 +455,81 @@
     {
       "id": "global-skill-output",
       "source": "global_skills/output-skill/SKILL.md",
+      "type": "skill",
+      "required": true,
+      "mutable": false,
+      "deploy": true,
+      "targets": [
+        "codex",
+        "gemini",
+        "antigravity"
+      ],
+      "owner": "Workflow Engineer",
+      "encoding": "UTF-8"
+    },
+    {
+      "id": "global-skill-wsr-grilling",
+      "source": "global_skills/wsr-grilling/SKILL.md",
+      "type": "skill",
+      "required": true,
+      "mutable": false,
+      "deploy": true,
+      "targets": [
+        "codex",
+        "gemini",
+        "antigravity"
+      ],
+      "owner": "Workflow Engineer",
+      "encoding": "UTF-8"
+    },
+    {
+      "id": "global-skill-wsr-grilling-domain",
+      "source": "global_skills/wsr-grilling/references/domain-modeling.md",
+      "type": "skill",
+      "required": true,
+      "mutable": false,
+      "deploy": true,
+      "targets": [
+        "codex",
+        "gemini",
+        "antigravity"
+      ],
+      "owner": "Workflow Engineer",
+      "encoding": "UTF-8"
+    },
+    {
+      "id": "global-skill-wsr-grilling-context",
+      "source": "global_skills/wsr-grilling/references/context-format.md",
+      "type": "skill",
+      "required": true,
+      "mutable": false,
+      "deploy": true,
+      "targets": [
+        "codex",
+        "gemini",
+        "antigravity"
+      ],
+      "owner": "Workflow Engineer",
+      "encoding": "UTF-8"
+    },
+    {
+      "id": "global-skill-wsr-grilling-adr",
+      "source": "global_skills/wsr-grilling/references/adr-format.md",
+      "type": "skill",
+      "required": true,
+      "mutable": false,
+      "deploy": true,
+      "targets": [
+        "codex",
+        "gemini",
+        "antigravity"
+      ],
+      "owner": "Workflow Engineer",
+      "encoding": "UTF-8"
+    },
+    {
+      "id": "global-skill-wsr-grilling-license",
+      "source": "global_skills/wsr-grilling/LICENSE.upstream",
       "type": "skill",
       "required": true,
       "mutable": false,
@@ -964,6 +1069,28 @@
     {
       "id": "conformance-evidence-run-20260831-1-6-release",
       "source": "evidence/cross-ide-conformance/20260831_WSR-CORE-1.6-RELEASE/result.json",
+      "type": "evidence",
+      "required": true,
+      "mutable": true,
+      "deploy": false,
+      "targets": [],
+      "owner": "QA Engineer",
+      "encoding": "UTF-8"
+    },
+    {
+      "id": "conformance-evidence-run-20260914-1-7-review",
+      "source": "evidence/cross-ide-conformance/20260914_WSR-CORE-1.7-REVIEW/result.json",
+      "type": "evidence",
+      "required": true,
+      "mutable": true,
+      "deploy": false,
+      "targets": [],
+      "owner": "QA Engineer",
+      "encoding": "UTF-8"
+    },
+    {
+      "id": "conformance-evidence-run-20260914-1-7-release",
+      "source": "evidence/cross-ide-conformance/20260914_WSR-CORE-1.7-RELEASE/result.json",
       "type": "evidence",
       "required": true,
       "mutable": true,

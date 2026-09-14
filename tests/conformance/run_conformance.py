@@ -23,6 +23,7 @@ def run(package_root: Path) -> dict:
     import wsr_audit
     import wsr_common
     import wsr_doctor
+    import wsr_reload
 
     doctor, _, _ = wsr_doctor.run_doctor_checks(str(package_root), strict=True, is_json=True, source_mode=True)
     if doctor.get("status") != "PASS":
@@ -38,6 +39,7 @@ def run(package_root: Path) -> dict:
         syntax_count += 1
     goal_cases = _run_goal_contract(package_root, fixtures, manifest, wsr_common, wsr_doctor)
     telemetry_cases = _run_context_telemetry(fixtures, wsr_common)
+    grilling_cases = _run_grilling_contract(package_root, fixtures, manifest, wsr_reload)
     approval_cases = 0
     for prompt in fixtures.get("approval", {}).get("approved", []):
         if not wsr_common.is_explicit_approval(prompt):
@@ -69,7 +71,7 @@ def run(package_root: Path) -> dict:
             adapters[adapter_name] = {"status": "PASS", "operations": len(plan), "runtimeDoctor": "PASS"}
     cases = (len(fixtures.get("profiles", {})) + len(fixtures.get("adapters", {}))
              + len(fixtures.get("negative", [])) + goal_cases + approval_cases)
-    cases += telemetry_cases
+    cases += telemetry_cases + grilling_cases
     findings = audit.get("findings", [])
     severities = {str(item.get("severity", "")).upper() for item in findings if isinstance(item, dict)}
     counts = {level: sum(1 for item in findings if isinstance(item, dict) and str(item.get("severity", "")).upper() == level)
@@ -174,6 +176,39 @@ def _run_context_telemetry(fixtures, wsr_common):
             raise RuntimeError("Context threshold state mismatch")
         if not report["contextLine"].startswith("[Context: ~"):
             raise RuntimeError("Context line missing")
+        cases += 1
+    return cases
+
+
+def _run_grilling_contract(package_root, fixtures, manifest, wsr_reload):
+    """Verify /gr and /grd route through one bounded task capability."""
+    grilling = fixtures.get("grilling", {})
+    capability = grilling.get("capability")
+    context = json.loads((package_root / "WSR_CONTEXT.json").read_text(encoding="utf-8"))
+    declared = {item.get("source") for item in manifest.get("artifacts", [])}
+    cases = 0
+
+    indexed = {item.get("capabilityId"): item for item in context.get("skillIndex", [])}
+    skill = indexed.get(capability)
+    if not skill or skill.get("references") != grilling.get("references"):
+        raise RuntimeError("WSR grilling capability or references are invalid")
+    if not set(skill.get("references", [])).issubset(declared):
+        raise RuntimeError("WSR grilling references are not declared artifacts")
+    cases += 1
+
+    for command, expected in grilling.get("commands", {}).items():
+        actual = context.get("commandMap", {}).get(command)
+        if not actual or any(actual.get(key) != value for key, value in expected.items()):
+            raise RuntimeError("WSR grilling command contract failed: {0}".format(command))
+        plan = wsr_reload.build_load_plan(
+            str(package_root), manifest, "codex", "task",
+            command_name=command, capability_ids=[capability],
+        )
+        roles = [item.get("role") for item in plan]
+        if roles != ["kernel", "command_index", "workflow", "skill"]:
+            raise RuntimeError("WSR grilling JIT load plan failed: {0}".format(command))
+        if plan[-1].get("capabilityOwner") != capability:
+            raise RuntimeError("WSR grilling skill owner is invalid")
         cases += 1
     return cases
 
