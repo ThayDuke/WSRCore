@@ -216,6 +216,41 @@ def print_json_report(report_dict):
     """Output standardized JSON report to stdout."""
     print(json.dumps(report_dict, indent=2, ensure_ascii=False))
 
+
+def validate_manual_uat_record(manual_uat, primary_adapters=("codex", "antigravity")):
+    """Validate either completed native UAT or an explicit, auditable waiver."""
+    if not isinstance(manual_uat, dict):
+        return False, "Manual UAT record is missing"
+    status = manual_uat.get("status")
+    expected = "PASS" if status == "PASS" else "NOT_RUN" if status == "WAIVED" else None
+    if expected is None:
+        return False, "Manual UAT status must be PASS or WAIVED"
+    required_keys = {"status", "adapters"} | ({"waiver"} if status == "WAIVED" else set())
+    if set(manual_uat) != required_keys:
+        return False, "Manual UAT record has invalid fields"
+    adapters = manual_uat.get("adapters")
+    if not isinstance(adapters, dict) or set(adapters) != set(primary_adapters):
+        return False, "Manual UAT adapter set is invalid"
+    result_keys = {"status", "router", "overridePrecedence", "restart"}
+    for name in primary_adapters:
+        result = adapters.get(name)
+        if not isinstance(result, dict) or set(result) != result_keys:
+            return False, "Manual UAT adapter fields are incomplete: {0}".format(name)
+        if any(result.get(key) != expected for key in result_keys):
+            return False, "Manual UAT adapter result is invalid: {0}".format(name)
+    if status == "WAIVED":
+        waiver = manual_uat.get("waiver")
+        waiver_keys = {"authorizedBy", "authorizedAt", "reason"}
+        if not isinstance(waiver, dict) or set(waiver) != waiver_keys:
+            return False, "Manual UAT waiver fields are incomplete"
+        if not all(isinstance(waiver.get(key), str) and waiver[key].strip() for key in waiver_keys):
+            return False, "Manual UAT waiver values are invalid"
+        try:
+            datetime.date.fromisoformat(waiver["authorizedAt"])
+        except ValueError:
+            return False, "Manual UAT waiver date is invalid"
+    return True, ""
+
 def format_alert(alert_type, title, message=None):
     """Format GitHub-style alerts."""
     lines = [f"> [!{alert_type.upper()}]", f"> {title}"]

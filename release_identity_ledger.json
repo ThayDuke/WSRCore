@@ -109,6 +109,18 @@
       "buildId": "WSR-CORE-1.7-RELEASE",
       "status": "Released",
       "contentHash": "09bd7b605b2348e8004ec3f873de10d4666ce338588201df11fa5ecb8943a222"
+    },
+    {
+      "version": "1.8",
+      "buildId": "WSR-CORE-1.8-REVIEW",
+      "status": "Review",
+      "contentHash": "7c2580c7604ab4d79a6dcff9f1e10478bb791c3965928275f18d508913cf4f89"
+    },
+    {
+      "version": "1.8",
+      "buildId": "WSR-CORE-1.8-RELEASE",
+      "status": "Released",
+      "contentHash": "b5bae4f14d13c82853da3e51434d139ee37360e90cd80a77f74618f66c3c225c"
     }
   ]
 }

@@ -1,0 +1,61 @@
+{
+  "adapters": {
+    "antigravity": {
+      "operations": 51,
+      "runtimeDoctor": "PASS",
+      "status": "PASS"
+    },
+    "codex": {
+      "operations": 52,
+      "runtimeDoctor": "PASS",
+      "status": "PASS"
+    }
+  },
+  "audit": {
+    "blockers": 0,
+    "high": 0,
+    "low": 0,
+    "medium": 0,
+    "score": 100,
+    "status": "PASS"
+  },
+  "buildId": "WSR-CORE-1.8-RELEASE",
+  "conformanceCases": 67,
+  "doctor": {
+    "gates": 32,
+    "score": 100,
+    "status": "PASS"
+  },
+  "fixtures": {
+    "cases": 67,
+    "status": "PASS"
+  },
+  "manualUat": {
+    "status": "WAIVED",
+    "waiver": {
+      "authorizedBy": "user",
+      "authorizedAt": "2026-10-26",
+      "reason": "Explicit release authorization without native Manual UAT"
+    },
+    "adapters": {
+      "codex": {
+        "status": "NOT_RUN",
+        "router": "NOT_RUN",
+        "overridePrecedence": "NOT_RUN",
+        "restart": "NOT_RUN"
+      },
+      "antigravity": {
+        "status": "NOT_RUN",
+        "router": "NOT_RUN",
+        "overridePrecedence": "NOT_RUN",
+        "restart": "NOT_RUN"
+      }
+    }
+  },
+  "schemaVersion": 2,
+  "status": "PASS",
+  "syntax": {
+    "files": 9,
+    "status": "PASS"
+  }
+}

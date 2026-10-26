@@ -1,9 +1,9 @@
 {
   "schemaVersion": 2,
   "packageName": "WSR-Core",
-  "version": "1.7",
-  "buildId": "WSR-CORE-1.7-RELEASE",
-  "manifestSha256": "a6e9524236b1d832ff2e40f31c8dc92c2c7fb63362f277fe9962c0285480b8a4",
+  "version": "1.8",
+  "buildId": "WSR-CORE-1.8-RELEASE",
+  "manifestSha256": "74217f2883bbbf2f1b47f1e849935f510d3b88ec124c583b42462f1c611400d7",
   "commandMap": {
     "goal": {
       "workflow": "global_workflows/goal.md",
@@ -14,7 +14,7 @@
     },
     "audit": {
       "workflow": "global_workflows/audit.md",
-      "description": "Run deterministic integrity, structure, minimality, dependency, resource, and IDE audits",
+      "description": "Run deterministic WSR audit",
       "readOnly": true,
       "approvalRequired": false,
       "requiredProfile": "command",
@@ -22,10 +22,17 @@
     },
     "br": {
       "workflow": "global_workflows/br.md",
-      "description": "Trigger brainstorm mode for discussions",
+      "description": "Discuss read-only",
       "readOnly": true,
       "approvalRequired": false,
       "requiredProfile": "command"
+    },
+    "diag": {
+      "workflow": "global_workflows/diag.md",
+      "description": "Prove root cause",
+      "readOnly": true,
+      "approvalRequired": false,
+      "requiredProfile": "task"
     },
     "gr": {
       "workflow": "global_workflows/gr.md",
@@ -36,21 +43,21 @@
     },
     "grd": {
       "workflow": "global_workflows/grd.md",
-      "description": "Grill decisions with approval-gated docs",
+      "description": "Grill; gate documentation writes",
       "readOnly": false,
       "approvalRequired": true,
       "requiredProfile": "task"
     },
     "pl": {
       "workflow": "global_workflows/pl.md",
-      "description": "Trigger planning workflow and create planning file",
+      "description": "Create or continue a plan",
       "readOnly": true,
       "approvalRequired": false,
       "requiredProfile": "command"
     },
     "clean": {
       "workflow": "global_workflows/clean.md",
-      "description": "Scan and remove temporary/unwanted files",
+      "description": "Remove approved temporary files",
       "readOnly": false,
       "approvalRequired": true,
       "requiredProfile": "command",
@@ -58,7 +65,7 @@
     },
     "reload": {
       "workflow": "global_workflows/reload.md",
-      "description": "Verify a released WSR source and emit a read-only reload receipt",
+      "description": "Verify source and emit reload receipt",
       "readOnly": true,
       "approvalRequired": false,
       "requiredProfile": "command",
@@ -66,7 +73,7 @@
     },
     "commit": {
       "workflow": "global_workflows/commit.md",
-      "description": "Intentional exception: commit all changes; push origin/main",
+      "description": "Commit all; push origin/main",
       "readOnly": false,
       "approvalRequired": false,
       "requiredProfile": "command",
@@ -74,11 +81,25 @@
     },
     "sync": {
       "workflow": "global_workflows/sync.md",
-      "description": "Approval-gated configuration sync",
+      "description": "Sync configuration after approval",
       "readOnly": false,
       "approvalRequired": true,
       "requiredProfile": "command",
       "entrypoint": "scripts/sync_config.py"
+    },
+    "tdd": {
+      "workflow": "global_workflows/tdd.md",
+      "description": "Approval-gated red-green-refactor",
+      "readOnly": false,
+      "approvalRequired": true,
+      "requiredProfile": "task"
+    },
+    "verify": {
+      "workflow": "global_workflows/verify.md",
+      "description": "Evidence gate before completion",
+      "readOnly": true,
+      "approvalRequired": false,
+      "requiredProfile": "task"
     },
     "ho": {
       "workflow": "global_workflows/ho.md",
@@ -118,6 +139,36 @@
       "trigger": "review, code review, wsr-review",
       "path": "skills/wsr-review/SKILL.md",
       "contentHash": "ed5ed1169db58d062914f2f3be6d5e1395921bc06107de00bd0d371158600376",
+      "scope": "global",
+      "priority": 10
+    },
+    {
+      "capabilityId": "wsr-diagnose",
+      "name": "WSR Diagnose",
+      "description": "Evidence-first root-cause diagnosis before corrective changes",
+      "trigger": "/diag, diagnose, debug, root cause, failing test",
+      "path": "skills/wsr-diagnose/SKILL.md",
+      "contentHash": "63cb208646812028d3d052d7f3413452a096d4a72f76fac61337c1744977a797",
+      "scope": "global",
+      "priority": 10
+    },
+    {
+      "capabilityId": "wsr-verify",
+      "name": "WSR Verify",
+      "description": "Fresh evidence gate for completion and correctness claims",
+      "trigger": "/verify, verify, validate completion, prove fix",
+      "path": "skills/wsr-verify/SKILL.md",
+      "contentHash": "e6193b8b6f0f9aacab89ba37ab8dbe374e1bc454e91095a2618a975b34faea2d",
+      "scope": "global",
+      "priority": 10
+    },
+    {
+      "capabilityId": "wsr-tdd",
+      "name": "WSR TDD",
+      "description": "Approval-gated red-green-refactor implementation discipline",
+      "trigger": "/tdd, tdd, test first, red green refactor",
+      "path": "skills/wsr-tdd/SKILL.md",
+      "contentHash": "97c70bb81dae64368d2ad60452d81ea86c4cc6dff3fb686d6c95956771523693",
       "scope": "global",
       "priority": 10
     },

@@ -1,4 +1,4 @@
-# AG Global Rules — WSR Core 1.7 RELEASE
+# AG Global Rules — WSR Core 1.8 REVIEW
 
 Canonical source: [GEMINI.md](../GEMINI.md). This file is a loader mirror.
 

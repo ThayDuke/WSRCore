@@ -1,6 +1,16 @@
 # WSR Core Changelog
 
+## [1.8] - 2026-10-26
+- Released the quality-skill hardening as WSR-Core 1.8.
+- Added `/diag`, `/verify`, and approval-gated `/tdd` workflows and JIT skills.
+- Added an explicit, auditable Manual UAT waiver without falsifying native test results.
+- Preserved WSR 1.0.8 approval semantics, layered loading, and adapter boundaries.
+- Released official WSR-Core 1.8 package (`WSR-CORE-1.8-RELEASE`).
+
 ## [1.7] - 2026-09-14
+- Added `/diag`, `/verify`, and approval-gated `/tdd` workflows.
+- Added JIT skills `wsr-diagnose`, `wsr-verify`, and `wsr-tdd`.
+- Adapted the three quality disciplines from `obra/superpowers` commit `2ce8aa15d05bd57213e6f746f953aafb7ded7a8b`.
 - Added native Manual UAT as a mandatory RELEASE packaging gate.
 - Consolidated overlapping frontend skills into one profile-based core skill.
 - Kept legacy frontend skill aliases without loading duplicate policy.

@@ -97,13 +97,11 @@ def validate_manual_uat(package_root, manifest):
     with open(evidence_path, "r", encoding="utf-8") as stream:
         evidence = json.load(stream)
     uat = evidence.get("manualUat", {})
-    if evidence.get("buildId") != manifest.get("buildId") or uat.get("status") != "PASS":
-        raise ValueError("Released packaging requires PASS native Manual UAT evidence")
-    for adapter in ("codex", "antigravity"):
-        result = uat.get("adapters", {}).get(adapter, {})
-        required = ("router", "overridePrecedence", "restart")
-        if result.get("status") != "PASS" or any(result.get(key) != "PASS" for key in required):
-            raise ValueError("Manual UAT evidence is incomplete for {0}".format(adapter))
+    if evidence.get("buildId") != manifest.get("buildId"):
+        raise ValueError("Released packaging requires matching Manual UAT evidence")
+    valid, detail = wsr_common.validate_manual_uat_record(uat)
+    if not valid:
+        raise ValueError(detail)
 
 def verify_zip_archive(zip_filepath, manifest, checksums):
     """Open built ZIP in read-only mode and verify entries and checksums."""

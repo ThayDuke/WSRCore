@@ -368,10 +368,18 @@ def _evidence_contract_ok(package_root, manifest):
             return False, "active evidence is not declared in manifest"
         active = load_json(wsr_common.safe_resolve_path(package_root, active_relative))
         required = {"schemaVersion", "buildId", "status", "audit", "doctor", "fixtures", "conformanceCases", "syntax", "adapters"}
-        if set(active) != required or active.get("schemaVersion") != 2:
+        allowed = required | {"manualUat"}
+        if not required.issubset(active) or not set(active).issubset(allowed) or active.get("schemaVersion") != 2:
             return False, "active evidence must use the exact v2 result contract"
         if active.get("buildId") != manifest.get("buildId") or active.get("status") != "PASS":
             return False, "active evidence identity/status mismatch"
+        manual_uat = active.get("manualUat")
+        if manifest.get("status") == "Released" and not isinstance(manual_uat, dict):
+            return False, "released evidence requires native Manual UAT"
+        if manual_uat is not None:
+            manual_ok, manual_detail = wsr_common.validate_manual_uat_record(manual_uat, PRIMARY_ADAPTERS)
+            if not manual_ok:
+                return False, manual_detail
         if not isinstance(active.get("conformanceCases"), int) or active.get("conformanceCases") < 1:
             return False, "evidence conformance case count is incomplete"
         doctor = active.get("doctor", {})

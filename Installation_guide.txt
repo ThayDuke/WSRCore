@@ -1,4 +1,4 @@
-WSR Core 1.7 RELEASE
+WSR Core 1.8 REVIEW
 
 1. Chạy Doctor strict và Deep Audit trong thư mục package.
 2. Dry-run adapter vào sandbox.
@@ -11,7 +11,19 @@ WSR Core 1.7 RELEASE
 9. /gr chạy read-only; /grd chỉ ghi glossary hoặc ADR sau approval chính xác.
 10. Codex đồng bộ cả AGENTS.md và GEMINI.md từ cùng release.
 11. Nếu AGENTS.override.md che router, sync dừng; xóa file hoặc chỉ giữ loader tối thiểu được hỗ trợ.
-12. Packaging RELEASE yêu cầu Manual UAT native PASS cho Codex và Antigravity.
+12. Packaging RELEASE yêu cầu Manual UAT native PASS hoặc waiver minh bạch, được phê duyệt rõ ràng.
 13. Sandbox conformance không thay thế Manual UAT native.
 14. Frontend dùng skill lõi và chọn profile phù hợp; alias cũ chỉ giữ tương thích.
 15. /commit là ngoại lệ có chủ đích, chỉ commit mọi thay đổi và push origin/main.
+
+MANUAL UAT NATIVE CHECKLIST
+
+Chạy riêng trên Codex và Antigravity sau khi đồng bộ đúng build RELEASE.
+
+1. Router: mở phiên IDE mới và xác nhận đúng buildId cùng manifest hash.
+2. Override precedence: xác nhận project rule thắng policy thấp hơn và override lỗi bị chặn.
+3. Restart: xác nhận router đổi yêu cầu phiên mới, rồi nhận đúng policy sau khởi động lại.
+4. Chỉ ghi PASS khi cả ba kiểm tra có bằng chứng quan sát trực tiếp.
+5. Nếu chạy UAT, ghi status, router, overridePrecedence, restart đều PASS.
+6. Nếu waiver, ghi WAIVED, người duyệt, ngày, lý do; mọi kiểm tra phải là NOT_RUN.
+7. Chạy lại Doctor strict, Deep Audit, conformance và packager.

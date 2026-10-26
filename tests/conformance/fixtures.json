@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "buildId": "WSR-CORE-1.7-RELEASE",
+  "buildId": "WSR-CORE-1.8-RELEASE",
   "contextTelemetry": {
     "everyResponse": true,
     "cases": [
@@ -97,6 +97,28 @@
       "global_skills/wsr-grilling/references/context-format.md",
       "global_skills/wsr-grilling/references/adr-format.md"
     ]
+  },
+  "qualitySkills": {
+    "commands": {
+      "diag": {
+        "capability": "wsr-diagnose",
+        "readOnly": true,
+        "approvalRequired": false,
+        "requiredProfile": "task"
+      },
+      "verify": {
+        "capability": "wsr-verify",
+        "readOnly": true,
+        "approvalRequired": false,
+        "requiredProfile": "task"
+      },
+      "tdd": {
+        "capability": "wsr-tdd",
+        "readOnly": false,
+        "approvalRequired": true,
+        "requiredProfile": "task"
+      }
+    }
   },
   "negative": [
     "duplicate-rule-id",

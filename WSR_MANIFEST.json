@@ -1,10 +1,10 @@
 {
   "schemaVersion": 2,
   "packageName": "WSR-Core",
-  "version": "1.7",
-  "buildId": "WSR-CORE-1.7-RELEASE",
+  "version": "1.8",
+  "buildId": "WSR-CORE-1.8-RELEASE",
   "status": "Released",
-  "createdAt": "2026-09-14T00:00:00+07:00",
+  "createdAt": "2026-10-26T00:00:00+07:00",
   "canonicalLayout": ".agents",
   "compatibilityLayouts": [
     ".agents",
@@ -36,7 +36,8 @@
     "Thumbs.db",
     "memory/",
     "metadata.json",
-    "DOCS/"
+    "DOCS/",
+    "WSRCore-Extensions.rar"
   ],
   "adapters": [
     "adapters/codex.json",
@@ -198,6 +199,21 @@
       "encoding": "UTF-8"
     },
     {
+      "id": "workflow-diag",
+      "source": "global_workflows/diag.md",
+      "type": "workflow",
+      "required": true,
+      "mutable": false,
+      "deploy": true,
+      "targets": [
+        "codex",
+        "gemini",
+        "antigravity"
+      ],
+      "owner": "Workflow Engineer",
+      "encoding": "UTF-8"
+    },
+    {
       "id": "workflow-gr",
       "source": "global_workflows/gr.md",
       "type": "workflow",
@@ -333,6 +349,36 @@
       "encoding": "UTF-8"
     },
     {
+      "id": "workflow-tdd",
+      "source": "global_workflows/tdd.md",
+      "type": "workflow",
+      "required": true,
+      "mutable": false,
+      "deploy": true,
+      "targets": [
+        "codex",
+        "gemini",
+        "antigravity"
+      ],
+      "owner": "Workflow Engineer",
+      "encoding": "UTF-8"
+    },
+    {
+      "id": "workflow-verify",
+      "source": "global_workflows/verify.md",
+      "type": "workflow",
+      "required": true,
+      "mutable": false,
+      "deploy": true,
+      "targets": [
+        "codex",
+        "gemini",
+        "antigravity"
+      ],
+      "owner": "Workflow Engineer",
+      "encoding": "UTF-8"
+    },
+    {
       "id": "skill-wsr-audit",
       "source": "skills/wsr-audit/SKILL.md",
       "type": "skill",
@@ -365,6 +411,51 @@
     {
       "id": "skill-wsr-review",
       "source": "skills/wsr-review/SKILL.md",
+      "type": "skill",
+      "required": true,
+      "mutable": false,
+      "deploy": true,
+      "targets": [
+        "codex",
+        "gemini",
+        "antigravity"
+      ],
+      "owner": "Workflow Engineer",
+      "encoding": "UTF-8"
+    },
+    {
+      "id": "skill-wsr-diagnose",
+      "source": "skills/wsr-diagnose/SKILL.md",
+      "type": "skill",
+      "required": true,
+      "mutable": false,
+      "deploy": true,
+      "targets": [
+        "codex",
+        "gemini",
+        "antigravity"
+      ],
+      "owner": "Workflow Engineer",
+      "encoding": "UTF-8"
+    },
+    {
+      "id": "skill-wsr-verify",
+      "source": "skills/wsr-verify/SKILL.md",
+      "type": "skill",
+      "required": true,
+      "mutable": false,
+      "deploy": true,
+      "targets": [
+        "codex",
+        "gemini",
+        "antigravity"
+      ],
+      "owner": "Workflow Engineer",
+      "encoding": "UTF-8"
+    },
+    {
+      "id": "skill-wsr-tdd",
+      "source": "skills/wsr-tdd/SKILL.md",
       "type": "skill",
       "required": true,
       "mutable": false,
@@ -1091,6 +1182,28 @@
     {
       "id": "conformance-evidence-run-20260914-1-7-release",
       "source": "evidence/cross-ide-conformance/20260914_WSR-CORE-1.7-RELEASE/result.json",
+      "type": "evidence",
+      "required": true,
+      "mutable": true,
+      "deploy": false,
+      "targets": [],
+      "owner": "QA Engineer",
+      "encoding": "UTF-8"
+    },
+    {
+      "id": "conformance-evidence-run-20261026-1-8-review",
+      "source": "evidence/cross-ide-conformance/20261026_WSR-CORE-1.8-REVIEW/result.json",
+      "type": "evidence",
+      "required": true,
+      "mutable": true,
+      "deploy": false,
+      "targets": [],
+      "owner": "QA Engineer",
+      "encoding": "UTF-8"
+    },
+    {
+      "id": "conformance-evidence-run-20261026-1-8-release",
+      "source": "evidence/cross-ide-conformance/20261026_WSR-CORE-1.8-RELEASE/result.json",
       "type": "evidence",
       "required": true,
       "mutable": true,

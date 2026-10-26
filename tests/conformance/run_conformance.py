@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import ast
 import contextlib
+import copy
 import io
 import json
 import os
@@ -43,8 +44,10 @@ def run(package_root: Path) -> dict:
     goal_cases = _run_goal_contract(package_root, fixtures, manifest, wsr_common, wsr_doctor)
     telemetry_cases = _run_context_telemetry(fixtures, wsr_common)
     grilling_cases = _run_grilling_contract(package_root, fixtures, manifest, wsr_reload)
+    quality_skill_cases = _run_quality_skill_contract(package_root, fixtures, manifest, wsr_reload)
     override_cases = _run_codex_override_contract(package_root, fixtures, manifest, sync_config)
     cli_cases = _run_cli_contract(package_root, manifest, pack_wsr, wsr_audit, wsr_reload)
+    manual_uat_cases = _run_manual_uat_contract(package_root, manifest, pack_wsr, wsr_doctor)
     approval_cases = 0
     for prompt in fixtures.get("approval", {}).get("approved", []):
         if not wsr_common.is_explicit_approval(prompt):
@@ -76,7 +79,7 @@ def run(package_root: Path) -> dict:
             adapters[adapter_name] = {"status": "PASS", "operations": len(plan), "runtimeDoctor": "PASS"}
     cases = (len(fixtures.get("profiles", {})) + len(fixtures.get("adapters", {}))
              + len(fixtures.get("negative", [])) + goal_cases + approval_cases)
-    cases += telemetry_cases + grilling_cases + override_cases + cli_cases
+    cases += telemetry_cases + grilling_cases + quality_skill_cases + override_cases + cli_cases + manual_uat_cases
     findings = audit.get("findings", [])
     severities = {str(item.get("severity", "")).upper() for item in findings if isinstance(item, dict)}
     counts = {level: sum(1 for item in findings if isinstance(item, dict) and str(item.get("severity", "")).upper() == level)
@@ -231,6 +234,36 @@ def _run_grilling_contract(package_root, fixtures, manifest, wsr_reload):
     return cases
 
 
+def _run_quality_skill_contract(package_root, fixtures, manifest, wsr_reload):
+    """Verify the three WSR quality commands load exactly their selected skill."""
+    quality = fixtures.get("qualitySkills", {})
+    context = json.loads((package_root / "WSR_CONTEXT.json").read_text(encoding="utf-8"))
+    declared = {item.get("source") for item in manifest.get("artifacts", [])}
+    indexed = {item.get("capabilityId"): item for item in context.get("skillIndex", [])}
+    cases = 0
+
+    for command, expected in quality.get("commands", {}).items():
+        capability = expected.get("capability")
+        skill = indexed.get(capability)
+        if not skill or skill.get("path") not in declared:
+            raise RuntimeError("WSR quality capability is not declared: {0}".format(capability))
+        actual = context.get("commandMap", {}).get(command)
+        contract = {key: value for key, value in expected.items() if key != "capability"}
+        if not actual or any(actual.get(key) != value for key, value in contract.items()):
+            raise RuntimeError("WSR quality command contract failed: {0}".format(command))
+        plan = wsr_reload.build_load_plan(
+            str(package_root), manifest, "codex", "task",
+            command_name=command, capability_ids=[capability],
+        )
+        roles = [item.get("role") for item in plan]
+        if roles != ["kernel", "command_index", "workflow", "skill"]:
+            raise RuntimeError("WSR quality JIT load plan failed: {0}".format(command))
+        if plan[-1].get("capabilityOwner") != capability:
+            raise RuntimeError("WSR quality skill owner is invalid: {0}".format(command))
+        cases += 1
+    return cases
+
+
 def _run_codex_override_contract(package_root, fixtures, manifest, sync_config):
     """Reject shadowing Codex overrides while accepting explicit delegation."""
     fixture = fixtures.get("codexOverride", {})
@@ -298,13 +331,10 @@ def _run_cli_contract(package_root, manifest, pack_wsr, wsr_audit, wsr_reload):
     report = wsr_audit.audit(single, "deep", False, None, "high")
     if report["coverage"]["auditedFiles"] != 1 or report["doctor"]["ran"]:
         raise RuntimeError("Single-file audit contract failed")
-    try:
+    if manifest.get("status") == "Released":
         pack_wsr.validate_manual_uat(str(package_root), manifest)
-    except ValueError as error:
-        if "Manual UAT" not in str(error):
-            raise RuntimeError("Manual UAT rejection returned the wrong failure") from error
     else:
-        raise RuntimeError("Released packaging accepted missing Manual UAT evidence")
+        pack_wsr.validate_manual_uat(str(package_root), manifest)
     args = argparse.Namespace(fetch_remote=True, approval_token=None)
     try:
         wsr_reload.validate_fetch_authorization(args, manifest.get("buildId"))
@@ -314,6 +344,102 @@ def _run_cli_contract(package_root, manifest, pack_wsr, wsr_audit, wsr_reload):
         raise RuntimeError("Remote fetch accepted without build approval token")
     args.approval_token = manifest.get("buildId")
     wsr_reload.validate_fetch_authorization(args, manifest.get("buildId"))
+    return 6
+
+
+def _run_manual_uat_contract(package_root, manifest, pack_wsr, wsr_doctor):
+    """Allow validated native Manual UAT evidence in the active result contract."""
+    evidence_index = json.loads(
+        (package_root / "evidence" / "cross-ide-conformance" / "index.json").read_text(encoding="utf-8")
+    )
+    source = json.loads(
+        (package_root / evidence_index["activeRun"]).read_text(encoding="utf-8")
+    )
+    manual_uat = {
+        "status": "PASS",
+        "adapters": {
+            name: {
+                "status": "PASS",
+                "router": "PASS",
+                "overridePrecedence": "PASS",
+                "restart": "PASS",
+            }
+            for name in ("codex", "antigravity")
+        },
+    }
+    with tempfile.TemporaryDirectory(prefix="wsr-manual-uat-") as temp:
+        root = Path(temp)
+        evidence_relative = "evidence/cross-ide-conformance/manual-uat/result.json"
+        evidence_path = root / evidence_relative
+        evidence_path.parent.mkdir(parents=True)
+        released = copy.deepcopy(manifest)
+        released["status"] = "Released"
+        released["artifacts"] = [{"type": "evidence", "source": evidence_relative}]
+        source.pop("manualUat", None)
+        evidence_path.write_text(json.dumps(source), encoding="utf-8")
+        index_path = root / "evidence" / "cross-ide-conformance" / "index.json"
+        index_path.write_text(json.dumps({
+            "schemaVersion": 2,
+            "activeRun": evidence_relative,
+            "primaryAdapters": ["codex", "antigravity"],
+        }), encoding="utf-8")
+        valid, _ = wsr_doctor._evidence_contract_ok(str(root), released)
+        if valid:
+            raise RuntimeError("Released evidence accepted missing Manual UAT")
+        try:
+            pack_wsr.validate_manual_uat(str(root), released)
+        except ValueError:
+            pass
+        else:
+            raise RuntimeError("Packager accepted missing Manual UAT evidence")
+
+        source["manualUat"] = manual_uat
+        evidence_path.write_text(json.dumps(source), encoding="utf-8")
+        valid, detail = wsr_doctor._evidence_contract_ok(str(root), released)
+        if not valid:
+            raise RuntimeError("Valid Manual UAT evidence was rejected: {0}".format(detail))
+        pack_wsr.validate_manual_uat(str(root), released)
+
+        source["manualUat"]["adapters"]["antigravity"].pop("restart")
+        evidence_path.write_text(json.dumps(source), encoding="utf-8")
+        valid, _ = wsr_doctor._evidence_contract_ok(str(root), released)
+        if valid:
+            raise RuntimeError("Incomplete Manual UAT evidence was accepted")
+        try:
+            pack_wsr.validate_manual_uat(str(root), released)
+        except ValueError:
+            pass
+        else:
+            raise RuntimeError("Packager accepted incomplete Manual UAT evidence")
+
+        source["manualUat"] = {
+            "status": "WAIVED",
+            "waiver": {
+                "authorizedBy": "user",
+                "authorizedAt": "2026-10-26",
+                "reason": "Explicit release authorization without native Manual UAT",
+            },
+            "adapters": {
+                name: {
+                    "status": "NOT_RUN",
+                    "router": "NOT_RUN",
+                    "overridePrecedence": "NOT_RUN",
+                    "restart": "NOT_RUN",
+                }
+                for name in ("codex", "antigravity")
+            },
+        }
+        evidence_path.write_text(json.dumps(source), encoding="utf-8")
+        valid, detail = wsr_doctor._evidence_contract_ok(str(root), released)
+        if not valid:
+            raise RuntimeError("Valid Manual UAT waiver was rejected: {0}".format(detail))
+        pack_wsr.validate_manual_uat(str(root), released)
+
+        source["manualUat"]["waiver"].pop("reason")
+        evidence_path.write_text(json.dumps(source), encoding="utf-8")
+        valid, _ = wsr_doctor._evidence_contract_ok(str(root), released)
+        if valid:
+            raise RuntimeError("Incomplete Manual UAT waiver was accepted")
     return 6
 
 

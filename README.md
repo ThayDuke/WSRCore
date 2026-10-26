@@ -1,6 +1,8 @@
-# WSR Core 1.7 RELEASE
+# WSR Core 1.8 REVIEW
 
-WSR Core 1.7 bổ sung `/gr`, `/grd` và global skill `wsr-grilling`.
+WSR Core 1.8 bổ sung `/gr`, `/grd` và global skill `wsr-grilling`.
+
+Ba quality workflow JIT: `/diag`, `/verify`, và `/tdd`.
 
 Hai workflow dùng chung engine, giữ JIT L2 và approval semantics của WSR.
 
@@ -52,7 +54,7 @@ python scripts/sync_config.py --adapter antigravity --target-root <sandbox>
 
 Apply RELEASE cần `--apply` và approval token đúng build. Không có force-sync.
 
-Packaging RELEASE yêu cầu Manual UAT native PASS cho Codex và Antigravity.
+Packaging RELEASE yêu cầu Manual UAT native PASS hoặc waiver minh bạch, được phê duyệt rõ ràng.
 Sandbox conformance không thay thế Manual UAT.
 
 Frontend design dùng một skill lõi với profile `standard`, `existing-project`, `premium`, `motion`.
