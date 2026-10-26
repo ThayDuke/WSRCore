@@ -17,8 +17,13 @@ Làm rõ một ý tưởng, quyết định hoặc thiết kế bằng phỏng v
 
 - Tự tra cứu dữ kiện có thể lấy từ môi trường.
 - Dựng cây quyết định và giải quyết tiền đề trước.
-- Mỗi lượt hỏi đúng một câu.
-- Mỗi câu luôn kèm phương án khuyến nghị.
+- Mỗi lượt hỏi đúng một câu duy nhất.
+- Trình bày các lựa chọn chuẩn hóa theo mẫu:
+  1. Lựa chọn A... (khuyến nghị).
+  2. Lựa chọn B...
+  3. Lựa chọn C...
+  Nếu chọn B thì...
+  Nếu chọn C thì...
 - Báo ngắn quyết định đã chốt và frontier còn mở.
 - Kết thúc khi frontier rỗng và hai bên đã hiểu thống nhất.
 - Đề nghị `/pl` nếu người dùng muốn chuyển kết quả thành kế hoạch.

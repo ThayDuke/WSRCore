@@ -178,7 +178,7 @@
       "description": "Decision-tree interview engine for /gr and /grd",
       "trigger": "/gr, /grd, grill me, stress-test decision",
       "path": "global_skills/wsr-grilling/SKILL.md",
-      "contentHash": "498d10a2de0b2f80b210b984c50a5a43e469afa79ce0615968eca3a4069bb487",
+      "contentHash": "0e0520a6eb6b5cd47655f7dafd05a84406c3fc7a12a704090d1394d3907079be",
       "references": [
         "global_skills/wsr-grilling/references/domain-modeling.md",
         "global_skills/wsr-grilling/references/context-format.md",

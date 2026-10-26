@@ -30,7 +30,12 @@ Mode `docs` đọc:
 - Dựng cây gồm quyết định, tiền đề và nhánh phụ thuộc.
 - Frontier chỉ chứa nhánh có tiền đề đã chốt.
 - Hỏi đúng một câu mỗi lượt.
-- Luôn kèm phương án khuyến nghị và tác động chính.
+- Trình bày lựa chọn theo chuẩn:
+  1. Lựa chọn A... (khuyến nghị).
+  2. Lựa chọn B...
+  3. Lựa chọn C...
+  Nếu chọn B thì...
+  Nếu chọn C thì...
 - Người dùng quyết định; agent tự tìm dữ kiện.
 - Dùng công cụ read-only trước khi hỏi dữ kiện có thể kiểm chứng.
 - Câu trả lời mới có thể mở hoặc đóng nhánh.

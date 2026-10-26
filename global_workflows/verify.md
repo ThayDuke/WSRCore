@@ -1,21 +1,34 @@
 ---
-description: Verify claims with fresh commands and evidence before declaring completion
+description: Evidence gate before completion
 ---
 
 # /verify
 
-Verify the current task, fix, build, or release claim.
+Kiểm chứng tuyên bố hoàn thành, sửa lỗi, build hoặc phát hành bằng bằng chứng tươi.
 
-## State
+## Trạng thái
 
-- Remain read-only for source files.
-- Load capability `wsr-verify` with profile `task`.
-- Run the complete relevant checks freshly.
-- Do not fix discovered failures without separate approval.
+- Giữ nguyên trạng thái read-only đối với mã nguồn.
+- Nạp capability `wsr-verify` theo profile `task`.
+- Chạy lại các lệnh kiểm tra mới nhất, cấm đoán mò theo luật `VERIFY-01`.
+- Không tự ý sửa lỗi phát hiện được khi chưa có phê duyệt mới.
 
-## Result
+## Hợp đồng bằng chứng
 
-- Map each claim to its proving evidence.
-- Report passed, failed, skipped, and unverified criteria.
-- Declare completion only when every required criterion is proven.
+- Bắt buộc lập bảng đối soát bằng chứng gồm 4 cột:
+  - Tiêu chí kiểm tra.
+  - Lệnh thực thi thực tế.
+  - Đầu ra / Bằng chứng quan sát được.
+  - Trạng thái: PASS hoặc FAIL.
+- Chỉ tuyên bố hoàn tất khi 100% tiêu chí bắt buộc đạt PASS.
+- Chuyển tiếp: Khi pass toàn bộ, đề xuất `/commit` hoặc `/audit`.
 
+## Định dạng
+
+- Dùng tiếng Việt Caveman, tối đa 20 từ mỗi dòng.
+- Dùng đúng bốn khối alert của `GEMINI.md`.
+- `[KẾT_QUẢ]` dùng `> [!TIP]`; `[PHƯƠNG_PHÁP]` dùng `> [!NOTE]`.
+- `[RỦI_RO]` dùng `> [!WARNING]`; `[DÒNG_CHỐT]` dùng `> [!IMPORTANT]`.
+- DISCUSSION chốt `> [!IMPORTANT]\n> XIN VUI LÒNG PHÊ DUYỆT`.
+- Nghiệm thu thành công chốt `> [!IMPORTANT]\n> ĐÃ HOÀN THÀNH NHIỆM VỤ`.
+- Dòng context luôn nằm cuối phản hồi.

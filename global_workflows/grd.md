@@ -21,7 +21,7 @@ Làm rõ thiết kế trong codebase và chuẩn bị glossary hoặc ADR có ki
 - Chạy engine grilling với mode `docs`.
 - Nạp reference domain chỉ khi mode này hoạt động.
 - Đối chiếu thuật ngữ với code và tài liệu hiện hữu.
-- Mỗi lượt hỏi đúng một câu và kèm khuyến nghị.
+- Mỗi lượt hỏi đúng một câu theo chuẩn lựa chọn như `/gr`.
 - Giữ glossary delta và ADR candidates trong hội thoại.
 - Khi frontier rỗng, trình bày toàn bộ target và nội dung dự kiến.
 - Chờ approval hiện tại trước khi ghi.
