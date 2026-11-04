@@ -1,3 +1,8 @@
+---
+name: dec-dev-operator
+description: Tập hợp tri thức kỹ thuật và vận hành chuyên sâu của dự án DEC, bao gồm kiến trúc, Minimal Coding Protocol và quy chuẩn UTF-8.
+---
+
 # HỆ THỐNG KỸ NĂNG AGENT (SKILL.md)
 *Tập hợp tri thức kỹ thuật và vận hành chuyên sâu của dự án DEC*
 

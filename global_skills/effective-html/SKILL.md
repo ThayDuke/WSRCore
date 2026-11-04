@@ -1,3 +1,8 @@
+---
+name: effective-html
+description: Kỹ năng tạo artifact HTML trực quan, báo cáo tự chứa (htmls), sơ đồ kiến trúc SVG (htmld), và kế hoạch hành động (htmlp).
+---
+
 # KỸ NĂNG TẠO ARTIFACT HTML TRỰC QUAN (effective-html)
 
 ---

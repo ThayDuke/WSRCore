@@ -103,7 +103,7 @@
     },
     "ho": {
       "workflow": "global_workflows/ho.md",
-      "description": "Alias /pl \u1edf ch\u1ebf \u0111\u1ed9 handoff",
+      "description": "Alias /pl ở chế độ handoff",
       "readOnly": true,
       "approvalRequired": false,
       "requiredProfile": "command",
@@ -193,7 +193,7 @@
       "description": "DEC System development operator skill",
       "trigger": "dec, dev operator, dec system",
       "path": "global_skills/dec-dev-operator/SKILL.md",
-      "contentHash": "6d87eec72822088e732ef96566fcd4487763a2587f4f8e1e78b6c3edf4d18ccb",
+      "contentHash": "85f5e2181097c3bba50c0fc25941b4ea9831eea608d3d8491f6042d410c3609f",
       "references": [
         "global_skills/dec-dev-operator/references/DEC_UI_skill.md"
       ],
@@ -206,7 +206,7 @@
       "description": "HTML layout and design standards",
       "trigger": "html, UI, layout",
       "path": "global_skills/effective-html/SKILL.md",
-      "contentHash": "5cf76935ece32d44ffd4788f3ce95ce1813a3fa090acc9e65c2e9e2c2de42bbf",
+      "contentHash": "1729a8a949e96b8e59ba2dea85df72100236cbed3cb482e74bba67eb5a303419",
       "scope": "global",
       "priority": 5
     },
@@ -320,7 +320,7 @@
   },
   "contextTelemetry": {
     "reportEveryResponse": true,
-    "lineFormat": "[Context: ~X% | Tr\u1ea1ng th\u00e1i: ...]",
+    "lineFormat": "[Context: ~X% | Trạng thái: ...]",
     "measurementPriority": [
       "native",
       "estimate"

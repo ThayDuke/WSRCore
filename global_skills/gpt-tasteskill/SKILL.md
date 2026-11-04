@@ -1,3 +1,8 @@
+---
+name: gpt-tasteskill
+description: Compatibility alias for frontend-design with motion profile.
+---
+
 # Compatibility Alias
 
 This legacy skill is retained for existing references.

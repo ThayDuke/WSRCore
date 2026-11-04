@@ -1,3 +1,8 @@
+---
+name: taste-skill-v1
+description: Compatibility alias for frontend-design with standard profile.
+---
+
 # Compatibility Alias
 
 This legacy skill is retained for backward compatibility.

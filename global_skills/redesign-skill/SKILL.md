@@ -1,3 +1,8 @@
+---
+name: redesign-skill
+description: Compatibility alias for frontend-design with existing-project profile.
+---
+
 # Compatibility Alias
 
 This legacy skill is retained for existing references.
