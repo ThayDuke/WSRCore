@@ -1,4 +1,4 @@
-# WSR Core 1.8 REVIEW
+# WSR Core 1.8 RELEASE
 
 WSR Core 1.8 bổ sung `/gr`, `/grd` và global skill `wsr-grilling`.
 
